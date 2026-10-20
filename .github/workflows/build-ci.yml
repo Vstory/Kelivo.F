@@ -1,0 +1,375 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# CI 滚动发布：任意分支 push 即出包（debug + release），发进固定 tag ci 的同一个滚动页。
+#   母版：知识库 100_System/templates/build-ci.workflow.yml（规程：GitHub域/CI滚动发布页流程.md）
+#   本项目（Flutter）对母版有四处改写：
+#     ① 构建环境换成 Flutter 3.47.6 + JDK 17（母版是 Gradle + JDK 21 + Android SDK 直装）
+#     ② 版本号：versionName 来自 pubspec.yaml，versionCode 由 CI 运行序号生成；
+#        Flutter 的 --build-name 只收数字点分版本，塞不进 `+ci-<变体>.<短号>`，
+#        改由 ci-fork-identity.py 就地让 Gradle 从环境变量取这两个值（只改工作区）
+#     ③ 产物定位：Flutter 的 apk 在 build/app/outputs/flutter-apk/，文件名按 ABI 与变体拼
+#     ④ fork 身份：只错开包名 / 显示名（Flutter 无内核态命名空间可撞），改写脚本
+#        scripts/ci-fork-identity.py 只动 runner 工作区，仓库源码与上游逐字一致
+# ══════════════════════════════════════════════════════════════════════════════
+name: Build · CI
+
+run-name: "Build · CI · ${{ github.ref_name }}"
+
+on:
+  push:
+    # ⚠️ 必须显式写 branches：只写 paths-ignore 时标签推送也会触发
+    branches: ['**']
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docs/**'
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: '构建变体（push 触发时用 PUSH_VARIANT）'
+        type: choice
+        options:
+          - debug
+          - release
+          - both
+        default: both
+        required: true
+
+permissions:
+  contents: write   # 发布 Release 需要写权限
+
+env:
+  # ════════════════════════ PROJECT-CUSTOM-BEGIN ════════════════════════
+  # 前缀 / 显示名 / 门禁同源：改 label 一处即全变。它进 APK 文件名与下载 URL，
+  # 只允许 A-Za-z0-9._-（ci-fork-identity.py 对 --label 有断言）
+  FORK_LABEL: Kelivo.F
+  # fork 包名：与上游 com.psyche.kelivo 并存安装，互不影响数据目录
+  EXPECT_PACKAGE: com.psyche.kelivo.fork
+  # namespace 没被动过（改它会让 Manifest 里的 .MainActivity 解析到不存在的类）
+  EXPECT_ACTIVITY: com.psyche.kelivo.MainActivity
+  EXPECT_ABI: arm64-v8a
+  # tokens/Signing/Vstory.jks（别名 Vstory）的 SHA-256，去冒号大写
+  EXPECTED_CERT_SHA256: '8D1B6022D3E3BB837A3BA1870E0EEAC8650F9470B8287EDF549DACEC9E9E2A64'
+  # versionCode = 基数 + 运行序号。5000 远高于上游当前的 80（pubspec），且不随提交数倒退
+  CI_VERSION_CODE_BASE: '5000'
+  CI_TAG: ci
+  CI_TITLE: CI Build
+  KEEP_GROUPS: '6'
+  REFRESH_SCRIPT: scripts/ci-refresh-page.sh
+  FLUTTER_VERSION: '3.47.6'
+  JAVA_VERSION: '17'
+  # push 触发时出 debug + release：debug 排障日志最全，release 验证正式构建形态
+  PUSH_VARIANT: both
+  # ═════════════════════════ PROJECT-CUSTOM-END ═════════════════════════
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GIT_CONFIG_COUNT: '1'
+      GIT_CONFIG_KEY_0: init.defaultBranch
+      GIT_CONFIG_VALUE_0: main
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      # 只改工作区，不入库：包名落进仓库会让每次 rebase 上游都撞冲突。
+      # ⚠️ 改的是 applicationId（最终包名），不动 namespace —— R 类与 .MainActivity 都跟 namespace 走。
+      - name: Apply fork identity (workspace only, not committed)
+        run: python3 scripts/ci-fork-identity.py --app-id "$EXPECT_PACKAGE" --label "$FORK_LABEL"
+
+      - name: Compute build info
+        id: info
+        run: |
+          echo "short=${GITHUB_SHA:0:8}" >> "$GITHUB_OUTPUT"
+          echo "ts=$(TZ=Asia/Shanghai date +%Y%m%d-%H%M)" >> "$GITHUB_OUTPUT"
+
+      # 产物名只在这里算一次：重命名 / 正文表格 / 清理正则三处都引用它，漏改一处就是静默错。
+      # 命名：<前缀>_<版本>.<code>_<时间>_ci-<变体>_<短号>.apk
+      - name: Resolve APK name
+        id: target
+        env:
+          TS: ${{ steps.info.outputs.ts }}
+          SHORT: ${{ steps.info.outputs.short }}
+          WANT: ${{ inputs.variant }}
+        run: |
+          set -euo pipefail
+          VER="$(sed -nE 's/^version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' pubspec.yaml | head -1)"
+          CODE="$(( CI_VERSION_CODE_BASE + GITHUB_RUN_NUMBER ))"
+          if [ "$CODE" -gt 2100000000 ]; then
+            echo "::error::versionCode=$CODE 超过 2100000000 —— 查 CI_VERSION_CODE_BASE 是不是被改大了"
+            exit 1
+          fi
+          if [ -z "$VER" ]; then
+            echo "::error::读不到 pubspec.yaml 的 version"
+            exit 1
+          fi
+
+          case "${WANT:-$PUSH_VARIANT}" in
+            debug|release) VLIST="${WANT:-$PUSH_VARIANT}" ;;
+            both)          VLIST="debug release" ;;
+            *) echo "::error::非法变体：${WANT}"; exit 1 ;;
+          esac
+
+          {
+            echo "tag=${CI_TAG}"
+            echo "name=${CI_TITLE}"
+            echo "prerelease=true"
+            echo "make_latest=false"
+            echo "variants=${VLIST}"
+            echo "variant_tag=$(printf '%s' "$VLIST" | tr ' ' '-')"
+          } >> "$GITHUB_OUTPUT"
+          for kv in "VER=$VER" "CODE=$CODE" "VARIANT_LIST=$VLIST" "SHORT=$SHORT"; do
+            echo "${kv}" >> "$GITHUB_ENV"
+          done
+
+          for v in $VLIST; do
+            N="${FORK_LABEL}_${VER}.${CODE}_${TS}_ci-${v}_${SHORT}.apk"
+            echo "APKNAME_$(printf '%s' "$v" | tr '[:lower:]' '[:upper:]')=${N}" >> "$GITHUB_ENV"
+            echo "产物名（${v}）：${N}"
+          done
+
+      # 上游把 SiliconFlow 兜底 key 放在被 gitignore 的 lib/secrets/fallback.dart 里，
+      # 不生成这个文件就编译不过；secret 缺失时写空串。
+      - name: Inject fallback
+        env:
+          SILICONFLOW_KEY: ${{ secrets.SILICONFLOW_KEY }}
+        run: |
+          mkdir -p lib/secrets
+          cat > lib/secrets/fallback.dart <<EOF
+          const String siliconflowFallbackKey = '${SILICONFLOW_KEY}';
+          EOF
+
+      # 签名：固定钥 tokens/Signing/Vstory.jks（各项目共用）。缺 secret 直接失败，
+      # 不回退 debug 签名 —— 「构建成功、签名不对」要等覆盖安装时才暴露。
+      - name: Prepare signing (fixed key from secrets)
+        env:
+          KEY_BASE64: ${{ secrets.KEY_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          missing=""
+          for v in KEY_BASE64 STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            [ -n "${!v}" ] || missing="$missing $v"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::缺少签名 secret:$missing —— 拒绝回退（那会让产物无法覆盖升级）"
+            exit 1
+          fi
+
+          printf '%s' "$KEY_BASE64" | base64 -d > android/app/key.jks
+          keytool -list -keystore android/app/key.jks -storepass:env STORE_PASSWORD -alias "$KEY_ALIAS" >/dev/null 2>&1 \
+            || { echo "::error::密钥库打不开或别名不存在 —— 核对 KEY_BASE64 / SIGNING_STORE_PASSWORD / SIGNING_KEY_ALIAS"; exit 1; }
+          echo "已校验：密钥库可打开、别名存在"
+
+          {
+            printf 'storeFile=key.jks\n'
+            printf 'storePassword=%s\n' "$STORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$KEY_PASSWORD"
+          } > android/key.properties
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      # 每个变体单独构建：versionName 是 defaultConfig 级的，无法在 Gradle 里按变体区分，
+      # 只能每轮换一个环境变量再编。版本号取值见 ci-fork-identity.py 的改写项。
+      - name: Flutter build
+        run: |
+          set -euo pipefail
+          for v in $VARIANT_LIST; do
+            echo "════ 构建 $v"
+            CI_VERSION_NAME="${VER}+ci-${v}.${SHORT}" \
+            CI_VERSION_CODE="$CODE" \
+              flutter build apk --"$v" --split-per-abi --target-platform android-arm64
+          done
+          ls -la build/app/outputs/flutter-apk/ || true
+
+      - name: Rename APK and assert naming rule
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          shopt -s nullglob
+          for v in $VARIANT_LIST; do
+            APKS=(build/app/outputs/flutter-apk/app-*-"$v".apk)
+            [ "${#APKS[@]}" -eq 1 ] \
+              || { echo "::error::$v 应恰好 1 个 apk，实际 ${#APKS[@]} 个（${APKS[*]:-空}）"; exit 1; }
+            var="APKNAME_$(printf '%s' "$v" | tr '[:lower:]' '[:upper:]')"
+            cp -- "${APKS[0]}" "dist/${!var}"
+            echo "产物: dist/${!var} ← ${APKS[0]}"
+          done
+
+          # ⚠️ 与 scripts/ci-refresh-page.sh 的 NAME_RE 同源，改命名规则必须两处同改
+          RE='^[A-Za-z0-9._-]+_[0-9]{8}-[0-9]{4}_ci-(debug|release)_[0-9a-f]{8}\.apk$'
+          apks=(dist/*.apk)
+          want=$(wc -w <<< "$VARIANT_LIST")
+          [ "${#apks[@]}" -eq "$want" ] || { echo "::error::应产出 $want 个包，实际 ${#apks[@]} 个"; exit 1; }
+          for f in "${apks[@]}"; do
+            B="$(basename "$f")"
+            printf '%s' "$B" | grep -qE "$RE" \
+              || { echo "::error::产物名与规则不符（或含空格/括号等 URL 不友好字符）: $B"; exit 1; }
+            case "$B" in
+              "${FORK_LABEL}_"*) ;;
+              *) echo "::error::产物名前缀不是 ${FORK_LABEL}: $B"; exit 1 ;;
+            esac
+          done
+          echo "✅ 命名自检通过"
+          ls -la dist
+
+      # 断言产物真的可用：包名 / 显示名 / 启动类 / 单 ABI / 变体 / 版本号 / 签名指纹。
+      # 全是静默失败模式（包照样装，只是身份或签名不对），必须做成门禁。
+      - name: Verify APK (package + variant + abi + signature)
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          APKSIGNER="$(command -v apksigner || true)"
+          [ -n "$APKSIGNER" ] || APKSIGNER="$(ls -d "$SDK"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1)"
+          [ -n "$APKSIGNER" ] || { echo "::error::找不到 apksigner，无法断言签名 —— 拒绝发布"; exit 1; }
+          AAPT2="$(ls -d "$SDK"/build-tools/*/aapt2 2>/dev/null | sort -V | tail -1)"
+          [ -n "$AAPT2" ] || { echo "::error::找不到 aapt2（用于读版本与 debuggable 标志）"; exit 1; }
+
+          for APK in dist/*.apk; do
+            NAME="$(basename "$APK")"
+            case "$NAME" in
+              *_ci-debug_*.apk)   VAR=debug ;;
+              *_ci-release_*.apk) VAR=release ;;
+              *) echo "::error::$NAME 无法从文件名判定变体"; exit 1 ;;
+            esac
+            echo "════ 校验 $NAME（$VAR）"
+
+            BADGING="$("$AAPT2" dump badging "$APK" 2>/dev/null || true)"
+            PKG_LINE="$(printf '%s' "$BADGING" | grep -m1 "^package:" || true)"
+            [ -n "$PKG_LINE" ] || { echo "::error::$NAME 读不到 badging 的 package 行"; exit 1; }
+
+            printf '%s' "$PKG_LINE" | grep -Fq "name='${EXPECT_PACKAGE}'" \
+              || { echo "::error::$NAME 包名不是 ${EXPECT_PACKAGE}：$PKG_LINE"; exit 1; }
+            LABEL_LINE="$(printf '%s' "$BADGING" | grep -m1 "^application-label:" || true)"
+            printf '%s' "$LABEL_LINE" | grep -Fq "'${FORK_LABEL}'" \
+              || { echo "::error::$NAME 显示名不是 ${FORK_LABEL}：${LABEL_LINE:-未读到}"; exit 1; }
+            printf '%s' "$BADGING" | grep -Fq "launchable-activity: name='${EXPECT_ACTIVITY}'" \
+              || { echo "::error::$NAME 启动类不是 ${EXPECT_ACTIVITY} —— namespace 是否被改过？"; exit 1; }
+            echo "  ✅ 包名 ${EXPECT_PACKAGE} / 显示名 ${FORK_LABEL} / 启动类 ${EXPECT_ACTIVITY}"
+
+            NC="$(printf '%s' "$BADGING" | grep -m1 "^native-code:" || true)"
+            [ "$NC" = "native-code: '${EXPECT_ABI}'" ] \
+              || { echo "::error::$NAME 的 native-code 不是单一 ${EXPECT_ABI}：${NC:-未读到}"; exit 1; }
+            echo "  ✅ 单 ABI：${EXPECT_ABI}"
+
+            EXPECT_VN="${VER}+ci-${VAR}.${SHORT}"
+            printf '%s' "$PKG_LINE" | grep -q "versionCode='${CODE}'" \
+              || { echo "::error::$NAME 的 versionCode 与 CI 生成值不符（期望 ${CODE}）：$PKG_LINE"; exit 1; }
+            printf '%s' "$PKG_LINE" | grep -Fq "versionName='${EXPECT_VN}'" \
+              || { echo "::error::$NAME 的 versionName 与 CI 生成值不符（期望 ${EXPECT_VN}）：$PKG_LINE"; exit 1; }
+            echo "  ✅ 版本号：${EXPECT_VN}(${CODE})"
+
+            DBG="$(printf '%s' "$BADGING" | grep -c "^application-debuggable" || true)"
+            if [ "$VAR" = debug ]; then
+              [ "$DBG" -ge 1 ] || { echo "::error::$NAME 名为 debug 但 badging 无 application-debuggable"; exit 1; }
+              echo "  ✅ debug 变体（application-debuggable）"
+            else
+              [ "$DBG" -eq 0 ] || { echo "::error::$NAME 名为 release 但 badging 含 application-debuggable"; exit 1; }
+              echo "  ✅ release 变体（非 debuggable）"
+            fi
+
+            OUT="$("$APKSIGNER" verify --print-certs "$APK" 2>&1 || true)"
+            if printf '%s' "$OUT" | grep -qi 'DOES NOT VERIFY\|Missing.*signature\|no signature'; then
+              echo "::error::$NAME 未通过签名校验 —— 拒绝发布"
+              printf '%s\n' "$OUT"
+              exit 1
+            fi
+            DIGEST="$(printf '%s' "$OUT" | sed -nE 's/^.*certificate SHA-256 digest: ([0-9a-fA-F]+).*$/\1/p' | head -1)"
+            [ -n "$DIGEST" ] || { echo "::error::$NAME 读不到签名证书指纹"; printf '%s\n' "$OUT"; exit 1; }
+            ACTUAL="$(printf '%s' "$DIGEST" | tr -d ':' | tr 'a-f' 'A-F')"
+            if [ "$ACTUAL" != "$EXPECTED_CERT_SHA256" ]; then
+              echo "::error::$NAME 签名指纹与固定密钥不符 —— 拒绝发布（多半是 secrets 没配好）"
+              echo "  期望: $EXPECTED_CERT_SHA256"
+              echo "  实际: $ACTUAL"
+              exit 1
+            fi
+            echo "  ✅ 签名有效，指纹与固定密钥一致：$ACTUAL"
+
+            # ⚠️ 带 --min-sdk-version 24：verify 默认按 manifest 的 minSdk 判定，minSdk ≥ 28 时
+            #    apksig 视 v2 为冗余、跳过上报 ⇒ 会误报 v2: false。
+            VERBOSE="$("$APKSIGNER" verify --verbose --min-sdk-version 24 "$APK" 2>&1 || true)"
+            printf '%s' "$VERBOSE" | grep -qE "Verified using v2 scheme.*: true" \
+              || { echo "::error::$NAME 未启用 v2 签名方案 —— 拒绝发布"; printf '%s\n' "$VERBOSE"; exit 1; }
+            echo "  ✅ 签名方案含 v2"
+          done
+
+      # 发布到固定 tag 的同一页。无并发锁下的写入安全靠三点：幂等创建、资产名天然唯一、
+      # 正文由 Refresh 全量重建（本步不写正文）。
+      # ⚠️ 不要给 asset 写 label：GitHub 会用 label 顶替文件名显示。
+      - name: Publish to ci release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_TAG: ${{ steps.target.outputs.tag }}
+          REL_NAME: ${{ steps.target.outputs.name }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          : > /tmp/empty-notes.md
+          for i in 1 2 3 4 5; do
+            gh release view "$TARGET_TAG" >/dev/null 2>&1 && break
+            gh release create "$TARGET_TAG" \
+              --title "$REL_NAME" --prerelease --latest=false \
+              --notes-file /tmp/empty-notes.md >/dev/null 2>&1 || true
+          done
+          gh release view "$TARGET_TAG" >/dev/null 2>&1 \
+            || { echo "::error::$TARGET_TAG 页不存在且创建失败"; exit 1; }
+
+          gh release upload "$TARGET_TAG" dist/*.apk --clobber >/dev/null
+          echo "已上传：$(ls dist/*.apk | tr '\n' ' ')"
+
+          gh api --paginate -H "Accept: application/vnd.github+json" \
+            "repos/${REPO}/releases/tags/${TARGET_TAG}" \
+            --jq '.assets[] | select((.label // "") != "") | (.id | tostring)' \
+          | while read -r id; do
+              [ -n "$id" ] || continue
+              gh api -X PATCH -H "Accept: application/vnd.github+json" \
+                "repos/${REPO}/releases/assets/${id}" -f label="" >/dev/null 2>&1 || true
+            done
+
+      # artifact 名必须带 run_number：upload-artifact 拒绝同名 artifact，
+      # 「同一 commit、同一分钟内重复触发」会让 ts 与短号都相同。
+      - name: Upload artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ env.FORK_LABEL }}-${{ steps.target.outputs.variant_tag }}-${{ steps.info.outputs.ts }}-${{ steps.info.outputs.short }}-${{ github.run_number }}
+          path: dist/*.apk
+          if-no-files-found: error
+
+      # 正文全量重建 + 清理共用同一份 API 快照 ⇒「表格列出的组」与「实际保留的组」必然一致。
+      - name: Refresh ci page body + cleanup
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          SERVER: ${{ github.server_url }}
+          PREFIX: ${{ env.FORK_LABEL }}
+        run: |
+          set -euo pipefail
+          chmod +x "$REFRESH_SCRIPT"
+          FOOTER_EXTRA="$(
+            echo "- 各包共用同一把固定钥（v2 签名），debug 与 release 可互相覆盖安装。"
+            echo "- debug 包调试日志最全，排障优先用它；release 包与正式版同构建类型，可用来验证 R8/minify 规则。"
+            echo "- 产物为单 ABI \`${EXPECT_ABI}\`（Flutter abi splits，非通用包）：装包前确认设备架构。"
+            echo "- 包名/显示名是 fork 的（\`${EXPECT_PACKAGE}\` / ${FORK_LABEL}）：可与上游原版并存安装、互不影响数据目录。"
+          )" \
+          "$REFRESH_SCRIPT"

@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""CI 专用：把 runner 工作区改写成 fork 身份，仓库源码一行都不落库。
+
+fork 包与上游原版要能同时安装、同时运行，包名与显示名必须错开。改写只作用于 CI 的
+工作区 —— 包名一旦落进仓库，每次 rebase 上游都要撞冲突。逐项校验「期望的原文还在」，
+上游改了写法就整体失败，不允许静默漏改。
+
+用法：
+    python3 scripts/ci-fork-identity.py --app-id com.psyche.kelivo.fork --label Kelivo.F
+    python3 scripts/ci-fork-identity.py --dry-run
+"""
+
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+GRADLE = "android/app/build.gradle.kts"
+MANIFEST = "android/app/src/main/AndroidManifest.xml"
+
+DEFAULT_APP_ID = "com.psyche.kelivo.fork"
+DEFAULT_LABEL = "Kelivo.F"
+
+
+def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
+    return [
+        (GRADLE, 'applicationId = "com.psyche.kelivo"', f'applicationId = "{app_id}"', 1),
+        (MANIFEST, 'android:label="Kelivo"', f'android:label="{label}"', 1),
+        # Flutter 的 --build-name 只收数字点分版本，塞不进 +ci-<变体>.<短号>；改成从环境变量
+        # 取 versionName/versionCode，CI 才能照 Mishka 的命名规则写构建元数据。
+        (
+            GRADLE,
+            "        versionCode = flutter.versionCode",
+            '        versionCode = System.getenv("CI_VERSION_CODE")?.toIntOrNull() ?: flutter.versionCode',
+            1,
+        ),
+        (
+            GRADLE,
+            "        versionName = flutter.versionName",
+            '        versionName = System.getenv("CI_VERSION_NAME") ?: flutter.versionName',
+            1,
+        ),
+        # debug 也签固定钥：否则 debug 包是 runner 上的随机 debug 证书，指纹门禁与实际都不对。
+        (
+            GRADLE,
+            '    buildTypes {\n        getByName("release") {',
+            '    buildTypes {\n        getByName("debug") {\n'
+            "            if (keystorePropertiesFile.exists()) {\n"
+            '                signingConfig = signingConfigs.getByName("release")\n'
+            "            }\n"
+            "        }\n"
+            '        getByName("release") {',
+            1,
+        ),
+        # 只编 arm64-v8a：三个 ABI 会白编两份用不上的原生库。
+        (
+            GRADLE,
+            'abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64")',
+            'abiFilters += listOf("arm64-v8a")',
+            1,
+        ),
+    ]
+
+
+FORBIDDEN = [
+    'applicationId = "com.psyche.kelivo"',
+    'android:label="Kelivo"',
+    "versionCode = flutter.versionCode",
+    "versionName = flutter.versionName",
+]
+
+
+def scan_forbidden() -> list[str]:
+    hits: list[str] = []
+    for rel in (GRADLE, MANIFEST):
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        for lineno, line in enumerate(text.splitlines(), 1):
+            for needle in FORBIDDEN:
+                if needle in line:
+                    hits.append(f"{rel}:{lineno}: {needle}")
+    return hits
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--app-id", default=DEFAULT_APP_ID)
+    parser.add_argument("--label", default=DEFAULT_LABEL)
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args()
+
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", args.label):
+        print(
+            f"::error::--label 只允许 A-Za-z0-9._-（它进 APK 文件名与下载 URL）：{args.label!r}",
+            file=sys.stderr,
+        )
+        return 1
+
+    edits = build_edits(args.app_id, args.label)
+    problems: list[str] = []
+    for rel, old, new, want in edits:
+        path = REPO_ROOT / rel
+        if not path.is_file():
+            problems.append(f"{rel}: 文件不存在")
+            continue
+        got = path.read_text(encoding="utf-8").count(old)
+        if got != want:
+            problems.append(f"{rel}: 期望 {want} 处、实际 {got} 处: {old}")
+
+    if problems:
+        print("::error::fork 身份改写的前置校验未通过：", file=sys.stderr)
+        for p in problems:
+            print(f"  - {p}", file=sys.stderr)
+        return 1
+
+    if args.dry_run:
+        for rel, old, new, _ in edits:
+            print(f"[dry-run] {rel}\n    - {old}\n    + {new}")
+        return 0
+
+    for rel, old, new, _ in edits:
+        path = REPO_ROOT / rel
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(old, new), encoding="utf-8"
+        )
+        print(f"  {rel}: 已改写")
+
+    hits = scan_forbidden()
+    if hits:
+        print("::error::改写后仍残留上游身份：", file=sys.stderr)
+        for h in hits:
+            print(f"  - {h}", file=sys.stderr)
+        return 1
+
+    print(f"已改写为 fork 身份：appId={args.app_id} label={args.label}（仅工作区，不入库）")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
