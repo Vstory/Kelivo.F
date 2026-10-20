@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # refresh_ci_page.sh — CI 滚动发布页刷新器（跨语言共享模板）
-# TEMPLATE_VERSION=1.0.2    # 模板版本号（模板内容变更时 bump；勿删）
+# TEMPLATE_VERSION=1.0.3    # 模板版本号（模板内容变更时 bump；勿删）
 #
 # 作用：把固定 tag 的 Release 正文重建为「最近 N 组构建」的表格，并删除被淘汰的旧资产。
 #       与语言无关：任何「push 即出包、产物追加进同一页」的项目都能用。
