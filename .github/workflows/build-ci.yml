@@ -215,14 +215,9 @@ jobs:
           # 与 CI 生成的 versionCode 对不上；只出一个 ABI，splits 本就没有意义。
           for v in $VARIANT_LIST; do
             echo "════ 构建 $v"
-            # release 必须关 R8：Flutter 3.4x 的 release 默认开 minify，而 shared_preferences_android
-            # 2.5.x 改用 Pigeon JNI 却没带 keep 规则，R8 会把 kotlin.coroutines.Continuation
-            # 改名（实测 o4.c），Dart 侧按原签名查 JNI 方法就 NoSuchMethodError —— 启动即崩。
-            shrink=""
-            if [ "$v" = "release" ]; then shrink="--no-shrink"; fi
             CI_VERSION_NAME="${VER}+ci-${v}.${SHORT}" \
             CI_VERSION_CODE="$CODE" \
-              flutter build apk --"$v" $shrink --target-platform android-arm64
+              flutter build apk --"$v" --target-platform android-arm64
           done
           ls -la build/app/outputs/flutter-apk/ || true
 

@@ -20,6 +20,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GRADLE = "android/app/build.gradle.kts"
 MANIFEST = "android/app/src/main/AndroidManifest.xml"
+PROGUARD = "android/app/proguard-rules.pro"
 
 DEFAULT_APP_ID = "com.psyche.kelivo.fork"
 DEFAULT_LABEL = "Kelivo.F"
@@ -53,6 +54,15 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
             "            }\n"
             "        }\n"
             '        getByName("release") {',
+            1,
+        ),
+        # release 的 R8 在 Flutter 里恒开（--no-shrink 已是空开关），它会改 JNI 签名里的类名；
+        # Pigeon JNI 按原签名查方法，Continuation 被改名就 NoSuchMethodError —— 启动即崩。
+        (
+            PROGUARD,
+            "-dontwarn com.tom_roush.pdfbox.filter.JPXFilter",
+            "-dontwarn com.tom_roush.pdfbox.filter.JPXFilter\n"
+            "-keepnames class kotlin.coroutines.Continuation",
             1,
         ),
         # 只编 arm64-v8a：三个 ABI 会白编两份用不上的原生库。
