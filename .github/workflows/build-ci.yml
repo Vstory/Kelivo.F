@@ -122,10 +122,14 @@ jobs:
       - name: Apply fork identity (workspace only, not committed)
         run: python3 scripts/ci-fork-identity.py --app-id "$EXPECT_PACKAGE" --label "$FORK_LABEL"
 
+      # 短号取被构建的那份代码（checkout 后的 HEAD），不是触发提交：指定 ref 构建时两者
+      # 不同，用触发提交的短号就看不出这一版到底是哪份源码。
       - name: Compute build info
         id: info
         run: |
-          echo "short=${GITHUB_SHA:0:8}" >> "$GITHUB_OUTPUT"
+          COMMIT="$(git rev-parse HEAD)"
+          echo "commit=${COMMIT}" >> "$GITHUB_OUTPUT"
+          echo "short=${COMMIT:0:8}" >> "$GITHUB_OUTPUT"
           echo "ts=$(TZ=Asia/Shanghai date +%Y%m%d-%H%M)" >> "$GITHUB_OUTPUT"
 
       # 产物名只在这里算一次：重命名 / 正文表格 / 清理正则三处都引用它，漏改一处就是静默错。
@@ -364,7 +368,7 @@ jobs:
             echo "tag $TAG 已存在 —— 按重跑处理"
             gh release edit "$TAG" --notes "$NOTES" --prerelease --latest=false >/dev/null
           else
-            gh release create "$TAG" --title "$TAG" --target "$GITHUB_SHA" \
+            gh release create "$TAG" --title "$TAG" --target "${{ steps.info.outputs.commit }}" \
               --prerelease --latest=false --notes "$NOTES" >/dev/null
           fi
           gh release upload "$TAG" dist/*.apk --clobber >/dev/null
