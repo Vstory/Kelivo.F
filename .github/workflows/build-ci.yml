@@ -80,13 +80,17 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
 
-      - name: Set up Flutter
-        # 仓库策略要求 action 一律钉到完整 commit SHA（v2 是移动 tag，不接受）
-        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
+      # 不用 subosito/flutter-action：它是复合 action，内部引用 actions/cache@v5（未钉 SHA），
+      # 本仓库「只认完整 SHA」的策略会连嵌套引用一起拦。直接下官方 SDK 包，行为可控。
+      - name: Install Flutter
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/flutter.tar.xz \
+            "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
+          tar xf /tmp/flutter.tar.xz -C "$HOME"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+          git config --global --add safe.directory "$HOME/flutter"
+          "$HOME/flutter/bin/flutter" --version
 
       # 只改工作区，不入库：包名落进仓库会让每次 rebase 上游都撞冲突。
       # ⚠️ 改的是 applicationId（最终包名），不动 namespace —— R 类与 .MainActivity 都跟 namespace 走。
