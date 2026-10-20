@@ -86,6 +86,23 @@ jobs:
           mkdir -p scripts
           git show origin/main:scripts/ci-fork-identity.py > scripts/ci-fork-identity.py
 
+      # 上游 v1.3.1 发版时（10-09）pub 解析到 shared_preferences_android 2.4.28；2.5.0 是
+      # 10-17 才发的，晚构建就会拿到 2.5.x —— 它的 Pigeon JNI 签名里的类名会被 R8 改名，
+      # 启动即 NoSuchMethodError。只改工作区，仓库源码保持与上游一致。
+      - name: Pin deps to upstream release build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, re
+          p = pathlib.Path('pubspec.yaml')
+          s = p.read_text()
+          out = re.sub(r'(?m)^dependency_overrides:\n',
+                       'dependency_overrides:\n  shared_preferences_android: 2.4.28\n', s, count=1)
+          assert out != s, 'pubspec.yaml 里找不到 dependency_overrides 块'
+          p.write_text(out)
+          PY
+          grep -A2 '^dependency_overrides:' pubspec.yaml
+
       - name: Set up JDK
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
@@ -355,10 +372,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.target.outputs.tag }}
           REPO: ${{ github.repository }}
+          COMMIT: ${{ steps.info.outputs.commit }}
         run: |
           set -euo pipefail
           NOTES="$(
-            echo "构建 \`${SHORT}\`（run ${GITHUB_RUN_NUMBER}），版本 ${VER}(${CODE})。"
+            echo "构建提交 [\`${SHORT}\`](https://github.com/${REPO}/commit/${COMMIT})　·　版本 ${VER}（versionCode ${CODE}）　·　变体 ${VARIANT_LIST}"
             echo
             echo "- 单 ABI \`${EXPECT_ABI}\`，包名 \`${EXPECT_PACKAGE}\` / 显示名 ${FORK_LABEL}：可与上游原版并存安装。"
             echo "- 各包共用同一把固定钥（v2 签名），debug 与 release 可互相覆盖安装。"
@@ -366,12 +384,13 @@ jobs:
           )"
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "tag $TAG 已存在 —— 按重跑处理"
-            gh release edit "$TAG" --notes "$NOTES" --prerelease --latest=false >/dev/null
+            gh release edit "$TAG" --notes "$NOTES" --prerelease --latest=false
           else
-            gh release create "$TAG" --title "$TAG" --target "${{ steps.info.outputs.commit }}" \
-              --prerelease --latest=false --notes "$NOTES" >/dev/null
+            jq -n --arg t "$TAG" --arg c "$COMMIT" --arg n "$NOTES" \
+              '{tag_name:$t, target_commitish:$c, name:$t, body:$n, prerelease:true}' \
+            | gh api -X POST "/repos/${REPO}/releases" --input -
           fi
-          gh release upload "$TAG" dist/*.apk --clobber >/dev/null
+          gh release upload "$TAG" dist/*.apk --clobber
           echo "已发布：https://github.com/${REPO}/releases/tag/${TAG}"
 
           gh api --paginate -H "Accept: application/vnd.github+json" \
