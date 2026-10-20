@@ -360,9 +360,11 @@ jobs:
             # ⚠️ 带 --min-sdk-version 24：verify 默认按 manifest 的 minSdk 判定，minSdk ≥ 28 时
             #    apksig 视 v2 为冗余、跳过上报 ⇒ 会误报 v2: false。
             VERBOSE="$("$APKSIGNER" verify --verbose --min-sdk-version 24 "$APK" 2>&1 || true)"
-            printf '%s' "$VERBOSE" | grep -qE "Verified using v2 scheme.*: true" \
-              || { echo "::error::$NAME 未启用 v2 签名方案 —— 拒绝发布"; printf '%s\n' "$VERBOSE"; exit 1; }
-            echo "  ✅ 签名方案含 v2"
+            for s in v2 v3; do
+              printf '%s' "$VERBOSE" | grep -qE "Verified using ${s} scheme.*: true" \
+                || { echo "::error::$NAME 未启用 ${s} 签名方案 —— 拒绝发布"; printf '%s\n' "$VERBOSE"; exit 1; }
+            done
+            echo "  ✅ 签名方案含 v2 + v3"
           done
 
       # 每次构建都发一个独立 tag 的预发布页（对齐 aria2.F）：同版本重跑走 edit + clobber 覆盖。
@@ -379,7 +381,7 @@ jobs:
             echo "构建提交 [\`${SHORT}\`](https://github.com/${REPO}/commit/${COMMIT})　·　版本 ${VER}（versionCode ${CODE}）　·　变体 ${VARIANT_LIST}"
             echo
             echo "- 单 ABI \`${EXPECT_ABI}\`，包名 \`${EXPECT_PACKAGE}\` / 显示名 ${FORK_LABEL}：可与上游原版并存安装。"
-            echo "- 各包共用同一把固定钥（v2 签名），debug 与 release 可互相覆盖安装。"
+            echo "- 各包共用同一把固定钥（v2 + v3 签名），debug 与 release 可互相覆盖安装。"
             echo "- debug 包调试日志最全，排障优先用它；release 包与正式版同构建类型。"
           )"
           if gh release view "$TAG" >/dev/null 2>&1; then
@@ -390,7 +392,13 @@ jobs:
               '{tag_name:$t, target_commitish:$c, name:$t, body:$n, prerelease:true}' \
             | gh api -X POST "/repos/${REPO}/releases" --input -
           fi
-          gh release upload "$TAG" dist/*.apk --clobber
+          # 资产按上传顺序展示：release 排 debug 前面。
+          APKS=()
+          for v in release debug; do
+            f=$(ls dist/*ci-${v}*.apk 2>/dev/null | head -1 || true)
+            [ -n "$f" ] && APKS+=("$f")
+          done
+          gh release upload "$TAG" "${APKS[@]}" --clobber
           echo "已发布：https://github.com/${REPO}/releases/tag/${TAG}"
 
           gh api --paginate -H "Accept: application/vnd.github+json" \

@@ -56,6 +56,15 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
             '        getByName("release") {',
             1,
         ),
+        # AGP 8.12 落盘时默认只签 v2，v3 要显式开；同一把钥匙，不影响与上游原版并存装。
+        (
+            GRADLE,
+            '        create("release") {\n            if (keystorePropertiesFile.exists()) {',
+            '        create("release") {\n'
+            "            enableV3Signing = true\n"
+            '            if (keystorePropertiesFile.exists()) {',
+            1,
+        ),
         # release 的 R8 在 Flutter 里恒开（--no-shrink 已是空开关），它会改 JNI 签名里的类名；
         # Pigeon JNI 按原签名查方法，Continuation 被改名就 NoSuchMethodError —— 启动即崩。
         (
