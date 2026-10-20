@@ -388,8 +388,8 @@ jobs:
           chmod +x "$REFRESH_SCRIPT"
           FOOTER_EXTRA="$(
             echo "- 各包共用同一把固定钥（v2 签名），debug 与 release 可互相覆盖安装。"
-            echo "- debug 包调试日志最全，排障优先用它；release 包与正式版同构建类型，可用来验证 R8/minify 规则。"
-            echo "- 产物为单 ABI \`${EXPECT_ABI}\`（Flutter abi splits，非通用包）：装包前确认设备架构。"
+            echo "- debug 包调试日志最全，排障优先用它；release 包与正式版同构建类型，可用来验证正式构建形态。"
+            echo "- 产物为单 ABI \`${EXPECT_ABI}\`（单 ABI 构建，非通用包）：装包前确认设备架构。"
             echo "- 包名/显示名是 fork 的（\`${EXPECT_PACKAGE}\` / ${FORK_LABEL}）：可与上游原版并存安装、互不影响数据目录。"
           )" \
           "$REFRESH_SCRIPT"
