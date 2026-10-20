@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# CI 滚动发布：任意分支 push 即出包（debug + release），发进固定 tag ci 的同一个滚动页。
+# CI 构建发布：任意分支 push 即出包（debug + release），每次构建发成一个独立 tag 的预发布页。
 #   母版：知识库 100_System/templates/build-ci.workflow.yml（规程：GitHub域/CI滚动发布页流程.md）
 #   本项目（Flutter）对母版有四处改写：
 #     ① 构建环境换成 Flutter 3.47.6 + JDK 17（母版是 Gradle + JDK 21 + Android SDK 直装）
@@ -34,6 +34,11 @@ on:
           - both
         default: both
         required: true
+      ref:
+        description: '要构建的提交/tag（留空则构建当前触发 ref）'
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: write   # 发布 Release 需要写权限
@@ -69,6 +74,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          ref: ${{ inputs.ref || github.sha }}
+
+      # 指定 ref 构建时（如复现上游发版时代的代码），那棵树里没有 fork 的改写脚本，
+      # 从 main 取一份备用，仍然只作用于 runner 工作区。
+      - name: Restore fork scripts
+        if: inputs.ref != ''
+        run: |
+          set -euo pipefail
+          git fetch -q origin main
+          mkdir -p scripts
+          git show origin/main:scripts/ci-fork-identity.py > scripts/ci-fork-identity.py
 
       - name: Set up JDK
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
