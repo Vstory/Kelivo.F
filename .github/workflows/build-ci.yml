@@ -177,9 +177,9 @@ jobs:
           esac
 
           {
-            # 每次构建一个独立 tag（对齐 aria2.F）：日期 + 短号，同版本重跑会命中同一个 tag
-            echo "tag=v${VER}-r${TS%%-*}.${SHORT}"
-            echo "name=v${VER}-r${TS%%-*}.${SHORT}"
+            # tag 名带时分：发布页列表按名字降序，短号是随机哈希，只带日期会让新构建沉到旧版下面。
+            echo "tag=v${VER}-r${TS}.${SHORT}"
+            echo "name=v${VER}-r${TS}.${SHORT}"
             echo "prerelease=true"
             echo "make_latest=false"
             echo "variants=${VLIST}"
@@ -398,7 +398,10 @@ jobs:
             f=$(ls dist/*ci-${v}*.apk 2>/dev/null | head -1 || true)
             [ -n "$f" ] && APKS+=("$f")
           done
-          gh release upload "$TAG" "${APKS[@]}" --clobber
+          for i in "${!APKS[@]}"; do
+            [ "$i" -gt 0 ] && sleep 2
+            gh release upload "$TAG" "${APKS[$i]}" --clobber
+          done
           echo "已发布：https://github.com/${REPO}/releases/tag/${TAG}"
 
           gh api --paginate -H "Accept: application/vnd.github+json" \
