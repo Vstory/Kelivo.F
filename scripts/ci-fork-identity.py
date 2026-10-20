@@ -62,6 +62,17 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
             'abiFilters += listOf("arm64-v8a")',
             1,
         ),
+        # --target-platform 只约束 Flutter 引擎，jniLibs 里三份 proot 仍会被打进包；
+        # 不排除它们，APK 的 native-code 就不是单 ABI。
+        (
+            GRADLE,
+            "        jniLibs {\n            useLegacyPackaging = true\n        }",
+            "        jniLibs {\n            useLegacyPackaging = true\n"
+            '            exclude("lib/armeabi-v7a/**")\n'
+            '            exclude("lib/x86_64/**")\n'
+            "        }",
+            1,
+        ),
     ]
 
 

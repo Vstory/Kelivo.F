@@ -92,6 +92,19 @@ jobs:
           git config --global --add safe.directory "$HOME/flutter"
           "$HOME/flutter/bin/flutter" --version
 
+      # 不能用 setup-java 的 cache: 'gradle' —— 它内部调 actions/cache@v5，会撞同一个
+      # 「只认完整 SHA」的策略拦截。缓存 Gradle 依赖与 pub 包：这两处才是构建耗时的大头。
+      - name: Cache Gradle and pub
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.pub-cache
+          key: ${{ runner.os }}-${{ env.FLUTTER_VERSION }}-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties', 'pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.FLUTTER_VERSION }}-
+
       # 只改工作区，不入库：包名落进仓库会让每次 rebase 上游都撞冲突。
       # ⚠️ 改的是 applicationId（最终包名），不动 namespace —— R 类与 .MainActivity 都跟 namespace 走。
       - name: Apply fork identity (workspace only, not committed)
