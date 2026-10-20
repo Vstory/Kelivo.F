@@ -52,10 +52,6 @@ env:
   EXPECTED_CERT_SHA256: '8D1B6022D3E3BB837A3BA1870E0EEAC8650F9470B8287EDF549DACEC9E9E2A64'
   # versionCode = 基数 + 运行序号。5000 远高于上游当前的 80（pubspec），且不随提交数倒退
   CI_VERSION_CODE_BASE: '5000'
-  CI_TAG: ci
-  CI_TITLE: CI Build
-  KEEP_GROUPS: '6'
-  REFRESH_SCRIPT: scripts/ci-refresh-page.sh
   FLUTTER_VERSION: '3.47.6'
   JAVA_VERSION: '17'
   # push 触发时出 debug + release：debug 排障日志最全，release 验证正式构建形态
@@ -144,8 +140,9 @@ jobs:
           esac
 
           {
-            echo "tag=${CI_TAG}"
-            echo "name=${CI_TITLE}"
+            # 每次构建一个独立 tag（对齐 aria2.F）：日期 + 短号，同版本重跑会命中同一个 tag
+            echo "tag=v${VER}-r${TS%%-*}.${SHORT}"
+            echo "name=v${VER}-r${TS%%-*}.${SHORT}"
             echo "prerelease=true"
             echo "make_latest=false"
             echo "variants=${VLIST}"
@@ -235,7 +232,6 @@ jobs:
             echo "产物: dist/${!var} ← ${APKS[0]}"
           done
 
-          # ⚠️ 与 scripts/ci-refresh-page.sh 的 NAME_RE 同源，改命名规则必须两处同改
           RE='^[A-Za-z0-9._-]+_[0-9]{8}-[0-9]{4}_ci-(debug|release)_[0-9a-f]{8}\.apk$'
           apks=(dist/*.apk)
           want=$(wc -w <<< "$VARIANT_LIST")
@@ -332,33 +328,34 @@ jobs:
             echo "  ✅ 签名方案含 v2"
           done
 
-      # 发布到固定 tag 的同一页。无并发锁下的写入安全靠三点：幂等创建、资产名天然唯一、
-      # 正文由 Refresh 全量重建（本步不写正文）。
+      # 每次构建都发一个独立 tag 的预发布页（对齐 aria2.F）：同版本重跑走 edit + clobber 覆盖。
       # ⚠️ 不要给 asset 写 label：GitHub 会用 label 顶替文件名显示。
-      - name: Publish to ci release
+      - name: Publish to release
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_TAG: ${{ steps.target.outputs.tag }}
-          REL_NAME: ${{ steps.target.outputs.name }}
+          TAG: ${{ steps.target.outputs.tag }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-
-          : > /tmp/empty-notes.md
-          for i in 1 2 3 4 5; do
-            gh release view "$TARGET_TAG" >/dev/null 2>&1 && break
-            gh release create "$TARGET_TAG" \
-              --title "$REL_NAME" --prerelease --latest=false \
-              --notes-file /tmp/empty-notes.md >/dev/null 2>&1 || true
-          done
-          gh release view "$TARGET_TAG" >/dev/null 2>&1 \
-            || { echo "::error::$TARGET_TAG 页不存在且创建失败"; exit 1; }
-
-          gh release upload "$TARGET_TAG" dist/*.apk --clobber >/dev/null
-          echo "已上传：$(ls dist/*.apk | tr '\n' ' ')"
+          NOTES="$(
+            echo "构建 \`${SHORT}\`（run ${GITHUB_RUN_NUMBER}），版本 ${VER}(${CODE})。"
+            echo
+            echo "- 单 ABI \`${EXPECT_ABI}\`，包名 \`${EXPECT_PACKAGE}\` / 显示名 ${FORK_LABEL}：可与上游原版并存安装。"
+            echo "- 各包共用同一把固定钥（v2 签名），debug 与 release 可互相覆盖安装。"
+            echo "- debug 包调试日志最全，排障优先用它；release 包与正式版同构建类型。"
+          )"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "tag $TAG 已存在 —— 按重跑处理"
+            gh release edit "$TAG" --notes "$NOTES" --prerelease --latest=false >/dev/null
+          else
+            gh release create "$TAG" --title "$TAG" --target "$GITHUB_SHA" \
+              --prerelease --latest=false --notes "$NOTES" >/dev/null
+          fi
+          gh release upload "$TAG" dist/*.apk --clobber >/dev/null
+          echo "已发布：https://github.com/${REPO}/releases/tag/${TAG}"
 
           gh api --paginate -H "Accept: application/vnd.github+json" \
-            "repos/${REPO}/releases/tags/${TARGET_TAG}" \
+            "repos/${REPO}/releases/tags/${TAG}" \
             --jq '.assets[] | select((.label // "") != "") | (.id | tostring)' \
           | while read -r id; do
               [ -n "$id" ] || continue
@@ -374,22 +371,3 @@ jobs:
           name: ${{ env.FORK_LABEL }}-${{ steps.target.outputs.variant_tag }}-${{ steps.info.outputs.ts }}-${{ steps.info.outputs.short }}-${{ github.run_number }}
           path: dist/*.apk
           if-no-files-found: error
-
-      # 正文全量重建 + 清理共用同一份 API 快照 ⇒「表格列出的组」与「实际保留的组」必然一致。
-      - name: Refresh ci page body + cleanup
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          RUN_ID: ${{ github.run_id }}
-          SERVER: ${{ github.server_url }}
-          PREFIX: ${{ env.FORK_LABEL }}
-        run: |
-          set -euo pipefail
-          chmod +x "$REFRESH_SCRIPT"
-          FOOTER_EXTRA="$(
-            echo "- 各包共用同一把固定钥（v2 签名），debug 与 release 可互相覆盖安装。"
-            echo "- debug 包调试日志最全，排障优先用它；release 包与正式版同构建类型，可用来验证正式构建形态。"
-            echo "- 产物为单 ABI \`${EXPECT_ABI}\`（单 ABI 构建，非通用包）：装包前确认设备架构。"
-            echo "- 包名/显示名是 fork 的（\`${EXPECT_PACKAGE}\` / ${FORK_LABEL}）：可与上游原版并存安装、互不影响数据目录。"
-          )" \
-          "$REFRESH_SCRIPT"
