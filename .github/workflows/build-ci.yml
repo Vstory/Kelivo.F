@@ -81,7 +81,8 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        # 仓库策略要求 action 一律钉到完整 commit SHA（v2 是移动 tag，不接受）
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
