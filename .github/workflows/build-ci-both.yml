@@ -10,9 +10,9 @@
 #     ④ fork 身份：只错开包名 / 显示名（Flutter 无内核态命名空间可撞），改写脚本
 #        scripts/ci-fork-identity.py 只动 runner 工作区，仓库源码与上游逐字一致
 # ══════════════════════════════════════════════════════════════════════════════
-name: Build · CI
+name: Build · CI Both
 
-run-name: "Build · CI · ${{ github.ref_name }}"
+run-name: "Build · CI Both · ${{ github.ref_name }}"
 
 on:
   push:
