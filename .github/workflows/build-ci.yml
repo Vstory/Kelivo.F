@@ -165,7 +165,7 @@ jobs:
           echo "ts=$(TZ=Asia/Shanghai date +%Y%m%d-%H%M)" >> "$GITHUB_OUTPUT"
 
       # 产物名只在这里算一次：重命名 / 正文表格 / 清理正则三处都引用它，漏改一处就是静默错。
-      # 命名：<前缀>_<版本>.<code>_<时间>_ci-<序号>-<变体>_<短号>.apk
+      # 命名：<前缀>_<版本>.<code>_<时间>_ci-<变体>_<短号>.apk
       - name: Resolve APK name
         id: target
         env:
@@ -190,11 +190,13 @@ jobs:
             *) echo "::error::PUSH_VARIANT 非法：$VLIST"; exit 1 ;;
           esac
 
+          # 年份压成两位：20261022-1512 → 261022-1512
+          STAMP="${TS:2:6}-${TS##*-}"
           {
             # 发布页按 tag 名比较（同一天的 commit 时间分不出先后），顺序即字符串降序：
-            # 年月日.时分 单调递增即可，故 TS 拆成 26yymmdd.hhmm 两段。
-            echo "tag=v${VER}-r${TS:2:6}.${TS##*-}.${SHORT}"
-            echo "name=v${VER}-r${TS:2:6}.${TS##*-}.${SHORT}"
+            # 年月日.时分 单调递增即可，故 STAMP 拆成 26yymmdd.hhmm 两段。
+            echo "tag=v${VER}-r${STAMP//-/.}.${SHORT}"
+            echo "name=v${VER}-r${STAMP//-/.}.${SHORT}"
             echo "prerelease=true"
             echo "make_latest=false"
             echo "variants=${VLIST}"
@@ -205,9 +207,7 @@ jobs:
           done
 
           for v in $VLIST; do
-            # assets 列表按文件名升序展示，序号让 release 排在 debug 前面
-            case "$v" in release) ORD=1 ;; debug) ORD=2 ;; *) ORD=9 ;; esac
-            N="${FORK_LABEL}_${VER}.${CODE}_${TS}_ci-${ORD}-${v}_${SHORT}.apk"
+            N="${FORK_LABEL}_${VER}.${CODE}_${STAMP}_ci-${v}_${SHORT}.apk"
             echo "APKNAME_$(printf '%s' "$v" | tr '[:lower:]' '[:upper:]')=${N}" >> "$GITHUB_ENV"
             echo "产物名（${v}）：${N}"
           done
@@ -286,7 +286,7 @@ jobs:
             echo "产物: dist/${!var} ← ${APKS[0]}"
           done
 
-          RE='^[A-Za-z0-9._-]+_[0-9]{8}-[0-9]{4}_ci-[0-9]-(debug|release)_[0-9a-f]{8}\.apk$'
+          RE='^[A-Za-z0-9._-]+_[0-9]{6}-[0-9]{4}_ci-(debug|release)_[0-9a-f]{8}\.apk$'
           apks=(dist/*.apk)
           want=$(wc -w <<< "$VARIANT_LIST")
           [ "${#apks[@]}" -eq "$want" ] || { echo "::error::应产出 $want 个包，实际 ${#apks[@]} 个"; exit 1; }
@@ -317,8 +317,8 @@ jobs:
           for APK in dist/*.apk; do
             NAME="$(basename "$APK")"
             case "$NAME" in
-              *_ci-*-debug_*.apk)   VAR=debug ;;
-              *_ci-*-release_*.apk) VAR=release ;;
+              *_ci-debug_*.apk)   VAR=debug ;;
+              *_ci-release_*.apk) VAR=release ;;
               *) echo "::error::$NAME 无法从文件名判定变体"; exit 1 ;;
             esac
             echo "════ 校验 $NAME（$VAR）"
@@ -412,7 +412,7 @@ jobs:
           # 资产按上传顺序展示：release 排 debug 前面。
           APKS=()
           for v in release debug; do
-            f=$(ls dist/*ci-*-${v}*.apk 2>/dev/null | head -1 || true)
+            f=$(ls dist/*ci-${v}*.apk 2>/dev/null | head -1 || true)
             [ -n "$f" ] && APKS+=("$f")
           done
           for i in "${!APKS[@]}"; do
