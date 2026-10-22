@@ -177,10 +177,10 @@ jobs:
           esac
 
           {
-            # 发布页按 tag 名比较（同一天的 commit 时间分不出先后）。时分要紧贴日期：
-            # 任何分隔符都小于 '.'，会把新 tag 排到旧 tag 后面。
-            echo "tag=v${VER}-r${TS//-/}.${SHORT}"
-            echo "name=v${VER}-r${TS//-/}.${SHORT}"
+            # 发布页按 tag 名比较（同一天的 commit 时间分不出先后），顺序即字符串降序：
+            # 年月日.时分 单调递增即可，故 TS 拆成 26yymmdd.hhmm 两段。
+            echo "tag=v${VER}-r${TS:2:6}.${TS##*-}.${SHORT}"
+            echo "name=v${VER}-r${TS:2:6}.${TS##*-}.${SHORT}"
             echo "prerelease=true"
             echo "make_latest=false"
             echo "variants=${VLIST}"
