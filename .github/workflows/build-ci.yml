@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# CI 构建发布：任意分支 push 即出包（debug + release），每次构建发成一个独立 tag 的预发布页。
+# CI 构建发布：任意分支 push 即出包（只出 release），每次构建发成一个独立 tag 的预发布页。
 #   母版：知识库 100_System/templates/build-ci.workflow.yml（规程：GitHub域/CI滚动发布页流程.md）
 #   本项目（Flutter）对母版有四处改写：
 #     ① 构建环境换成 Flutter 3.47.6 + JDK 17（母版是 Gradle + JDK 21 + Android SDK 直装）
@@ -10,9 +10,9 @@
 #     ④ fork 身份：只错开包名 / 显示名（Flutter 无内核态命名空间可撞），改写脚本
 #        scripts/ci-fork-identity.py 只动 runner 工作区，仓库源码与上游逐字一致
 # ══════════════════════════════════════════════════════════════════════════════
-name: Build · CI · Both
+name: Build · CI
 
-run-name: "Build · CI · Both · ${{ github.ref_name }}"
+run-name: "Build · CI · ${{ github.ref_name }}"
 
 on:
   push:
@@ -25,15 +25,6 @@ on:
       - 'docs/**'
   workflow_dispatch:
     inputs:
-      variant:
-        description: '构建变体（push 触发时用 PUSH_VARIANT）'
-        type: choice
-        options:
-          - debug
-          - release
-          - both
-        default: both
-        required: true
       ref:
         description: '要构建的提交/tag（留空则构建当前触发 ref）'
         type: string
@@ -60,7 +51,7 @@ env:
   FLUTTER_VERSION: '3.47.6'
   JAVA_VERSION: '17'
   # push 触发时出 debug + release：debug 排障日志最全，release 验证正式构建形态
-  PUSH_VARIANT: both
+  PUSH_VARIANT: release
   # ═════════════════════════ PROJECT-CUSTOM-END ═════════════════════════
 
 jobs:
@@ -156,7 +147,6 @@ jobs:
         env:
           TS: ${{ steps.info.outputs.ts }}
           SHORT: ${{ steps.info.outputs.short }}
-          WANT: ${{ inputs.variant }}
         run: |
           set -euo pipefail
           VER="$(sed -nE 's/^version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' pubspec.yaml | head -1)"
@@ -170,10 +160,10 @@ jobs:
             exit 1
           fi
 
-          case "${WANT:-$PUSH_VARIANT}" in
-            debug|release) VLIST="${WANT:-$PUSH_VARIANT}" ;;
-            both)          VLIST="debug release" ;;
-            *) echo "::error::非法变体：${WANT}"; exit 1 ;;
+          VLIST="$PUSH_VARIANT"
+          case "$VLIST" in
+            release|debug) ;;
+            *) echo "::error::PUSH_VARIANT 非法：$VLIST"; exit 1 ;;
           esac
 
           {
