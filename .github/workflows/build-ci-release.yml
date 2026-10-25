@@ -1,8 +1,11 @@
 # ══════════════════════════════════════════════════════════════════════════════
 # CI 构建发布：任意分支 push 即出包（只出 release），每次构建发成一个独立 tag 的预发布页。
-#   母版：知识库 100_System/templates/build-ci.workflow.yml（规程：GitHub域/CI滚动发布页流程.md）
+#   母版：知识库 100_System/templates/build-ci-release.workflow.yml
+#   构建环境对齐上游 .github/workflows/build-stable-47.yml：
+#     ubuntu-latest + JDK 17 zulu + Flutter 3.47.6 stable（Dart 3.13），与上游 README 标称的
+#     「Flutter 3.47.6 (Dart 3.13, matching CI)」同版本；上游 master 线用 Flutter master channel，
+#     不跟 —— 滚动 channel 会让同一次提交的构建结果不可复现。
 #   本项目（Flutter）对母版有四处改写：
-#     ① 构建环境换成 Flutter 3.47.6 + JDK 17（母版是 Gradle + JDK 21 + Android SDK 直装）
 #     ② 版本号：versionName 来自 pubspec.yaml，versionCode 由 CI 运行序号生成；
 #        Flutter 的 --build-name 只收数字点分版本，塞不进 `+ci-<变体>.<短号>`，
 #        改由 ci-fork-identity.py 就地让 Gradle 从环境变量取这两个值（只改工作区）
@@ -10,9 +13,9 @@
 #     ④ fork 身份：只错开包名 / 显示名（Flutter 无内核态命名空间可撞），改写脚本
 #        scripts/ci-fork-identity.py 只动 runner 工作区，仓库源码与上游逐字一致
 # ══════════════════════════════════════════════════════════════════════════════
-name: Build · CI
+name: Build · CI · Release · Flutter 3.47
 
-run-name: "Build · CI · ${{ github.ref_name }}"
+run-name: "Build · CI · Release · Flutter 3.47 · ${{ github.ref_name }}"
 
 on:
   push:
@@ -97,7 +100,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: ${{ env.JAVA_VERSION }}
 
       # 不用 subosito/flutter-action：它是复合 action，内部引用 actions/cache@v5（未钉 SHA），
