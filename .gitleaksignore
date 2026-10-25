@@ -1,0 +1,10 @@
+# 上游开源代码里的公开常量被 generic-api-key 误判：OAuth client id、*_v1 键名、API 版本串
+1234ba2219efe4f02825c98eb712028c505eefa0:lib/core/database/business_settings_merger.dart:generic-api-key:125
+1234ba2219efe4f02825c98eb712028c505eefa0:lib/core/providers/mcp_provider.dart:generic-api-key:370
+29f32ac23b9694c8fb48345b8c517f1386173fd6:lib/core/models/provider_oauth.dart:generic-api-key:20
+29f32ac23b9694c8fb48345b8c517f1386173fd6:lib/core/models/provider_oauth.dart:generic-api-key:21
+5499aafcb3e352cfc1e311d202e62ca3207f9fa2:lib/core/providers/settings_provider.dart:generic-api-key:84
+a1a75bb8f54bcc71bb913f302d58479594b7f98c:lib/core/models/provider_oauth.dart:generic-api-key:24
+a1a75bb8f54bcc71bb913f302d58479594b7f98c:lib/core/services/auth/claude_oauth_adapter.dart:generic-api-key:5
+a1a75bb8f54bcc71bb913f302d58479594b7f98c:lib/core/services/auth/claude_oauth_request.dart:generic-api-key:18
+f685a3396077b6623ae7880802a9a4d9483411df:lib/core/providers/settings_provider.dart:generic-api-key:108
