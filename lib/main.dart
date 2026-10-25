@@ -108,6 +108,8 @@ import 'core/services/mobile_background.dart';
 import 'core/services/notification_service.dart';
 import 'features/home/controllers/chat_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'core/models/workspace_binding.dart';
+import 'core/services/browser/browser_workspace_resources.dart';
 
 final RouteObserver<ModalRoute<dynamic>> routeObserver =
     RouteObserver<ModalRoute<dynamic>>();
@@ -120,6 +122,17 @@ void _wireWorkspaceServices(BuildContext ctx) {
     final chat = ctx.read<ChatService>();
     final workspaces = ctx.read<WorkspaceProvider>();
     final assistants = ctx.read<AssistantProvider>();
+    BrowserWorkspaceResources.instance.rootForSession = (sessionId) async {
+      await workspaces.loaded;
+      final conversation = chat.getConversation(sessionId);
+      if (conversation == null) return null;
+      final binding = WorkspaceBinding.fromExtras(conversation.extras);
+      final workspace = binding.workspaceId == null
+          ? null
+          : workspaces.byId(binding.workspaceId!);
+      if (workspace == null) return null;
+      return Directory(await workspaces.hostRootFor(workspace));
+    };
     chat.newConversationExtras = (assistantId) {
       if (assistantId == null) {
         return const <String, dynamic>{};
@@ -201,7 +214,7 @@ Future<void> main() async {
           return;
         }
       }
-      final RestoreReceipt? restoreOutcome;
+      late final RestoreReceipt? restoreOutcome;
       final restoreDiagnostics = RestoreStartupDiagnostics();
       RestoreBusinessLease? businessLease;
       // A restore large enough to take seconds would otherwise spend all of
@@ -217,38 +230,56 @@ Future<void> main() async {
       if (restoreStage != null) {
         runApp(_RestoreProgressApp(stage: restoreStage));
       }
-      try {
-        // The lease remains process-owned through its internal registry until
-        // process exit, preventing another instance from racing business I/O.
-        businessLease = await RestoreBusinessLease.acquire(
-          appDataDirectory: appDataDirectory,
-        );
-        restoreOutcome =
-            await RestoreStartupGate.recoverAndRequireBusinessReady(
+      while (true) {
+        try {
+          // The lease remains process-owned through its internal registry until
+          // process exit, preventing another instance from racing business I/O.
+          businessLease ??= await RestoreBusinessLease.acquire(
+            appDataDirectory: appDataDirectory,
+          );
+          restoreOutcome =
+              await RestoreStartupGate.recoverAndRequireBusinessReady(
+                appDataDirectory: appDataDirectory,
+                businessLease: businessLease,
+                diagnostics: restoreDiagnostics,
+                onStage: restoreStage == null
+                    ? null
+                    : (stage) => restoreStage.value = stage,
+              );
+          break;
+        } catch (error, stackTrace) {
+          stderr.writeln('[RestoreStartupGate] $error\n$stackTrace');
+          await _initRestoreFailureWindow();
+          final report = StartupFailureReport.capture(
+            stage: StartupFailureStage.restoreGate,
+            error: error,
+            step: 'recover_and_require_business_ready',
+            stackTrace: stackTrace,
+            restoreDetails: restoreDiagnostics.details,
+          );
+          final retry = report.blockedRestoreDirectory == null
+              ? null
+              : Completer<void>();
+          runApp(
+            _RestoreFailureApp(
+              key: ObjectKey(report),
+              report: report,
               appDataDirectory: appDataDirectory,
               businessLease: businessLease,
-              diagnostics: restoreDiagnostics,
-              onStage: restoreStage == null
+              retryRestore: retry == null
                   ? null
-                  : (stage) => restoreStage.value = stage,
-            );
-      } catch (error, stackTrace) {
-        stderr.writeln('[RestoreStartupGate] $error\n$stackTrace');
-        await _initRestoreFailureWindow();
-        runApp(
-          _RestoreFailureApp(
-            report: StartupFailureReport.capture(
-              stage: StartupFailureStage.restoreGate,
-              error: error,
-              step: 'recover_and_require_business_ready',
-              stackTrace: stackTrace,
-              restoreDetails: restoreDiagnostics.details,
+                  : () async {
+                      if (!retry.isCompleted) retry.complete();
+                    },
             ),
-            appDataDirectory: appDataDirectory,
-            businessLease: businessLease,
-          ),
-        );
-        return;
+          );
+          if (retry == null) return;
+          await retry.future;
+          if (restoreStage != null) {
+            restoreStage.value = RestoreStartupStage.checkingBackup;
+            runApp(_RestoreProgressApp(stage: restoreStage));
+          }
+        }
       }
       try {
         final prefs = await SharedPreferences.getInstance();
@@ -508,16 +539,19 @@ class _RestoreProgressApp extends StatelessWidget {
 
 class _RestoreFailureApp extends StatelessWidget {
   const _RestoreFailureApp({
+    super.key,
     required this.report,
     this.appDataDirectory,
     this.businessLease,
     this.privateStorageSource,
+    this.retryRestore,
   });
 
   final StartupFailureReport report;
   final Directory? appDataDirectory;
   final Directory? privateStorageSource;
   final RestoreBusinessLease? businessLease;
+  final Future<void> Function()? retryRestore;
 
   @override
   Widget build(BuildContext context) {
@@ -534,6 +568,7 @@ class _RestoreFailureApp extends StatelessWidget {
           : RestoreFailureScreen(
               report: report,
               restart: PlatformUtils.restartApp,
+              retryRestore: retryRestore,
               appDataDirectory: appDataDirectory,
               privateStorageSource: privateStorageSource,
               businessLease: businessLease,
