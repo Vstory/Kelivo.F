@@ -18,6 +18,7 @@ import '../../database/business_repository.dart';
 import '../../database/business_restore_service.dart';
 import '../../database/chat_database_repository.dart';
 import 'backup_cancel_token.dart';
+import 'backup_limits.dart';
 import 'backup_isolate_runner.dart';
 import 'backup_settings_validator.dart';
 import 'backup_task_progress.dart';
@@ -87,7 +88,6 @@ final class RestoreBundleStaging {
     'sessions',
   ];
   static const _databaseEntry = 'database/kelivo.db';
-  static const _maximumManifestBytes = 16 * 1024 * 1024;
   // Settings contain structured preferences, never chat rows or binary assets.
   // Cap JSON before copying/parsing to bound UTF-8 and DOM amplification.
   static const _maximumSettingsBytes = 1024 * 1024 * 1024;
@@ -177,7 +177,7 @@ final class RestoreBundleStaging {
       );
       final sourceManifestBytes = await _readBoundedBytes(
         sourceManifestFile,
-        maximumBytes: _maximumManifestBytes,
+        maximumBytes: backupManifestMaxBytes,
         error: 'restore_staging_manifest',
         cancelToken: cancelToken,
       );
@@ -368,7 +368,7 @@ final class RestoreBundleStaging {
         p.join(payloadDirectory.path, 'manifest.json'),
       );
       final stagedManifestBytes = utf8.encode(jsonEncode(manifest));
-      if (stagedManifestBytes.length > _maximumManifestBytes) {
+      if (stagedManifestBytes.length > backupManifestMaxBytes) {
         throw const FormatException('restore_staging_manifest_size');
       }
       _throwIfCancelled(cancelToken);
@@ -460,7 +460,7 @@ final class RestoreBundleStaging {
     final manifestFile = File(p.join(candidateDirectory.path, 'manifest.json'));
     final manifestBytes = await _readBoundedBytes(
       manifestFile,
-      maximumBytes: _maximumManifestBytes,
+      maximumBytes: backupManifestMaxBytes,
       error: 'restore_staging_manifest_reopen',
     );
     final manifestSha256 = sha256.convert(manifestBytes).toString();

@@ -1,4 +1,5 @@
 import 'package:Kelivo/core/models/tool_permission_mode.dart';
+import 'backup_limits.dart';
 import 'package:sqlite3/sqlite3.dart' as composer_sqlite;
 import 'dart:async';
 import 'dart:convert';
@@ -298,10 +299,6 @@ class DataSync {
     'workspaces',
     'sessions',
   ];
-  // 16 MiB 只够约 7 万条；工作区堆满小文件时（实测 7.3 万文件 → 17 MB）导出照样成功、
-  // 导入却被拒。32 MiB 与 _maxRestoreEntries（10 万条 × 约 233 字节 ≈ 23 MB）配套，
-  // 让条目数先于体积撞墙。导出端受同一个上限约束。
-  static const _maxManifestBytes = 32 * 1024 * 1024;
   // Settings are parsed as one JSON object, so keep their decoded input bound.
   static const _maxSettingsBytes = 1024 * 1024 * 1024;
   // ZIP64 supports larger entries. Restore keeps explicit, diagnosable bounds.
@@ -1269,7 +1266,7 @@ class DataSync {
         scope: scope,
       );
       final manifestBytes = utf8.encode(manifestJson);
-      if (manifestBytes.length > _maxManifestBytes) {
+      if (manifestBytes.length > backupManifestMaxBytes) {
         throw const FormatException('manifest_size');
       }
       final manifestFile = File(manifestPath)
@@ -1495,15 +1492,15 @@ class DataSync {
         Map<String, int>? declaredEntrySizes;
         if (manifestEntry != null) {
           if (manifestEntry.size < 0 ||
-              manifestEntry.size > _maxManifestBytes) {
+              manifestEntry.size > backupManifestMaxBytes) {
             throw const FormatException('manifest_size');
           }
           final manifestPath = p.join(extractDirPath, _manifestEntryName);
           final manifestOutput = _BoundedOutputFileStream(
             manifestPath,
             expectedBytes: manifestEntry.size,
-            maxEntryBytes: _maxManifestBytes,
-            budget: _ExtractionBudget(maxTotalBytes: _maxManifestBytes),
+            maxEntryBytes: backupManifestMaxBytes,
+            budget: _ExtractionBudget(maxTotalBytes: backupManifestMaxBytes),
           );
           try {
             writeZipEntryStreaming(
@@ -2348,7 +2345,7 @@ class DataSync {
   }) async {
     final manifestFile = File(manifestPath);
     if (!manifestFile.existsSync() ||
-        manifestFile.lengthSync() > _maxManifestBytes) {
+        manifestFile.lengthSync() > backupManifestMaxBytes) {
       throw const FormatException('manifest.json');
     }
     final decoded = jsonDecode(manifestFile.readAsStringSync());
@@ -2567,7 +2564,7 @@ class DataSync {
         name: {'bytes': entries[name]!.bytes, 'sha256': entries[name]!.sha256},
     };
     final normalizedManifestBytes = utf8.encode(jsonEncode(manifest));
-    if (normalizedManifestBytes.length > _maxManifestBytes) {
+    if (normalizedManifestBytes.length > backupManifestMaxBytes) {
       throw const FormatException('manifest_size');
     }
     final normalizedManifestSha256 = sha256
@@ -3265,7 +3262,7 @@ class DataSync {
         final archive = ZipDecoder().decodeStream(inputStream);
         for (final entry in archive.files) {
           if (_zipEntryName(entry.name) != _manifestEntryName) continue;
-          if (!entry.isFile || entry.size > _maxManifestBytes) return null;
+          if (!entry.isFile || entry.size > backupManifestMaxBytes) return null;
           final decoded = jsonDecode(utf8.decode(entry.readBytes()!));
           if (decoded is Map<String, dynamic>) manifest = decoded;
           break;

@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 
 import '../../database/app_database.dart';
 import '../../../utils/app_directories.dart';
+import 'backup_limits.dart';
 import 'restore_durability.dart';
 import 'restore_previous_plan.dart';
 import 'restore_receipt.dart';
@@ -31,7 +32,6 @@ final class RestorePreviousBuilder {
   static const _maximumAssetEntries = 0xffff;
   static const _maximumAssetPathBytes = 8 * 1024 * 1024;
   static const _maximumSinglePathBytes = 0xffff;
-  static const _maximumManifestBytes = 16 * 1024 * 1024;
 
   static Future<RestorePreviousBundle> build({
     required Directory appDataDirectory,
@@ -73,7 +73,7 @@ final class RestorePreviousBuilder {
       database: database,
       assets: assets,
     );
-    if (utf8.encode(jsonEncode(plan.toJson())).length > _maximumManifestBytes) {
+    if (utf8.encode(jsonEncode(plan.toJson())).length > backupManifestMaxBytes) {
       throw StateError('restore_previous_manifest_budget');
     }
     return RestorePreviousBundle(plan: plan);

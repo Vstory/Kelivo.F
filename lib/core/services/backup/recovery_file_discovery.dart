@@ -142,7 +142,7 @@ abstract final class RecoveryFileDiscovery {
       input = InputFileStream(file.path);
       final archive = ZipDecoder().decodeStream(input);
       final entry = archive.findFile('manifest.json');
-      if (entry == null || !entry.isFile || entry.size > 16 * 1024 * 1024) {
+      if (entry == null || !entry.isFile || entry.size > backupManifestMaxBytes) {
         return null;
       }
       final value = jsonDecode(utf8.decode(entry.readBytes()!));
