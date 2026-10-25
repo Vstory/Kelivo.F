@@ -44,18 +44,6 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
             '        versionName = System.getenv("CI_VERSION_NAME") ?: flutter.versionName',
             1,
         ),
-        # debug 也签固定钥：否则 debug 包是 runner 上的随机 debug 证书，指纹门禁与实际都不对。
-        (
-            GRADLE,
-            '    buildTypes {\n        getByName("release") {',
-            '    buildTypes {\n        getByName("debug") {\n'
-            "            if (keystorePropertiesFile.exists()) {\n"
-            '                signingConfig = signingConfigs.getByName("release")\n'
-            "            }\n"
-            "        }\n"
-            '        getByName("release") {',
-            1,
-        ),
         # AGP 8.12 落盘时默认只签 v2，v3 要显式开；同一把钥匙，不影响与上游原版并存装。
         (
             GRADLE,

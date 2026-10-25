@@ -80,23 +80,6 @@ jobs:
           mkdir -p scripts
           git show origin/main:scripts/ci-fork-identity.py > scripts/ci-fork-identity.py
 
-      # 上游 v1.3.1 发版时（10-09）pub 解析到 shared_preferences_android 2.4.28；2.5.0 是
-      # 10-17 才发的，晚构建就会拿到 2.5.x —— 它的 Pigeon JNI 签名里的类名会被 R8 改名，
-      # 启动即 NoSuchMethodError。只改工作区，仓库源码保持与上游一致。
-      - name: Pin deps to upstream release build
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import pathlib, re
-          p = pathlib.Path('pubspec.yaml')
-          s = p.read_text()
-          out = re.sub(r'(?m)^dependency_overrides:\n',
-                       'dependency_overrides:\n  shared_preferences_android: 2.4.28\n', s, count=1)
-          assert out != s, 'pubspec.yaml 里找不到 dependency_overrides 块'
-          p.write_text(out)
-          PY
-          grep -A2 '^dependency_overrides:' pubspec.yaml
-
       - name: Set up JDK
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
@@ -395,14 +378,13 @@ jobs:
           TAG: ${{ steps.target.outputs.tag }}
           REPO: ${{ github.repository }}
           COMMIT: ${{ steps.info.outputs.commit }}
+          BRANCH: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           NOTES="$(
-            echo "构建提交 [\`${SHORT}\`](https://github.com/${REPO}/commit/${COMMIT})　·　版本 ${VER}（versionCode ${CODE}）　·　变体 ${VARIANT_LIST}"
+            echo "**Commit** [\`${SHORT}\`](https://github.com/${REPO}/commit/${COMMIT})　·　**Branch** ${BRANCH}　·　**Version** ${VER}+ci-${VARIANT_LIST}.${SHORT}（versionCode ${CODE}）"
             echo
             echo "- 单 ABI \`${EXPECT_ABI}\`，包名 \`${EXPECT_PACKAGE}\` / 显示名 ${FORK_LABEL}：可与上游原版并存安装。"
-            echo "- 各包共用同一把固定钥（v2 + v3 签名），debug 与 release 可互相覆盖安装。"
-            echo "- debug 包调试日志最全，排障优先用它；release 包与正式版同构建类型。"
           )"
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "tag $TAG 已存在 —— 按重跑处理"
@@ -412,9 +394,8 @@ jobs:
               '{tag_name:$t, target_commitish:$c, name:$t, body:$n, prerelease:true}' \
             | gh api -X POST "/repos/${REPO}/releases" --input -
           fi
-          # 资产按上传顺序展示：release 排 debug 前面。
           APKS=()
-          for v in release debug; do
+          for v in release; do
             f=$(ls dist/*ci-${v}*.apk 2>/dev/null | head -1 || true)
             [ -n "$f" ] && APKS+=("$f")
           done
