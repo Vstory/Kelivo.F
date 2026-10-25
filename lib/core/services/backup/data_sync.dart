@@ -298,8 +298,10 @@ class DataSync {
     'workspaces',
     'sessions',
   ];
-  // A 16 MiB metadata cap keeps manifest parsing and entry metadata bounded.
-  static const _maxManifestBytes = 16 * 1024 * 1024;
+  // 16 MiB 只够约 7 万条；工作区堆满小文件时（实测 7.3 万文件 → 17 MB）导出照样成功、
+  // 导入却被拒。32 MiB 与 _maxRestoreEntries（10 万条 × 约 233 字节 ≈ 23 MB）配套，
+  // 让条目数先于体积撞墙。导出端受同一个上限约束。
+  static const _maxManifestBytes = 32 * 1024 * 1024;
   // Settings are parsed as one JSON object, so keep their decoded input bound.
   static const _maxSettingsBytes = 1024 * 1024 * 1024;
   // ZIP64 supports larger entries. Restore keeps explicit, diagnosable bounds.
@@ -1266,8 +1268,12 @@ class DataSync {
         businessEntityRowIds: businessEntityRowIds,
         scope: scope,
       );
+      final manifestBytes = utf8.encode(manifestJson);
+      if (manifestBytes.length > _maxManifestBytes) {
+        throw const FormatException('manifest_size');
+      }
       final manifestFile = File(manifestPath)
-        ..writeAsStringSync(manifestJson, flush: true);
+        ..writeAsBytesSync(manifestBytes, flush: true);
       entries[_manifestEntryName] = writer.addFile(
         manifestFile,
         _manifestEntryName,
