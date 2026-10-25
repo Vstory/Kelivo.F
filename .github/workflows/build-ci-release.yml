@@ -34,6 +34,12 @@ on:
         required: false
         default: ''
 
+# 同一分支上的新推送会取消旧构建：连续推送时两个 run 同时创建 release，
+# GitHub 会对后到的那个回 403（Resource not accessible by integration）。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write   # 发布 Release 需要写权限
 

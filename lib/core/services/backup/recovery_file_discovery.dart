@@ -7,6 +7,7 @@ import 'package:archive/archive_io.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../utils/app_directories.dart';
+import 'backup_limits.dart';
 
 /// Finds retained data without moving, opening or deleting any candidate.
 /// Restrict traversal to data roots and snapshot folders, never user workspaces.
