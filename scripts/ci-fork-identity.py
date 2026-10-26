@@ -21,6 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 GRADLE = "android/app/build.gradle.kts"
 MANIFEST = "android/app/src/main/AndroidManifest.xml"
 PROGUARD = "android/app/proguard-rules.pro"
+MAIN_DART = "lib/main.dart"
 
 DEFAULT_APP_ID = "com.psyche.kelivo.fork"
 DEFAULT_LABEL = "Kelivo.F"
@@ -30,6 +31,9 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
     return [
         (GRADLE, 'applicationId = "com.psyche.kelivo"', f'applicationId = "{app_id}"', 1),
         (MANIFEST, 'android:label="Kelivo"', f'android:label="{label}"', 1),
+        # 最近任务的标题来自 MaterialApp.title（经 Title widget 推成 TaskDescription），
+        # 与 manifest 的 application label 互不影响，两处都要改才不会再顶着上游名字。
+        (MAIN_DART, "title: 'Kelivo'", f"title: '{label}'", 6),
         # Flutter 的 --build-name 只收数字点分版本，塞不进 +ci-<变体>.<短号>；改成从环境变量
         # 取 versionName/versionCode，CI 才能照 Mishka 的命名规则写构建元数据。
         (
@@ -86,6 +90,7 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
 FORBIDDEN = [
     'applicationId = "com.psyche.kelivo"',
     'android:label="Kelivo"',
+    "title: 'Kelivo'",
     "versionCode = flutter.versionCode",
     "versionName = flutter.versionName",
 ]
@@ -93,7 +98,7 @@ FORBIDDEN = [
 
 def scan_forbidden() -> list[str]:
     hits: list[str] = []
-    for rel in (GRADLE, MANIFEST):
+    for rel in (GRADLE, MANIFEST, MAIN_DART):
         text = (REPO_ROOT / rel).read_text(encoding="utf-8")
         for lineno, line in enumerate(text.splitlines(), 1):
             for needle in FORBIDDEN:
