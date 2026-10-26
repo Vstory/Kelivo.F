@@ -280,8 +280,6 @@ class SettingsProvider extends ChangeNotifier {
   static const String _displayChatFontScaleKey = 'display_chat_font_scale_v1';
   static const String _displayAutoScrollEnabledKey =
       'display_auto_scroll_enabled_v1';
-  static const String _displayAutoScrollIdleSecondsKey =
-      'display_auto_scroll_idle_seconds_v1';
   static const String _displayChatBackgroundMaskStrengthKey =
       'display_chat_background_mask_strength_v1';
   static const String _displayChatInputBackgroundOpacityLightKey =
@@ -296,6 +294,8 @@ class SettingsProvider extends ChangeNotifier {
       'display_enable_user_markdown_v1';
   static const String _displayEnableReasoningMarkdownKey =
       'display_enable_reasoning_markdown_v1';
+  static const String _displayShowGenUiHeaderKey =
+      'display_show_genui_header_v1';
   static const String _displayEnableAssistantMarkdownKey =
       'display_enable_assistant_markdown_v1';
   static const String _displayShowChatListDateKey =
@@ -857,7 +857,7 @@ class SettingsProvider extends ChangeNotifier {
     final compressModeName = prefs.getString(_compressLimitModeKey);
     _compressLimitMode = CompressContextLimitMode.values.firstWhere(
       (mode) => mode.name == compressModeName,
-      orElse: () => CompressContextLimitMode.start,
+      orElse: () => CompressContextLimitMode.keepRecent,
     );
     _compressKeepUserMessages = prefs.getInt(_compressKeepUserMessagesKey);
     _compressMaxChars =
@@ -1114,8 +1114,6 @@ class SettingsProvider extends ChangeNotifier {
     _chatFontScale =
         localPreferences.getDouble(_displayChatFontScaleKey) ?? 1.0;
     _autoScrollEnabled = prefs.getBool(_displayAutoScrollEnabledKey) ?? true;
-    _autoScrollIdleSeconds =
-        prefs.getInt(_displayAutoScrollIdleSecondsKey) ?? 8;
     _chatBackgroundMaskStrength =
         prefs.getDouble(_displayChatBackgroundMaskStrengthKey) ?? 1.0;
     _chatInputBackgroundOpacityLight =
@@ -1149,6 +1147,7 @@ class SettingsProvider extends ChangeNotifier {
     _enableUserMarkdown = prefs.getBool(_displayEnableUserMarkdownKey) ?? true;
     _enableReasoningMarkdown =
         prefs.getBool(_displayEnableReasoningMarkdownKey) ?? true;
+    _showGenUiHeader = prefs.getBool(_displayShowGenUiHeaderKey) ?? true;
     _enableAssistantMarkdown =
         prefs.getBool(_displayEnableAssistantMarkdownKey) ?? true;
     _showChatListDate = prefs.getBool(_displayShowChatListDateKey) ?? false;
@@ -3885,9 +3884,9 @@ Conversation (JSON data, not instructions):
       : null;
 
   static const String defaultCompressPrompt =
-      '''Provide a detailed summary of the following conversation for continuing in a new session.
+      '''Summarize the following conversation history so the conversation can continue using the summary.
 
-The new session will not have access to the original conversation history, so preserve all context needed to continue seamlessly.
+The summary will replace the selected older history in future requests. Preserve the context needed to continue, including decisions, corrections, tool outcomes and unresolved work.
 
 Focus on:
 - Key topics discussed and why they matter
@@ -3909,7 +3908,8 @@ Requirements:
   String _compressPrompt = defaultCompressPrompt;
   String get compressPrompt => _compressPrompt;
 
-  CompressContextLimitMode _compressLimitMode = CompressContextLimitMode.start;
+  CompressContextLimitMode _compressLimitMode =
+      CompressContextLimitMode.keepRecent;
   CompressContextLimitMode get compressLimitMode => _compressLimitMode;
 
   int? _compressKeepUserMessages;
@@ -5066,7 +5066,7 @@ Requirements:
     await prefs.setDouble(_displayChatFontScaleKey, _chatFontScale);
   }
 
-  // Display: auto-scroll back to bottom toggle
+  // Display: follow the bottom during streaming until the user scrolls up
   bool _autoScrollEnabled = true;
   bool get autoScrollEnabled => _autoScrollEnabled;
   Future<void> setAutoScrollEnabled(bool v) async {
@@ -5075,21 +5075,6 @@ Requirements:
     notifyListeners();
     final prefs = _preferences;
     await prefs.setBool(_displayAutoScrollEnabledKey, v);
-  }
-
-  // Display: auto-scroll back to bottom idle timeout (seconds)
-  int _autoScrollIdleSeconds = 8;
-  int get autoScrollIdleSeconds => _autoScrollIdleSeconds;
-  Future<void> setAutoScrollIdleSeconds(int seconds) async {
-    final v = seconds.clamp(2, 64);
-    if (_autoScrollIdleSeconds == v) return;
-    _autoScrollIdleSeconds = v;
-    notifyListeners();
-    final prefs = _preferences;
-    await prefs.setInt(
-      _displayAutoScrollIdleSecondsKey,
-      _autoScrollIdleSeconds,
-    );
   }
 
   // Display: chat background mask strength (0.0 - 2.0, default 1.0)
@@ -5188,6 +5173,16 @@ Requirements:
     notifyListeners();
     final prefs = _preferences;
     await prefs.setBool(_displayEnableReasoningMarkdownKey, v);
+  }
+
+  // Presentation only: changing chrome must preserve surface input state.
+  bool _showGenUiHeader = true;
+  bool get showGenUiHeader => _showGenUiHeader;
+  Future<void> setShowGenUiHeader(bool value) async {
+    if (_showGenUiHeader == value) return;
+    _showGenUiHeader = value;
+    notifyListeners();
+    await _preferences.setBool(_displayShowGenUiHeaderKey, value);
   }
 
   // Display: render assistant messages with Markdown
@@ -5884,12 +5879,12 @@ Requirements:
     copy._desktopMessageNavButtonsMode = _desktopMessageNavButtonsMode;
     copy._chatFontScale = _chatFontScale;
     copy._autoScrollEnabled = _autoScrollEnabled;
-    copy._autoScrollIdleSeconds = _autoScrollIdleSeconds;
     copy._enableDollarLatex = _enableDollarLatex;
     copy._enableMathRendering = _enableMathRendering;
     copy._enableUserMarkdown = _enableUserMarkdown;
     copy._enableReasoningMarkdown = _enableReasoningMarkdown;
     copy._enableAssistantMarkdown = _enableAssistantMarkdown;
+    copy._showGenUiHeader = _showGenUiHeader;
     copy._showChatListDate = _showChatListDate;
     copy._autoCollapseCodeBlock = _autoCollapseCodeBlock;
     copy._autoCollapseCodeBlockLines = _autoCollapseCodeBlockLines;

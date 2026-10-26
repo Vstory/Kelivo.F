@@ -1,3 +1,9 @@
+import 'package:Kelivo/features/intelligent_ui/host/ui_search_navigation.dart';
+import '../../intelligent_ui/host/ui_copy_actions.dart';
+import '../../intelligent_ui/host/ui_draft_staging.dart';
+import '../../intelligent_ui/host/ui_draft_request.dart';
+import '../../intelligent_ui/widgets/genui_draft_dialog.dart';
+import '../../intelligent_ui/host/ui_context_submission.dart';
 import 'package:Kelivo/shared/text_input/message_editing_controller.dart';
 import '../../../core/database/composer_draft_store.dart';
 import '../../../core/models/composer_draft.dart';
@@ -41,6 +47,8 @@ import '../../../utils/markdown_media_sanitizer.dart';
 import '../../../utils/platform_utils.dart';
 import '../../../utils/assistant_regex.dart';
 import '../../chat/models/message_edit_result.dart';
+import '../../chat/widgets/context_operation_actions.dart';
+import '../../../core/models/context_operation.dart';
 import '../../chat/widgets/chat_message_widget.dart' show ToolUIPart;
 import '../../chat/widgets/message_edit_sheet.dart';
 import '../../chat/widgets/message_export_sheet.dart';
@@ -404,10 +412,35 @@ class HomePageController extends ChangeNotifier {
         draft.revision != revision) {
       return;
     }
+    final incoming = draft.pending!;
+    if (choice == 'append' &&
+        ComposerDraftStore.hasUiContextConflict(
+          draft.recoveryTarget,
+          incoming,
+        )) {
+      if (!_context.mounted ||
+          !await confirmGenUiReplacement(
+            _context,
+            current: draft.recoveryTarget.uiContext!,
+            replacement: incoming.uiContext!,
+          )) {
+        return;
+      }
+      if (_composerDisposed ||
+          owner != _composerOwner ||
+          draft.revision != revision) {
+        return;
+      }
+    }
+    await _inputController.flushMessageInput();
+    if (_composerDisposed || owner != _composerOwner) return;
+    _saveComposerDraft();
+    if (draft.revision != revision) return;
     drafts.restorePending(
       owner,
       append: choice == 'append',
       replace: choice == 'replace',
+      selectedUiContext: choice == 'append' ? incoming.uiContext : null,
     );
     _applyComposerValue(draft.active);
     _userMessageEditState = draft.editMessageId == null
@@ -697,6 +730,9 @@ class HomePageController extends ChangeNotifier {
       _viewModel.isCurrentConversationLoading;
 
   QueuedChatInput? get currentQueuedInput => _viewModel.currentQueuedInput;
+  bool get currentQueuedInputPaused => _viewModel.currentQueuedInputPaused;
+  bool get isCurrentConversationCompressing =>
+      _viewModel.currentCompressionTask?.active ?? false;
 
   ValueNotifier<String?> get processingFilesMessageId =>
       _viewModel.processingFilesMessageId;
@@ -947,6 +983,10 @@ class HomePageController extends ChangeNotifier {
   }
 
   String _localizeGenerationError(AppLocalizations l10n, String error) {
+    if (error.contains('context_changed')) return l10n.contextChanged;
+    if (error.contains('context_budget_exceeded')) {
+      return l10n.contextBudgetExceeded;
+    }
     return '${l10n.generationInterrupted}: $error';
   }
 
@@ -956,8 +996,6 @@ class HomePageController extends ChangeNotifier {
       onStateChanged: () => notifyListeners(),
       getAutoScrollEnabled: () =>
           _context.read<SettingsProvider>().autoScrollEnabled,
-      getAutoScrollIdleSeconds: () =>
-          _context.read<SettingsProvider>().autoScrollIdleSeconds,
       getTopRevealInset: () =>
           kToolbarHeight + MediaQuery.paddingOf(_context).top,
       isGenerating: () => _chatController.isCurrentConversationLoading,
@@ -1257,9 +1295,12 @@ class HomePageController extends ChangeNotifier {
     notifyListeners();
   }
 
+  final uiSearchNavigation = UiSearchNavigation();
+
   Future<void> openGlobalSearchResult({
     required String conversationId,
     required String messageId,
+    String? surfaceKey,
   }) async {
     await switchConversationAnimated(conversationId);
     // Wait one extra frame so the new conversation's indexed message list is
@@ -1268,7 +1309,7 @@ class HomePageController extends ChangeNotifier {
       await WidgetsBinding.instance.endOfFrame;
     } catch (_) {}
     if (messageId.isNotEmpty) {
-      await scrollToMessageId(messageId);
+      await scrollToMessageId(messageId, surfaceKey: surfaceKey);
       _spotlightMessageId = messageId;
       _spotlightToken++;
       notifyListeners();
@@ -1493,10 +1534,7 @@ class HomePageController extends ChangeNotifier {
   Future<ChatInputSubmissionResult> _sendComposerMessage(
     ChatInputData input,
   ) async {
-    final content = input.text.trim();
-    if (content.isEmpty &&
-        input.imagePaths.isEmpty &&
-        input.documents.isEmpty) {
+    if (input.isEmpty) {
       return ChatInputSubmissionResult.rejected;
     }
     final submissionConversation = input.draftSubmission == null
@@ -1612,36 +1650,56 @@ class HomePageController extends ChangeNotifier {
     await _viewModel.toggleTemporaryConversation();
   }
 
-  void cancelQueuedMessage() {
+  Future<void> cancelQueuedMessage() async {
+    final serial = _composerSwitch;
     final draining = _drainComposerInput();
-    if (draining != null) {
-      final serial = _composerSwitch;
-      unawaited(
-        draining.then((_) {
-          if (!_composerDisposed && serial == _composerSwitch) {
-            cancelQueuedMessage();
-          }
-        }),
-      );
+    if (draining != null) await draining;
+    if (_composerDisposed || serial != _composerSwitch) return;
+    final queued = _viewModel.currentQueuedInput;
+    if (queued == null) return;
+    if (queued.input.draftSubmission != null && _composerDrafts != null) {
+      if (_viewModel.cancelCurrentQueuedInput() == null) return;
+      await _restoreRecoveredDraft();
+      if (!_composerDisposed) notifyListeners();
       return;
     }
-    final restored = _viewModel.cancelCurrentQueuedInput();
-    if (restored == null) return;
-    if (restored.draftSubmission != null && _composerDrafts != null) {
-      unawaited(_restoreRecoveredDraft());
-      notifyListeners();
-      return;
+    final before = _mediaController.snapshotDraft(_inputController.text);
+    final incoming = ComposerDraftInput.fromInput(queued.input);
+    if (ComposerDraftStore.hasUiContextConflict(before, incoming)) {
+      if (!_context.mounted ||
+          !await confirmGenUiReplacement(
+            _context,
+            current: before.uiContext!,
+            replacement: incoming.uiContext!,
+          )) {
+        return;
+      }
     }
-
-    _inputController.value = TextEditingValue(
-      text: restored.text,
-      selection: TextSelection.collapsed(offset: restored.text.length),
-      composing: TextRange.empty,
+    final merged = ComposerDraftStore.merge(
+      before,
+      incoming,
+      selectedUiContext: incoming.uiContext,
     );
-    _mediaController.restoreInput(restored);
+    if (!before.isEmpty) {
+      if (!_context.mounted || !await confirmGenUiMerge(_context, merged)) {
+        return;
+      }
+    }
+    await _inputController.flushMessageInput();
+    if (_composerDisposed ||
+        serial != _composerSwitch ||
+        !identical(_viewModel.currentQueuedInput, queued) ||
+        !before.sameValue(
+          _mediaController.snapshotDraft(_inputController.text),
+        ) ||
+        !_inputController.value.composing.isCollapsed) {
+      return;
+    }
+    if (_viewModel.cancelCurrentQueuedInput() == null) return;
+    _applyComposerValue(merged);
+    _saveComposerDraft();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_context.mounted) return;
-      _inputFocus.requestFocus();
+      if (_context.mounted) _inputFocus.requestFocus();
     });
     notifyListeners();
   }
@@ -1652,8 +1710,41 @@ class HomePageController extends ChangeNotifier {
     bool? allowImagesApiRouting,
   }) async {
     if (currentConversation == null) return;
+    final projected = await _chatService.loadSelectedMessageProjections(
+      message.conversationId,
+    );
+    if (!_context.mounted) return;
+    final deletingTail = _context
+        .read<SettingsProvider>()
+        .regenerateDeleteTrailingMessages;
+    final versioning = _messageGenerationService
+        .calculateRegenerationVersioning(
+          message: message,
+          messages: projected,
+          assistantAsNewReply: assistantAsNewReply,
+        );
+    final affectedGroups = {
+      if (versioning.targetGroupId != null) versioning.targetGroupId!,
+    };
+    final removedGroups = deletingTail && versioning.lastKeep >= 0
+        ? projected
+              .skip(versioning.lastKeep + 1)
+              .map(ContextHistory.group)
+              .where((group) => group != versioning.targetGroupId)
+              .toSet()
+        : <String>{};
+    affectedGroups.addAll(removedGroups);
+    final approved = await confirmContextSourceMutation(
+      _context,
+      chat: _chatService,
+      conversationId: message.conversationId,
+      groups: affectedGroups,
+      removedGroups: removedGroups,
+    );
+    if (approved == null) return;
     _warmupSerial++;
 
+    if (!_context.mounted) return;
     final settings = _context.read<SettingsProvider>();
     if (settings.regenerateDeleteTrailingMessages &&
         currentConversation?.id == message.conversationId) {
@@ -1674,6 +1765,7 @@ class HomePageController extends ChangeNotifier {
     final success = await _viewModel.regenerateAtMessage(
       message,
       assistantAsNewReply: assistantAsNewReply,
+      expectedContextState: approved,
       allowImagesApiRouting:
           allowImagesApiRouting ?? _mediaController.allowImagesApiRouting,
     );
@@ -1689,7 +1781,8 @@ class HomePageController extends ChangeNotifier {
   ) async {
     final conversation = currentConversation;
     if (conversation == null ||
-        _viewModel.isConversationSendInFlight(conversation.id)) {
+        _viewModel.isConversationSendInFlight(conversation.id) ||
+        _chatService.contextCompression.blocksSending(conversation.id)) {
       return;
     }
 
@@ -1944,27 +2037,13 @@ class HomePageController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Compress context: summarize via LLM, create new conversation.
-  /// Returns null on success, or an error string on failure.
   Future<String?> compressContext({
     required CompressContextOptions options,
-  }) async {
-    final result = await _viewModel.compressContext(options: options);
-    if (result == null) {
-      // Success - switched to new conversation.
-      // keepRecent clones original messages (including translation text).
-      // `onConversationSwitched` already rebuilt fold state for those ids;
-      // clearing here would leave arrows visible but untoggleable.
-      if (options.mode == CompressContextLimitMode.keepRecent) {
-        _restoreMessageUiState();
-      } else {
-        _translations.clear();
-      }
-      notifyListeners();
-      _scrollToBottomSoon(animate: false);
-    }
-    return result;
-  }
+    String? targetConversationId,
+  }) => _viewModel.compressContext(
+    options: options,
+    targetConversationId: targetConversationId,
+  );
 
   // ============================================================================
   // Public Methods - Message Operations
@@ -1974,6 +2053,18 @@ class HomePageController extends ChangeNotifier {
     required ChatMessage message,
     required Map<String, List<ChatMessage>> byGroup,
   }) async {
+    if (!_context.mounted) return;
+    final approved = await confirmContextSourceMutation(
+      _context,
+      deleting: true,
+      chat: _chatService,
+      conversationId: message.conversationId,
+      groups: {ContextHistory.group(message)},
+      removedGroups: (byGroup[ContextHistory.group(message)]?.length ?? 1) <= 1
+          ? {ContextHistory.group(message)}
+          : {},
+    );
+    if (approved == null) return;
     final keepAtBottom = _scrollCtrl.isNearBottom();
     final gid = (message.groupId ?? message.id);
     // Deleting the only version removes the whole slot; deleting one version
@@ -1989,7 +2080,11 @@ class HomePageController extends ChangeNotifier {
     }
     _translations.remove(message.id);
     try {
-      await _viewModel.deleteMessage(message: message, byGroup: byGroup);
+      await _viewModel.deleteMessage(
+        message: message,
+        byGroup: byGroup,
+        expectedContextState: approved,
+      );
     } finally {
       _settleAfterSlotRemoval(
         gid,
@@ -2004,6 +2099,16 @@ class HomePageController extends ChangeNotifier {
     required ChatMessage message,
     required Map<String, List<ChatMessage>> byGroup,
   }) async {
+    if (!_context.mounted) return;
+    final approved = await confirmContextSourceMutation(
+      _context,
+      deleting: true,
+      chat: _chatService,
+      conversationId: message.conversationId,
+      groups: {ContextHistory.group(message)},
+      removedGroups: {ContextHistory.group(message)},
+    );
+    if (approved == null) return;
     final keepAtBottom = _scrollCtrl.isNearBottom();
     final gid = (message.groupId ?? message.id);
     int? preserveRequest;
@@ -2020,6 +2125,7 @@ class HomePageController extends ChangeNotifier {
       await _viewModel.deleteAllMessageVersions(
         message: message,
         byGroup: byGroup,
+        expectedContextState: approved,
       );
     } finally {
       _settleAfterSlotRemoval(
@@ -2127,6 +2233,41 @@ class HomePageController extends ChangeNotifier {
     final selectedMessageIds = Set<String>.of(_selectedItems);
     if (selectedMessageIds.isEmpty) return;
 
+    final conversationId = currentConversation?.id;
+    if (conversationId == null) return;
+    final selected = await _chatService.loadSelectedMessageProjections(
+      conversationId,
+    );
+    final groups = {
+      for (final m in selected)
+        if (selectedMessageIds.contains(m.id)) ContextHistory.group(m),
+    };
+    final versions = await _chatService.loadMessagesForGroups(
+      conversationId,
+      groups,
+    );
+    final removedGroups = deleteAllVersions
+        ? groups
+        : {
+            for (final group in groups)
+              if (versions
+                  .where((m) => ContextHistory.group(m) == group)
+                  .every((m) => selectedMessageIds.contains(m.id)))
+                group,
+          };
+    if (!_context.mounted) return;
+    final approved = await confirmContextSourceMutation(
+      _context,
+      deleting: true,
+      chat: _chatService,
+      conversationId: conversationId,
+      removedGroups: removedGroups,
+      groups: {
+        for (final m in selected)
+          if (selectedMessageIds.contains(m.id)) ContextHistory.group(m),
+      },
+    );
+    if (approved == null) return;
     final keepAtBottom = _scrollCtrl.isNearBottom();
     // Invalidate in-flight select-all before awaiting delete work.
     _selectionEpoch++;
@@ -2138,6 +2279,7 @@ class HomePageController extends ChangeNotifier {
       _translations.remove(id);
     }
     await _viewModel.deleteMessages(
+      expectedContextState: approved,
       messageIds: selectedMessageIds,
       deleteAllVersions: deleteAllVersions,
     );
@@ -2204,6 +2346,14 @@ class HomePageController extends ChangeNotifier {
         : showMessageEditSheet(ctx, message: message);
     final MessageEditResult? result = await future;
     if (result == null) return;
+    if (!_context.mounted) return;
+    final approved = await confirmContextSourceMutation(
+      _context,
+      chat: _chatService,
+      conversationId: message.conversationId,
+      groups: {ContextHistory.group(message)},
+    );
+    if (approved == null) return;
 
     if (currentConversation != null) {
       await _chatService.clearConversationSuggestions(currentConversation!.id);
@@ -2213,6 +2363,7 @@ class HomePageController extends ChangeNotifier {
     }
 
     final newMsg = await _chatService.appendMessageVersion(
+      expectedContextState: approved,
       messageId: message.id,
       content: result.content,
       parts: message.role == 'assistant' && !keepThinkingAndToolCards
@@ -2255,7 +2406,8 @@ class HomePageController extends ChangeNotifier {
     if (!ctx.mounted || bindingSerial != _composerSwitch) return;
     final hasDraft =
         _inputController.text.trim().isNotEmpty ||
-        _mediaController.hasDraftMedia;
+        _mediaController.hasDraftMedia ||
+        _mediaController.hasUiContext;
     if (hasDraft &&
         (_composerDrafts == null ||
             isTemporaryConversation ||
@@ -2297,9 +2449,7 @@ class HomePageController extends ChangeNotifier {
       return;
     }
     var input = _mediaController.snapshotInput(_inputController.text);
-    if (input.text.trim().isEmpty &&
-        input.imagePaths.isEmpty &&
-        input.documents.isEmpty) {
+    if (input.isEmpty) {
       return;
     }
     final owner = _composerOwner;
@@ -2429,6 +2579,22 @@ class HomePageController extends ChangeNotifier {
     }
   }
 
+  Future<void> stageUiDraft(UiDraftRequest request) {
+    final serial = _composerSwitch;
+    final edit = _userMessageEditState;
+    return stageUiComposerDraft(
+      _context,
+      request: request,
+      target: _mediaController.capture(),
+      isCurrent: () =>
+          !_composerDisposed &&
+          serial == _composerSwitch &&
+          identical(edit, _userMessageEditState) &&
+          currentQueuedInput == null &&
+          currentConversation?.id == request.conversationId,
+    );
+  }
+
   Future<ChatMessage?> _saveEditedUserMessageVersion(
     ChatInputData input,
     UserMessageEditState editState,
@@ -2437,10 +2603,24 @@ class HomePageController extends ChangeNotifier {
         ? currentConversation
         : _chatService.getConversation(input.draftSubmission!.conversationId);
     if (conversation == null) return null;
+    final original = (await _chatService.loadMessagesByIds([
+      editState.messageId,
+    ])).firstOrNull;
+    if (original == null) return null;
+    if (!_context.mounted) return null;
+    final approved = await confirmContextSourceMutation(
+      _context,
+      chat: _chatService,
+      conversationId: conversation.id,
+      groups: {ContextHistory.group(original)},
+    );
+    if (approved == null) return null;
+    if (!_context.mounted) return null;
     final assistants = _context.read<AssistantProvider>();
     final assistant = assistants.resolveConversationAssistant(
       conversation.assistantId,
     );
+    final omittedText = AppLocalizations.of(_context)!.genuiChipOmitted;
     final parts = await MessageGenerationService.buildPersistedUserMessageParts(
       input,
       assistant: assistant,
@@ -2454,9 +2634,13 @@ class HomePageController extends ChangeNotifier {
     }
 
     final newMsg = await _chatService.appendMessageVersion(
+      expectedContextState: approved,
       messageId: editState.messageId,
       parts: parts,
       draftSubmission: input.draftSubmission,
+      uiContext: input.uiContext == null
+          ? null
+          : UiContextSubmission(input.uiContext!, omittedText: omittedText),
     );
     if (newMsg == null) return null;
     if (currentConversation?.id != conversation.id) return newMsg;
@@ -2565,6 +2749,8 @@ class HomePageController extends ChangeNotifier {
   Future<void> debugHandleAssistantMessageFinished(ChatMessage message) =>
       _handleAssistantMessageFinished(message);
 
+  int _speechProjectionEpoch = 0;
+
   Future<void> speakMessage(ChatMessage message) async {
     await _speakAssistantMessage(message, autoPlay: false);
   }
@@ -2573,6 +2759,7 @@ class HomePageController extends ChangeNotifier {
     ChatMessage message, {
     required bool autoPlay,
   }) async {
+    final epoch = ++_speechProjectionEpoch;
     final tts = _context.read<TtsProvider>();
     if (!autoPlay && tts.playbackState.isActive) {
       await tts.stop();
@@ -2593,14 +2780,25 @@ class HomePageController extends ChangeNotifier {
     }
 
     final sp = _context.read<SettingsProvider>();
-    final text = TtsTextSelection.apply(
-      message.content,
-      mode: sp.ttsTextSelectionMode,
-    );
+    final mode = sp.ttsTextSelectionMode;
+    final projected = await readUiMessageText(_context, message);
+    if (projected == null ||
+        !_context.mounted ||
+        _composerDisposed ||
+        epoch != _speechProjectionEpoch) {
+      return;
+    }
+    final text = projected.hasUi
+        ? projected.speech(mode)
+        : TtsTextSelection.apply(message.content, mode: mode);
     if (text.trim().isEmpty) return;
     // Automatic narration acknowledges preparation, so ChatActions can release
     // generation resources while the independent speech session keeps running.
-    await tts.speak(text, waitForCompletion: !autoPlay);
+    await tts.speak(
+      text,
+      waitForCompletion: !autoPlay,
+      plainText: projected.hasUi,
+    );
   }
 
   void shareMessage(int messageIndex, List<ChatMessage> messageList) {
@@ -3000,7 +3198,21 @@ class HomePageController extends ChangeNotifier {
   // ============================================================================
 
   Future<void> setSelectedVersion(String groupId, int version) async {
-    await _chatController.setSelectedVersion(groupId, version);
+    final conversationId = currentConversation?.id;
+    if (conversationId == null) return;
+    if (!_context.mounted) return;
+    final approved = await confirmContextSourceMutation(
+      _context,
+      chat: _chatService,
+      conversationId: conversationId,
+      groups: {groupId},
+    );
+    if (approved == null || currentConversation?.id != conversationId) return;
+    await _chatController.setSelectedVersion(
+      groupId,
+      version,
+      expectedContextState: approved,
+    );
     for (final message in _chatController.collapsedMessages) {
       if ((message.groupId ?? message.id) == groupId) {
         _restoreAssistantMessageUiState(message);
@@ -3238,6 +3450,7 @@ class HomePageController extends ChangeNotifier {
     if (!_context.mounted) return false;
     if (_inputController.text.isEmpty &&
         !_mediaController.hasDraftMedia &&
+        !_mediaController.hasUiContext &&
         !_mediaController.hasUnreadyImages) {
       return true;
     }
@@ -3322,9 +3535,44 @@ class HomePageController extends ChangeNotifier {
             DraftImage(path: path, processing: true),
         ],
         documents: input.documents,
+        uiContext: input.uiContext,
       );
+      if (choice == 'append' &&
+          ComposerDraftStore.hasUiContextConflict(draft.active, shared)) {
+        if (!_context.mounted ||
+            !await confirmGenUiReplacement(
+              _context,
+              current: draft.active.uiContext!,
+              replacement: shared.uiContext!,
+            )) {
+          return false;
+        }
+        if (draft.revision != revision ||
+            _composerOwner != owner ||
+            !drafts.isCurrent(owner, generation)) {
+          throw StateError('composer_share_changed');
+        }
+      }
+      if (visible) {
+        await _inputController.flushMessageInput();
+        if (_composerDisposed ||
+            _composerOwner != owner ||
+            currentConversation?.id != owner) {
+          throw StateError('composer_share_changed');
+        }
+        _saveComposerDraft();
+      }
+      if (drafts.suspended ||
+          !drafts.isCurrent(owner, generation) ||
+          draft.revision != revision) {
+        throw StateError('composer_share_changed');
+      }
       final value = choice == 'append'
-          ? ComposerDraftStore.merge(draft.active, shared)
+          ? ComposerDraftStore.merge(
+              draft.active,
+              shared,
+              selectedUiContext: shared.uiContext,
+            )
           : shared;
       if (choice == 'replace') {
         drafts.invalidateInputOperations(
@@ -3389,7 +3637,9 @@ class HomePageController extends ChangeNotifier {
       text: input.text,
       selection: TextSelection.collapsed(offset: input.text.length),
     );
-    _mediaController.addFiles(input.documents);
+    _mediaController.restoreDraft(
+      ComposerDraftInput.fromInput(input).copyWith(images: const []),
+    );
     _mediaController.enqueueImages(
       input.imagePaths,
       _context.read<SettingsProvider>().resolveImageCompressConfig(),
@@ -3451,6 +3701,8 @@ class HomePageController extends ChangeNotifier {
           targetId,
           assistantId: _chatService.getConversation(targetId)?.assistantId,
         );
+        final source = await drafts.load(sourceId);
+        final sourceRevision = source.revision;
         final revision = target.revision;
         final choice = target.active.isEmpty
             ? 'replace'
@@ -3459,11 +3711,32 @@ class HomePageController extends ChangeNotifier {
         if (target.revision != revision) {
           throw StateError('composer_transfer_changed');
         }
+        final sourceContext = source.active.uiContext;
+        if (choice == 'append' &&
+            ComposerDraftStore.hasUiContextConflict(
+              target.active,
+              source.active,
+            )) {
+          if (!_context.mounted ||
+              !await confirmGenUiReplacement(
+                _context,
+                current: target.active.uiContext!,
+                replacement: sourceContext!,
+              )) {
+            return;
+          }
+        }
+        if (source.revision != sourceRevision ||
+            target.revision != revision ||
+            currentConversation?.id != visibleId) {
+          throw StateError('composer_transfer_changed');
+        }
         final finalInput = _drainComposerInput();
         if (finalInput != null) await finalInput;
         if (_composerDisposed ||
             currentConversation?.id != visibleId ||
-            target.revision != revision) {
+            target.revision != revision ||
+            source.revision != sourceRevision) {
           throw StateError('composer_transfer_changed');
         }
         _saveComposerDraft();
@@ -3473,7 +3746,12 @@ class HomePageController extends ChangeNotifier {
         _mediaController.restoringDraft = true;
         notifyListeners();
         try {
-          await drafts.transfer(sourceId, targetId, append: choice == 'append');
+          await drafts.transfer(
+            sourceId,
+            targetId,
+            append: choice == 'append',
+            selectedUiContext: choice == 'append' ? sourceContext : null,
+          );
         } finally {
           if (!_composerDisposed &&
               _composerOwner == bindingOwner &&
@@ -3560,8 +3838,11 @@ class HomePageController extends ChangeNotifier {
   Future<void> scrollToMessageId(
     String targetId, {
     bool useRikkaTransition = false,
+    String? surfaceKey,
   }) async {
     _warmupSerial++;
+    uiSearchNavigation.clear();
+    final conversationId = currentConversation?.id;
     if (useRikkaTransition) {
       try {
         await _messageJumpTransitionController.reverse();
@@ -3582,6 +3863,11 @@ class HomePageController extends ChangeNotifier {
         targetId: targetId,
         targetIndex: index,
       );
+      if (surfaceKey != null &&
+          conversationId != null &&
+          currentConversation?.id == conversationId) {
+        uiSearchNavigation.reveal(conversationId, targetId, surfaceKey);
+      }
     } finally {
       if (useRikkaTransition) {
         try {
@@ -3929,6 +4215,7 @@ class HomePageController extends ChangeNotifier {
 
   @override
   void dispose() {
+    uiSearchNavigation.dispose();
     final owner = _composerOwner;
     final drafts = _composerDrafts;
     final edit = owner == null ? null : drafts?.peek(owner)?.editMessageId;
@@ -3993,6 +4280,7 @@ class HomePageController extends ChangeNotifier {
     try {
       _notificationTapSub?.cancel();
     } catch (_) {}
+    _viewModel.dispose();
     _chatController.dispose();
     _streamController.dispose();
     super.dispose();

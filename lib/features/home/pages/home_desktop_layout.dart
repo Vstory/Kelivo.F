@@ -107,7 +107,11 @@ class HomeDesktopScaffold extends StatelessWidget {
   final bool globalSearchMode;
   final String globalSearchQuery;
   final ValueChanged<String> onGlobalSearchQueryChanged;
-  final Future<void> Function(String conversationId, String messageId)
+  final Future<void> Function(
+    String conversationId,
+    String messageId,
+    String? surfaceKey,
+  )
   onOpenGlobalSearchResult;
   final void Function(double dx) onSidebarWidthChanged;
   final VoidCallback onSidebarWidthChangeEnd;
@@ -307,7 +311,7 @@ class HomeDesktopScaffold extends StatelessWidget {
                   onGlobalSearchQueryChanged: (_) {},
                   onEnterGlobalSearch: () {},
                   onExitGlobalSearch: () {},
-                  onOpenGlobalSearchResult: (_, __) async {},
+                  onOpenGlobalSearchResult: (_, _, _) async {},
                   onSelectConversation: (id, {closeDrawer = true}) =>
                       onSelectConversation(id),
                   onNewConversation: ({closeDrawer = true}) =>
@@ -323,14 +327,15 @@ class HomeDesktopScaffold extends StatelessWidget {
 
   bool _hasBoundWorkspace(BuildContext context) {
     try {
-      final chat = context.watch<ChatService>();
       final workspaces = context.watch<WorkspaceProvider>();
-      final id = chat.currentConversationId;
-      if (id == null) return false;
-      return WorkspaceBinding.extrasHaveWorkspace(
-        chat.getConversation(id)?.extras,
-        (workspaceId) => workspaces.byId(workspaceId) != null,
-      );
+      return context.select<ChatService, bool>((chat) {
+        final id = chat.currentConversationId;
+        return id != null &&
+            WorkspaceBinding.extrasHaveWorkspace(
+              chat.getConversation(id)?.extras,
+              (workspaceId) => workspaces.byId(workspaceId) != null,
+            );
+      });
     } on ProviderNotFoundException {
       return false;
     }
@@ -345,7 +350,9 @@ class HomeDesktopScaffold extends StatelessWidget {
     final open =
         workspaceBound &&
         context.watch<SettingsProvider>().desktopWorkspaceBarOpen;
-    final conversationId = context.watch<ChatService>().currentConversationId;
+    final conversationId = context.select<ChatService, String?>(
+      (chat) => chat.currentConversationId,
+    );
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

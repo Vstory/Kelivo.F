@@ -24,12 +24,16 @@ export 'src/flutter/selection/selection_controller.dart'
         MarkstreamSelection,
         MarkstreamSelectionController,
         MarkstreamSelectionScope,
-        MarkstreamSelectionFragment;
+        MarkstreamSelectionFragment,
+        MarkstreamCopyLimitException;
 export 'src/flutter/performance_limits.dart';
 export 'src/flutter/render/blocks/code_block.dart' show MarkstreamCodeBlock;
+export 'src/flutter/render/blocks/math_block.dart' show MarkstreamMathBlock;
 export 'src/flutter/render/blocks/directive_card.dart'
     show MarkstreamDirectiveCard;
 
 export 'src/flutter/render/blocks/table_block.dart' show MarkstreamTableBlock;
 export 'src/flutter/render/blocks/details_block.dart'
     show MarkstreamDetailsBlock;
+
+export 'src/flutter/selection/selection_projection.dart';
