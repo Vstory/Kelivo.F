@@ -8,3 +8,6 @@ a1a75bb8f54bcc71bb913f302d58479594b7f98c:lib/core/models/provider_oauth.dart:gen
 a1a75bb8f54bcc71bb913f302d58479594b7f98c:lib/core/services/auth/claude_oauth_adapter.dart:generic-api-key:5
 a1a75bb8f54bcc71bb913f302d58479594b7f98c:lib/core/services/auth/claude_oauth_request.dart:generic-api-key:18
 f685a3396077b6623ae7880802a9a4d9483411df:lib/core/providers/settings_provider.dart:generic-api-key:108
+# Argon2id 迁移测试里的固定测试向量（32 字节 hex），不是真实密钥
+003679664882bbc2223668708aeba8151f00d1ff:test/core/services/backup/backup_encryption_test.dart:generic-api-key:184
+003679664882bbc2223668708aeba8151f00d1ff:test/core/services/backup/backup_encryption_test.dart:generic-api-key:190
