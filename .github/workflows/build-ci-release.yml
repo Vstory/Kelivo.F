@@ -5,15 +5,13 @@
 #     ubuntu-latest + JDK 17 zulu + Flutter 3.47.6 stable（Dart 3.13），与上游 README 标称的
 #     「Flutter 3.47.6 (Dart 3.13, matching CI)」同版本；上游 master 线用 Flutter master channel，
 #     不跟 —— 滚动 channel 会让同一次提交的构建结果不可复现。
-#   本项目（Flutter）对母版有五处改写：
+#   本项目（Flutter）对母版有四处改写：
 #     ② 版本号：versionName 来自 pubspec.yaml，versionCode 由 CI 运行序号生成；
 #        Flutter 的 --build-name 只收数字点分版本，塞不进 `+ci-<变体>.<短号>`，
 #        改由 ci-fork-identity.py 就地让 Gradle 从环境变量取这两个值（只改工作区）
 #     ③ 产物定位：Flutter 的 apk 在 build/app/outputs/flutter-apk/，文件名按 ABI 与变体拼
 #     ④ fork 身份：只错开包名 / 显示名（Flutter 无内核态命名空间可撞），改写脚本
 #        scripts/ci-fork-identity.py 只动 runner 工作区，仓库源码与上游逐字一致
-#     ⑤ fork UI 补丁：同一个脚本顺带改 MCP 自定义图标（URL / 文件）铺满头像、
-#        不留 0.75 内缩的灰边；同样只动工作区，源码与上游逐字一致
 # ══════════════════════════════════════════════════════════════════════════════
 name: Build · CI · Release · Flutter 3.47
 

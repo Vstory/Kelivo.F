@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-"""CI 专用：把 runner 工作区改写成 fork 差异，仓库源码一行都不落库。
+"""CI 专用：把 runner 工作区改写成 fork 身份，仓库源码一行都不落库。
 
 fork 包与上游原版要能同时安装、同时运行，包名与显示名必须错开。改写只作用于 CI 的
 工作区 —— 包名一旦落进仓库，每次 rebase 上游都要撞冲突。逐项校验「期望的原文还在」，
 上游改了写法就整体失败，不允许静默漏改。
-
-除身份外，fork 想改的上游 UI 细节（目前是 MCP 自定义图标铺满头像）也走这里，
-理由同上：源码保持与上游逐字一致，rebase 不用解冲突。
 
 用法：
     python3 scripts/ci-fork-identity.py --app-id com.psyche.kelivo.fork --label Kelivo.F
@@ -25,8 +22,6 @@ GRADLE = "android/app/build.gradle.kts"
 MANIFEST = "android/app/src/main/AndroidManifest.xml"
 PROGUARD = "android/app/proguard-rules.pro"
 MAIN_DART = "lib/main.dart"
-MCP_ICON = "lib/features/mcp/widgets/mcp_resolved_icon.dart"
-MCP_AVATAR = "lib/features/mcp/widgets/mcp_server_avatar.dart"
 
 DEFAULT_APP_ID = "com.psyche.kelivo.fork"
 DEFAULT_LABEL = "Kelivo.F"
@@ -89,35 +84,6 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
             "        }",
             1,
         ),
-        # 列表头像里用户自己填的 MCP 图标（URL / 文件）被 0.75 缩进，圆形 logo 四周留出一圈
-        # 容器底色。内置 asset 图标与 emoji 保留缩进 —— 它们自带留白，铺满反而拥挤。
-        (
-            MCP_ICON,
-            "                  width: widget.size * (widget.inset ? .75 : 1),\n"
-            "                  height: widget.size * (widget.inset ? .75 : 1),",
-            "                  width: widget.size,\n                  height: widget.size,",
-            1,
-        ),
-        (
-            MCP_ICON,
-            "                width: widget.size * (widget.inset ? .65 : 1),\n"
-            "                height: widget.size * (widget.inset ? .65 : 1),\n"
-            "                theme: SvgTheme(",
-            "                width: widget.size,\n"
-            "                height: widget.size,\n"
-            "                theme: SvgTheme(",
-            1,
-        ),
-        # 铺满后图片自带的 0.2·size 圆角小于容器圆角（36dp tile 配 10dp），满色图四角会探出
-        # 容器边缘；让容器自己裁一刀，形状回到容器圆角。
-        (
-            MCP_AVATAR,
-            "            alignment: Alignment.center,\n            decoration: showBackground",
-            "            alignment: Alignment.center,\n"
-            "            clipBehavior: showBackground ? Clip.antiAlias : Clip.none,\n"
-            "            decoration: showBackground",
-            1,
-        ),
     ]
 
 
@@ -127,14 +93,12 @@ FORBIDDEN = [
     "title: 'Kelivo'",
     "versionCode = flutter.versionCode",
     "versionName = flutter.versionName",
-    # asset 图标用的 .65 会留下，只有自定义图标这条 .75 必须消失。
-    "widget.size * (widget.inset ? .75 : 1)",
 ]
 
 
 def scan_forbidden() -> list[str]:
     hits: list[str] = []
-    for rel in (GRADLE, MANIFEST, MAIN_DART, MCP_ICON):
+    for rel in (GRADLE, MANIFEST, MAIN_DART):
         text = (REPO_ROOT / rel).read_text(encoding="utf-8")
         for lineno, line in enumerate(text.splitlines(), 1):
             for needle in FORBIDDEN:
