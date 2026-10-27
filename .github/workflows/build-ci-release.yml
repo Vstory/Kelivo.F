@@ -59,7 +59,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     env:
       GIT_CONFIG_COUNT: '1'
       GIT_CONFIG_KEY_0: init.defaultBranch
