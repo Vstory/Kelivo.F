@@ -343,6 +343,17 @@ jobs:
               echo "  ✅ release 变体（非 debuggable）"
             fi
 
+            # R8 改名会打断 JNI：-keepnames 声明的类必须原样出现在 dex 里，
+            # 否则 native 侧按原名查类会拿到 NoSuchMethodError / ClassNotFound，
+            # 而且是启动即崩、构建期毫无征兆。清单为空就跳过（没声明 ≠ 失败）。
+            KEEP="$(sed -nE 's/^-keepnames +class +([^ {]+).*/\1/p' android/app/proguard-rules.pro 2>/dev/null | head -50 || true)"
+            for cls in $KEEP; do
+              cls_path="$(printf '%s' "$cls" | tr . /)"
+              unzip -p "$APK" 'classes*.dex' 2>/dev/null | grep -aq "$cls_path" \
+                || { echo "::error::$NAME 中 $cls 被 R8 改名或移除 —— JNI 会 NoSuchMethodError，拒绝发布"; exit 1; }
+              echo "  ✅ R8 未改 JNI 类：$cls"
+            done
+
             OUT="$("$APKSIGNER" verify --print-certs "$APK" 2>&1 || true)"
             if printf '%s' "$OUT" | grep -qi 'DOES NOT VERIFY\|Missing.*signature\|no signature'; then
               echo "::error::$NAME 未通过签名校验 —— 拒绝发布"
