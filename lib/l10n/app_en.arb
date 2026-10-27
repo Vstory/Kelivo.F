@@ -1784,6 +1784,8 @@
   "modelSpecFormDialectAnthropicBudgetSubtitle": "thinking.budget_tokens",
   "modelSpecFormDialectAnthropicAdaptiveEffort": "Anthropic adaptive effort",
   "modelSpecFormDialectAnthropicAdaptiveEffortSubtitle": "thinking + output_config.effort",
+  "modelSpecFormDialectAnthropicBetweenTools": "Anthropic adaptive / between_tools",
+  "modelSpecFormDialectAnthropicBetweenToolsSubtitle": "Adaptive thinking; Off uses between_tools",
   "modelSpecFormDialectAnthropicEffort": "Anthropic effort",
   "modelSpecFormDialectAnthropicEffortSubtitle": "thinking + output_config.effort",
   "modelSpecFormDialectGeminiThinkingBudget": "Gemini thinking budget",
@@ -6001,8 +6003,8 @@
   "imageExportSaving": "Saving image…",
   "backupEncryptionTitle": "Encrypt backups",
   "backupEncryptionOffHint": "Unencrypted backups can be read by anyone with the file.",
-  "backupEncryptionOnHint": "Backups are encrypted while this page stays open.",
-  "backupEncryptionPasswordHint": "Keep this password safe. If you lose it, the backup cannot be restored. It is kept only while this page is open.",
+  "backupEncryptionOnHint": "Backups are encrypted. Enter the password again after restarting the app.",
+  "backupEncryptionPasswordHint": "Keep this password safe. If you lose it, the backup cannot be restored. It is kept in memory until you exit the app.",
   "backupEncryptionPassword": "Password",
   "backupEncryptionConfirmPassword": "Confirm password",
   "backupEncryptionMismatch": "Passwords do not match.",
@@ -7134,5 +7136,101 @@
   },
   "contextImpactUndoAlso": "Also undone",
   "contextClearMarker": "Context cleared",
-  "toolPermissionScopeThisChat": "This chat only"
+  "toolPermissionScopeThisChat": "This chat only",
+  "dataDirectoryTitle": "Data directory",
+  "dataDirectoryChange": "Change directory",
+  "dataDirectoryChoose": "Choose an empty local folder",
+  "dataDirectoryHint": "Choose an empty folder on a local drive. Chat history, attachments and app-managed files move after a restart. Small device settings and system caches stay in their system locations.",
+  "dataDirectoryPendingHint": "The move is scheduled for the next restart. Your current data remains in place until copying and verification finish. Destination:",
+  "dataDirectoryRestart": "Restart and move data",
+  "dataDirectoryCancelMove": "Cancel move and keep original directory",
+  "dataDirectoryPreviousHint": "The original copy was retained. Once the new directory has started successfully, you can remove the old copy to free disk space. Clean it before changing directories again.",
+  "dataDirectoryCleanPrevious": "Clean up original copy",
+  "dataDirectoryCleanConfirm": "Remove the retained copy from the directory below? Data in the current directory will be kept. Files changed since the move will not be deleted.",
+  "dataDirectoryMoving": "Moving and verifying data… Please keep Kelivo open.",
+  "dataDirectoryStartupFailed": "Unable to open the data directory",
+  "dataDirectoryRetry": "Retry",
+  "dataDirectoryUnavailable": "The data directory is unavailable. Reconnect the drive or restore the folder to its original location, then retry. No empty database will be created.",
+  "dataDirectoryIdentityMismatch": "This folder does not match the configured data directory. Restore the original folder and retry.",
+  "dataDirectoryNotEmpty": "Choose an empty folder. Existing files will not be overwritten.",
+  "dataDirectoryOverlap": "Choose a separate folder outside the current data directory. Its parent folders and the drive root cannot be used.",
+  "dataDirectoryLocalOnly": "Choose a local drive rather than a network share.",
+  "dataDirectoryFinishPrevious": "Finish or cancel the pending move, and clean up the retained copy before choosing another directory.",
+  "dataDirectoryPendingRestore": "A backup restore is pending. Cancel the directory move and restart to finish restoring, then try the move again.",
+  "dataDirectorySourceChanged": "The original data has changed since the copy was made. It has been kept. Cancel the pending move before starting a new one; retained copies can be inspected manually.",
+  "dataDirectoryCopyChanged": "The destination contains unexpected or changed files. The original data has been kept. Check the destination before retrying.",
+  "dataDirectoryGenericError": "The operation could not finish. Check available disk space, folder permissions and whether another Kelivo process is running, then retry. Existing data has been kept.",
+  "dataDirectoryCancelHint": "Cancelling keeps any files already copied to the destination. You can inspect and remove that partial copy yourself.",
+  "providerDetailPageBaseUrlExample": "e.g. {url}",
+  "@providerDetailPageBaseUrlExample": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "providerDetailPageApiKeyExample": "e.g. sk-…",
+  "providerDetailPageRequestUrlLabel": "Request URL",
+  "providerDetailPageUrlWillAppendVersion": "No version in URL; {v} will be added when you leave the field",
+  "@providerDetailPageUrlWillAppendVersion": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
+  "providerDetailPageUrlAppendedVersion": "Added {v} automatically",
+  "@providerDetailPageUrlAppendedVersion": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
+  "providerDetailPageUrlTrimmedSlash": "Removed trailing /",
+  "providerDetailPageUrlMovedPath": "Full endpoint detected; {path} moved to API Path",
+  "@providerDetailPageUrlMovedPath": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "providerDetailPageUrlEmptyError": "Required to send requests",
+  "providerDetailPageUrlInvalidError": "Invalid URL; must start with http:// or https://",
+  "providerDetailPageRestoreDefaultTooltip": "Restore default",
+  "providerDetailPageClearTooltip": "Clear",
+  "providerDetailPageTestSuccessWithLatency": "Success · {ms} ms",
+  "@providerDetailPageTestSuccessWithLatency": {
+    "placeholders": {
+      "ms": {
+        "type": "String"
+      }
+    }
+  },
+  "providerDetailPageTestFailedWithCode": "Failed · {code}",
+  "@providerDetailPageTestFailedWithCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "providerDetailPageTestHintMissingVersion": "The URL may be missing a version; try {url}",
+  "@providerDetailPageTestHintMissingVersion": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "providerAutoVersionAdded": "Added {v} automatically",
+  "@providerAutoVersionAdded": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
+  "providerUndo": "Undo"
 }

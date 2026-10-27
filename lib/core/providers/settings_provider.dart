@@ -40,6 +40,7 @@ import '../../utils/provider_grouping_logic.dart';
 import '../../utils/brand_assets.dart';
 import '../../utils/image_compressor.dart';
 import '../database/business_preferences.dart';
+import '../services/backup/backup_cancel_token.dart';
 import '../services/memory/memory_prompts.dart';
 import '../services/memory/memory_trace.dart';
 import '../../theme/palettes.dart';
@@ -101,6 +102,9 @@ class SettingsProvider extends ChangeNotifier {
   static const Set<String> _builtInProviderKeys = {
     ..._builtInProviderKeysInOrder,
   };
+  static bool isBuiltInProvider(String key) =>
+      _builtInProviderKeys.contains(key);
+
   static const String _themeModeKey = 'theme_mode_v1';
   static const String _providerConfigsKey = 'provider_configs_v1';
   static const String _pinnedModelsKey = 'pinned_models_v1';
@@ -394,6 +398,8 @@ class SettingsProvider extends ChangeNotifier {
   static const String _searchAutoTestOnLaunchKey =
       'search_auto_test_on_launch_v1';
   static const String _webFetchModeKey = 'search_web_fetch_v1';
+  static const String _backupEncryptionEnabledKey =
+      'backup_encryption_enabled_v1';
   static const String _webDavConfigKey = 'webdav_config_v1';
   static const String _s3ConfigKey = 's3_config_v1';
   // Global network proxy
@@ -1454,6 +1460,8 @@ class SettingsProvider extends ChangeNotifier {
         await prefs.setString(_asrSelectedServiceIdKey, _selectedAsrServiceId!);
       }
     }
+    _backupEncryptionEnabled =
+        prefs.getBool(_backupEncryptionEnabledKey) ?? false;
     // webdav config
     final webdavStr = prefs.getString(_webDavConfigKey);
     if (webdavStr != null && webdavStr.isNotEmpty) {
@@ -2190,6 +2198,39 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   // ===== Backup & WebDAV settings =====
+  bool _backupEncryptionEnabled = false;
+  String? _backupEncryptionPassword;
+  bool get backupEncryptionEnabled => _backupEncryptionEnabled;
+
+  /// Persist only the preference. The password stays in this app session, so
+  /// navigating away cannot silently disable encryption or lose the password.
+  Future<void> setBackupEncryptionPassword(String? password) async {
+    if (password != null && password.isEmpty) {
+      throw ArgumentError('backup_password_empty');
+    }
+    await loaded;
+    await _preferences.setBool(_backupEncryptionEnabledKey, password != null);
+    _backupEncryptionEnabled = password != null;
+    _backupEncryptionPassword = password;
+    notifyListeners();
+  }
+
+  /// An enabled preference without a session password must prompt or cancel;
+  /// null is returned only when the user has disabled encryption.
+  Future<String?> resolveBackupEncryptionPassword(
+    Future<String?> Function() prompt,
+  ) async {
+    await loaded;
+    if (!_backupEncryptionEnabled) return null;
+    if (_backupEncryptionPassword case final String password) return password;
+    final password = await prompt();
+    if (password == null || password.isEmpty || !_backupEncryptionEnabled) {
+      throw const BackupCancelledException();
+    }
+    _backupEncryptionPassword = password;
+    return password;
+  }
+
   WebDavConfig _webDavConfig = const WebDavConfig();
   WebDavConfig get webDavConfig => _webDavConfig;
   Future<void> setWebDavConfig(WebDavConfig cfg) async {
@@ -2987,6 +3028,7 @@ class SettingsProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _backupEncryptionPassword = null;
     ProviderOAuthService.instance.unbind(this);
     _toolSchemaOverridePersistTimer?.cancel();
     _toolSchemaOverridePersistTimer = null;
@@ -5744,6 +5786,8 @@ Requirements:
     copy._asrServices = _asrServices;
     copy._selectedAsrServiceId = _selectedAsrServiceId;
     // Copy other fields
+    copy._backupEncryptionEnabled = _backupEncryptionEnabled;
+    copy._backupEncryptionPassword = _backupEncryptionPassword;
     copy._providersOrder = _providersOrder;
     copy._themeMode = _themeMode;
     copy._themePaletteId = _themePaletteId;
@@ -6140,6 +6184,7 @@ class ProviderConfig {
   final String? oauthModelsClientVersion;
   bool get isOAuth => oauthProvider != null;
   final String baseUrl;
+  final bool autoVersionDisabled;
   final ProviderKind?
   providerType; // Explicit provider type to avoid misclassification
   final String? chatPath; // openai only
@@ -6234,6 +6279,7 @@ class ProviderConfig {
     this.oauthModelsSyncedAt,
     this.oauthModelsClientVersion,
     required this.baseUrl,
+    this.autoVersionDisabled = false,
     this.providerType,
     this.chatPath,
     this.useResponseApi,
@@ -6288,6 +6334,7 @@ class ProviderConfig {
     DateTime? oauthModelsSyncedAt,
     Object? oauthModelsClientVersion = _sentinel,
     String? baseUrl,
+    bool? autoVersionDisabled,
     ProviderKind? providerType,
     String? chatPath,
     bool? useResponseApi,
@@ -6331,6 +6378,7 @@ class ProviderConfig {
         ? this.oauthModelsClientVersion
         : oauthModelsClientVersion as String?,
     baseUrl: baseUrl ?? this.baseUrl,
+    autoVersionDisabled: autoVersionDisabled ?? this.autoVersionDisabled,
     providerType: providerType ?? this.providerType,
     chatPath: chatPath ?? this.chatPath,
     useResponseApi: useResponseApi ?? this.useResponseApi,
@@ -6382,6 +6430,7 @@ class ProviderConfig {
     if (oauthModelsClientVersion != null)
       'oauthModelsClientVersion': oauthModelsClientVersion,
     'baseUrl': baseUrl,
+    'autoVersionDisabled': autoVersionDisabled,
     'providerType': providerType?.name,
     'chatPath': chatPath,
     'useResponseApi': useResponseApi,
@@ -6433,6 +6482,7 @@ class ProviderConfig {
     ),
     oauthModelsClientVersion: json['oauthModelsClientVersion'] as String?,
     baseUrl: json['baseUrl'] as String? ?? '',
+    autoVersionDisabled: json['autoVersionDisabled'] as bool? ?? false,
     providerType: json['providerType'] != null
         ? ProviderKind.values.firstWhere(
             (e) => e.name == json['providerType'],

@@ -7219,6 +7219,18 @@ abstract class AppLocalizations {
   /// **'thinking + output_config.effort'**
   String get modelSpecFormDialectAnthropicAdaptiveEffortSubtitle;
 
+  /// No description provided for @modelSpecFormDialectAnthropicBetweenTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Anthropic adaptive / between_tools'**
+  String get modelSpecFormDialectAnthropicBetweenTools;
+
+  /// No description provided for @modelSpecFormDialectAnthropicBetweenToolsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adaptive thinking; Off uses between_tools'**
+  String get modelSpecFormDialectAnthropicBetweenToolsSubtitle;
+
   /// No description provided for @modelSpecFormDialectAnthropicEffort.
   ///
   /// In en, this message translates to:
@@ -23637,13 +23649,13 @@ abstract class AppLocalizations {
   /// No description provided for @backupEncryptionOnHint.
   ///
   /// In en, this message translates to:
-  /// **'Backups are encrypted while this page stays open.'**
+  /// **'Backups are encrypted. Enter the password again after restarting the app.'**
   String get backupEncryptionOnHint;
 
   /// No description provided for @backupEncryptionPasswordHint.
   ///
   /// In en, this message translates to:
-  /// **'Keep this password safe. If you lose it, the backup cannot be restored. It is kept only while this page is open.'**
+  /// **'Keep this password safe. If you lose it, the backup cannot be restored. It is kept in memory until you exit the app.'**
   String get backupEncryptionPasswordHint;
 
   /// No description provided for @backupEncryptionPassword.
@@ -26903,6 +26915,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This chat only'**
   String get toolPermissionScopeThisChat;
+
+  /// No description provided for @dataDirectoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data directory'**
+  String get dataDirectoryTitle;
+
+  /// No description provided for @dataDirectoryChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change directory'**
+  String get dataDirectoryChange;
+
+  /// No description provided for @dataDirectoryChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an empty local folder'**
+  String get dataDirectoryChoose;
+
+  /// No description provided for @dataDirectoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an empty folder on a local drive. Chat history, attachments and app-managed files move after a restart. Small device settings and system caches stay in their system locations.'**
+  String get dataDirectoryHint;
+
+  /// No description provided for @dataDirectoryPendingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The move is scheduled for the next restart. Your current data remains in place until copying and verification finish. Destination:'**
+  String get dataDirectoryPendingHint;
+
+  /// No description provided for @dataDirectoryRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart and move data'**
+  String get dataDirectoryRestart;
+
+  /// No description provided for @dataDirectoryCancelMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel move and keep original directory'**
+  String get dataDirectoryCancelMove;
+
+  /// No description provided for @dataDirectoryPreviousHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The original copy was retained. Once the new directory has started successfully, you can remove the old copy to free disk space. Clean it before changing directories again.'**
+  String get dataDirectoryPreviousHint;
+
+  /// No description provided for @dataDirectoryCleanPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean up original copy'**
+  String get dataDirectoryCleanPrevious;
+
+  /// No description provided for @dataDirectoryCleanConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the retained copy from the directory below? Data in the current directory will be kept. Files changed since the move will not be deleted.'**
+  String get dataDirectoryCleanConfirm;
+
+  /// No description provided for @dataDirectoryMoving.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving and verifying data… Please keep Kelivo open.'**
+  String get dataDirectoryMoving;
+
+  /// No description provided for @dataDirectoryStartupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the data directory'**
+  String get dataDirectoryStartupFailed;
+
+  /// No description provided for @dataDirectoryRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get dataDirectoryRetry;
+
+  /// No description provided for @dataDirectoryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The data directory is unavailable. Reconnect the drive or restore the folder to its original location, then retry. No empty database will be created.'**
+  String get dataDirectoryUnavailable;
+
+  /// No description provided for @dataDirectoryIdentityMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This folder does not match the configured data directory. Restore the original folder and retry.'**
+  String get dataDirectoryIdentityMismatch;
+
+  /// No description provided for @dataDirectoryNotEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an empty folder. Existing files will not be overwritten.'**
+  String get dataDirectoryNotEmpty;
+
+  /// No description provided for @dataDirectoryOverlap.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a separate folder outside the current data directory. Its parent folders and the drive root cannot be used.'**
+  String get dataDirectoryOverlap;
+
+  /// No description provided for @dataDirectoryLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a local drive rather than a network share.'**
+  String get dataDirectoryLocalOnly;
+
+  /// No description provided for @dataDirectoryFinishPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish or cancel the pending move, and clean up the retained copy before choosing another directory.'**
+  String get dataDirectoryFinishPrevious;
+
+  /// No description provided for @dataDirectoryPendingRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'A backup restore is pending. Cancel the directory move and restart to finish restoring, then try the move again.'**
+  String get dataDirectoryPendingRestore;
+
+  /// No description provided for @dataDirectorySourceChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'The original data has changed since the copy was made. It has been kept. Cancel the pending move before starting a new one; retained copies can be inspected manually.'**
+  String get dataDirectorySourceChanged;
+
+  /// No description provided for @dataDirectoryCopyChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'The destination contains unexpected or changed files. The original data has been kept. Check the destination before retrying.'**
+  String get dataDirectoryCopyChanged;
+
+  /// No description provided for @dataDirectoryGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'The operation could not finish. Check available disk space, folder permissions and whether another Kelivo process is running, then retry. Existing data has been kept.'**
+  String get dataDirectoryGenericError;
+
+  /// No description provided for @dataDirectoryCancelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelling keeps any files already copied to the destination. You can inspect and remove that partial copy yourself.'**
+  String get dataDirectoryCancelHint;
+
+  /// No description provided for @providerDetailPageBaseUrlExample.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. {url}'**
+  String providerDetailPageBaseUrlExample(String url);
+
+  /// No description provided for @providerDetailPageApiKeyExample.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. sk-…'**
+  String get providerDetailPageApiKeyExample;
+
+  /// No description provided for @providerDetailPageRequestUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Request URL'**
+  String get providerDetailPageRequestUrlLabel;
+
+  /// No description provided for @providerDetailPageUrlWillAppendVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'No version in URL; {v} will be added when you leave the field'**
+  String providerDetailPageUrlWillAppendVersion(String v);
+
+  /// No description provided for @providerDetailPageUrlAppendedVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {v} automatically'**
+  String providerDetailPageUrlAppendedVersion(String v);
+
+  /// No description provided for @providerDetailPageUrlTrimmedSlash.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed trailing /'**
+  String get providerDetailPageUrlTrimmedSlash;
+
+  /// No description provided for @providerDetailPageUrlMovedPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Full endpoint detected; {path} moved to API Path'**
+  String providerDetailPageUrlMovedPath(String path);
+
+  /// No description provided for @providerDetailPageUrlEmptyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Required to send requests'**
+  String get providerDetailPageUrlEmptyError;
+
+  /// No description provided for @providerDetailPageUrlInvalidError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid URL; must start with http:// or https://'**
+  String get providerDetailPageUrlInvalidError;
+
+  /// No description provided for @providerDetailPageRestoreDefaultTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore default'**
+  String get providerDetailPageRestoreDefaultTooltip;
+
+  /// No description provided for @providerDetailPageClearTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get providerDetailPageClearTooltip;
+
+  /// No description provided for @providerDetailPageTestSuccessWithLatency.
+  ///
+  /// In en, this message translates to:
+  /// **'Success · {ms} ms'**
+  String providerDetailPageTestSuccessWithLatency(String ms);
+
+  /// No description provided for @providerDetailPageTestFailedWithCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed · {code}'**
+  String providerDetailPageTestFailedWithCode(String code);
+
+  /// No description provided for @providerDetailPageTestHintMissingVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'The URL may be missing a version; try {url}'**
+  String providerDetailPageTestHintMissingVersion(String url);
+
+  /// No description provided for @providerAutoVersionAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {v} automatically'**
+  String providerAutoVersionAdded(String v);
+
+  /// No description provided for @providerUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get providerUndo;
 }
 
 class _AppLocalizationsDelegate
