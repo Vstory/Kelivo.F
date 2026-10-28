@@ -364,8 +364,6 @@ class SettingsProvider extends ChangeNotifier {
   static const String _appLaunchCountKey = 'app_launch_count_v1';
   // Desktop topic panel placement + right sidebar open state
   static const String _desktopTopicPositionKey = 'desktop_topic_position_v1';
-  static const String _desktopRightSidebarOpenKey =
-      'desktop_right_sidebar_open_v1';
   static const String _mobileBackgroundKey = 'mobile_background_settings_v1';
   // Fonts
   static const String _displayAppFontFamilyKey = 'display_app_font_family_v1';
@@ -427,10 +425,6 @@ class SettingsProvider extends ChangeNotifier {
   // Desktop UI
   static const String _desktopSidebarWidthKey = 'desktop_sidebar_width_v1';
   static const String _desktopSidebarOpenKey = 'desktop_sidebar_open_v1';
-  static const String _desktopRightSidebarWidthKey =
-      'desktop_right_sidebar_width_v1';
-  static const String _desktopWorkspaceBarOpenKey =
-      'desktop_workspace_bar_open_v1';
 
   // ===== Network TTS services =====
   List<TtsServiceOptions> _ttsServices = const <TtsServiceOptions>[];
@@ -560,24 +554,19 @@ class SettingsProvider extends ChangeNotifier {
   bool _desktopSidebarOpen = true;
   double get desktopSidebarWidth => _desktopSidebarWidth;
   bool get desktopSidebarOpen => _desktopSidebarOpen;
-  double _desktopRightSidebarWidth = 300;
-  double get desktopRightSidebarWidth => _desktopRightSidebarWidth;
 
   // Desktop: topic list position (left or right) and right sidebar open state
   DesktopTopicPosition _desktopTopicPosition = DesktopTopicPosition.left;
   DesktopTopicPosition get desktopTopicPosition => _desktopTopicPosition;
   bool get desktopTopicsOnRight =>
       _desktopTopicPosition == DesktopTopicPosition.right;
-  bool _desktopRightSidebarOpen = true;
-  bool get desktopRightSidebarOpen => _desktopRightSidebarOpen;
-  bool _desktopWorkspaceBarOpen = false;
-  bool get desktopWorkspaceBarOpen => _desktopWorkspaceBarOpen;
 
   Map<String, ProviderConfig> _providerConfigs = {};
   Map<String, ProviderConfig> get providerConfigs =>
       Map.unmodifiable(_providerConfigs);
-  bool get hasAnyActiveModel =>
-      _providerConfigs.values.any((c) => c.enabled && c.models.isNotEmpty);
+  bool get hasAnyActiveModel => _providerConfigs.values.any(
+    (c) => c.enabled && c.enabledModels.isNotEmpty,
+  );
   // Returns a config for the given key without mutating internal state when missing.
   // This avoids implicitly creating providers during read paths (e.g., rendering old chats).
   ProviderConfig getProviderConfig(String key, {String? defaultName}) {
@@ -1234,10 +1223,6 @@ class SettingsProvider extends ChangeNotifier {
       default:
         _desktopTopicPosition = DesktopTopicPosition.left;
     }
-    _desktopRightSidebarOpen =
-        prefs.getBool(_desktopRightSidebarOpenKey) ?? true;
-    _desktopWorkspaceBarOpen =
-        prefs.getBool(_desktopWorkspaceBarOpenKey) ?? false;
     // Chat message background style (default | frosted | solid)
     final bgStyleStr =
         prefs.getString(_displayChatMessageBackgroundStyleKey) ?? 'default';
@@ -1301,8 +1286,6 @@ class SettingsProvider extends ChangeNotifier {
     // desktop UI
     _desktopSidebarWidth = prefs.getDouble(_desktopSidebarWidthKey) ?? 300;
     _desktopSidebarOpen = prefs.getBool(_desktopSidebarOpenKey) ?? true;
-    _desktopRightSidebarWidth =
-        prefs.getDouble(_desktopRightSidebarWidthKey) ?? 300;
     // Load app locale; default to follow system on first launch
     final storedAppLocale = prefs.get(_appLocaleKey);
     _appLocaleTag = _readAppLocaleTag(prefs);
@@ -2107,17 +2090,6 @@ class SettingsProvider extends ChangeNotifier {
     await prefs.setBool(_desktopSidebarOpenKey, _desktopSidebarOpen);
   }
 
-  Future<void> setDesktopRightSidebarWidth(double w) async {
-    if ((_desktopRightSidebarWidth - w).abs() < 0.5) return;
-    _desktopRightSidebarWidth = w;
-    notifyListeners();
-    final prefs = _preferences;
-    await prefs.setDouble(
-      _desktopRightSidebarWidthKey,
-      _desktopRightSidebarWidth,
-    );
-  }
-
   // Desktop: topic panel placement (left/right)
   Future<void> setDesktopTopicPosition(DesktopTopicPosition pos) async {
     if (_desktopTopicPosition == pos) return;
@@ -2129,21 +2101,6 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   // Desktop: right sidebar visible state
-  Future<void> setDesktopRightSidebarOpen(bool open) async {
-    if (_desktopRightSidebarOpen == open) return;
-    _desktopRightSidebarOpen = open;
-    notifyListeners();
-    final prefs = _preferences;
-    await prefs.setBool(_desktopRightSidebarOpenKey, _desktopRightSidebarOpen);
-  }
-
-  Future<void> setDesktopWorkspaceBarOpen(bool open) async {
-    if (_desktopWorkspaceBarOpen == open) return;
-    _desktopWorkspaceBarOpen = open;
-    notifyListeners();
-    final prefs = _preferences;
-    await prefs.setBool(_desktopWorkspaceBarOpenKey, _desktopWorkspaceBarOpen);
-  }
 
   // ===== App locale (UI language) =====
   String? _appLocaleTag; // 'system', 'zh_CN', 'zh_Hant', 'en_US'
@@ -3134,6 +3091,31 @@ class SettingsProvider extends ChangeNotifier {
     await prefs.setString(_providerConfigsKey, jsonEncode(map));
   }
 
+  Future<void> setModelEnabled(
+    String providerKey,
+    String modelId,
+    bool enabled,
+  ) async {
+    final config = _providerConfigs[providerKey];
+    if (config == null || !config.models.contains(modelId)) return;
+    final disabled = Set<String>.of(config.disabledModels);
+    final changed = enabled ? disabled.remove(modelId) : disabled.add(modelId);
+    if (!changed) return;
+    await setProviderConfig(
+      providerKey,
+      config.copyWith(disabledModels: disabled),
+    );
+    if (!enabled &&
+        _providerConfigs[providerKey]?.disabledModels.contains(modelId) ==
+            true) {
+      await clearSelectionsForModel(
+        providerKey,
+        modelId,
+        preserveModelPreferences: true,
+      );
+    }
+  }
+
   Future<int> deleteModels(String providerKey, Set<String> modelIds) async {
     if (modelIds.isEmpty) return 0;
     final old = _providerConfigs[providerKey];
@@ -3352,11 +3334,12 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   /// Clears global model selections that reference a specific model.
-  /// Used when a model is deleted from a provider.
+  /// Used when a model is disabled or deleted from a provider.
   Future<void> clearSelectionsForModel(
     String providerKey,
-    String modelId,
-  ) async {
+    String modelId, {
+    bool preserveModelPreferences = false,
+  }) async {
     final prefs = _preferences;
     bool changed = false;
     if (_currentModelProvider == providerKey && _currentModelId == modelId) {
@@ -3415,14 +3398,15 @@ class SettingsProvider extends ChangeNotifier {
       await prefs.remove(_memoryModelKey);
       changed = true;
     }
-    // Also remove from pinned if applicable
+    // Disabling hides a model temporarily; deleting also removes its preferences.
     final pinKey = '$providerKey::$modelId';
-    if (_pinnedModels.contains(pinKey)) {
+    if (!preserveModelPreferences && _pinnedModels.contains(pinKey)) {
       _pinnedModels.remove(pinKey);
       await prefs.setStringList(_pinnedModelsKey, _pinnedModels.toList());
       changed = true;
     }
-    if (_reasoningChoiceByModel.containsKey(pinKey)) {
+    if (!preserveModelPreferences &&
+        _reasoningChoiceByModel.containsKey(pinKey)) {
       _reasoningChoiceByModel = Map<String, ReasoningRequest>.from(
         _reasoningChoiceByModel,
       )..remove(pinKey);
@@ -6195,7 +6179,14 @@ class ProviderConfig {
   final String? projectId; // google vertex ai only
   // Google Vertex AI via service account JSON (paste or import)
   final String? serviceAccountJson; // google vertex ai only
-  final List<String> models; // placeholder for future model management
+  final List<String> models;
+  // Keep user choices separate from the catalog refreshed by OAuth discovery.
+  // Retain disabled IDs even if a model temporarily disappears from that catalog.
+  final Set<String> disabledModels;
+  Iterable<String> get enabledModels =>
+      models.where((id) => !disabledModels.contains(id));
+  bool isModelEnabled(String modelId) =>
+      models.contains(modelId) && !disabledModels.contains(modelId);
   // Per-model overrides (by logical model key).
   // Each entry may point to an upstream/vendor model id via `apiModelId` so that
   // multiple logical models can share the same backend model with different params.
@@ -6289,6 +6280,7 @@ class ProviderConfig {
     this.projectId,
     this.serviceAccountJson,
     this.models = const [],
+    this.disabledModels = const {},
     this.modelOverrides = const {},
     this.customHeaders = const <Map<String, String>>[],
     this.customBody = const <Map<String, String>>[],
@@ -6344,6 +6336,7 @@ class ProviderConfig {
     String? projectId,
     String? serviceAccountJson,
     List<String>? models,
+    Set<String>? disabledModels,
     Map<String, dynamic>? modelOverrides,
     List<Map<String, String>>? customHeaders,
     List<Map<String, String>>? customBody,
@@ -6388,6 +6381,7 @@ class ProviderConfig {
     projectId: projectId ?? this.projectId,
     serviceAccountJson: serviceAccountJson ?? this.serviceAccountJson,
     models: models ?? this.models,
+    disabledModels: disabledModels ?? this.disabledModels,
     modelOverrides: modelOverrides ?? this.modelOverrides,
     customHeaders: customHeaders ?? this.customHeaders,
     customBody: customBody ?? this.customBody,
@@ -6440,6 +6434,7 @@ class ProviderConfig {
     'projectId': projectId,
     'serviceAccountJson': serviceAccountJson,
     'models': models,
+    'disabledModels': disabledModels.toList(),
     'modelOverrides': modelOverrides,
     'customHeaders': customHeaders,
     'customBody': customBody,
@@ -6499,6 +6494,8 @@ class ProviderConfig {
     models:
         (json['models'] as List?)?.map((e) => e.toString()).toList() ??
         const [],
+    disabledModels:
+        (json['disabledModels'] as List?)?.cast<String>().toSet() ?? const {},
     modelOverrides:
         (json['modelOverrides'] as Map?)?.map(
           (k, v) => MapEntry(k.toString(), v),
