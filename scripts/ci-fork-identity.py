@@ -84,6 +84,26 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
             "        }",
             1,
         ),
+        # 无障碍服务名显示在系统设置里，只改 arb 文案会让提示指向系统里不存在的名字。
+        # 授权按组件名绑定，改 label 不影响已开启的服务。
+        (
+            "android/app/src/main/res/values/phone_control.xml",
+            '<string name="phone_control_service_label">Kelivo phone control</string>',
+            f'<string name="phone_control_service_label">{label} phone control</string>',
+            1,
+        ),
+        (
+            "android/app/src/main/res/values-zh-rCN/phone_control.xml",
+            '<string name="phone_control_service_label">Kelivo 手机控制</string>',
+            f'<string name="phone_control_service_label">{label} 手机控制</string>',
+            1,
+        ),
+        (
+            "android/app/src/main/res/values-zh-rTW/phone_control.xml",
+            '<string name="phone_control_service_label">Kelivo 手機控制</string>',
+            f'<string name="phone_control_service_label">{label} 手機控制</string>',
+            1,
+        ),
     ]
 
 
@@ -96,13 +116,11 @@ FORBIDDEN = [
 ]
 
 L10N_LANGS = ("en", "zh", "zh_Hans", "zh_Hant")
-# QQ 群指向上游社区、无障碍服务名要与原生 label 对齐，这两类里的 Kelivo 不是本应用的显示名。
+# QQ 群指向的是上游社区，fork 没有自己的群，跟着改名就指错了。
 L10N_SKIP_KEYS = {
     "aboutPageQQGroupOne",
     "aboutPageQQGroupTwo",
     "aboutPageQQGroupThree",
-    "phoneControlAssistantHint",
-    "phoneControlRestrictedHint",
 }
 ARB_ENTRY = re.compile(
     r'^\s*"(?P<key>[^"@][^"]*)"\s*:\s*"(?P<value>[^"]*)"\s*,?\s*$', re.MULTILINE
