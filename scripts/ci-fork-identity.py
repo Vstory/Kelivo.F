@@ -95,6 +95,65 @@ FORBIDDEN = [
     "versionName = flutter.versionName",
 ]
 
+L10N_LANGS = ("en", "zh", "zh_Hans", "zh_Hant")
+# QQ 群指向上游社区、无障碍服务名要与原生 label 对齐，这两类里的 Kelivo 不是本应用的显示名。
+L10N_SKIP_KEYS = {
+    "aboutPageQQGroupOne",
+    "aboutPageQQGroupTwo",
+    "aboutPageQQGroupThree",
+    "phoneControlAssistantHint",
+    "phoneControlRestrictedHint",
+}
+ARB_ENTRY = re.compile(
+    r'^\s*"(?P<key>[^"@][^"]*)"\s*:\s*"(?P<value>[^"]*)"\s*,?\s*$', re.MULTILINE
+)
+
+
+def build_l10n_edits(label: str) -> list[tuple[str, str, str, int]]:
+    """通知栏标题、关于页和全部报错文案的名字都来自 arb，只改 manifest 与 MaterialApp.title 盖不住。"""
+    edits: list[tuple[str, str, str, int]] = []
+    keys: set[str] = set()
+    for lang in L10N_LANGS:
+        arb_rel = f"lib/l10n/app_{lang}.arb"
+        renamed = 0
+        for match in ARB_ENTRY.finditer((REPO_ROOT / arb_rel).read_text(encoding="utf-8")):
+            key, value = match.group("key"), match.group("value")
+            if key in L10N_SKIP_KEYS or "Kelivo" not in value:
+                continue
+            renamed += 1
+            keys.add(key)
+            edits.append(
+                (
+                    arb_rel,
+                    f'"{key}": "{value}"',
+                    f'"{key}": "{value.replace("Kelivo", label)}"',
+                    1,
+                )
+            )
+        if renamed < 20:
+            raise SystemExit(
+                f"::error::{arb_rel} 只匹配到 {renamed} 处含 Kelivo 的文案，"
+                f"上游可能改了写法（期望 50 处以上）"
+            )
+
+    # 生成物 app_localizations_*.dart 是提交在仓库里的实体文件，gen-l10n 在 build 时不
+    # 保证重跑，不改这里运行时仍是旧名字。zh 的三个类（zh / zh_Hans / zh_Hant）同在一个
+    # 文件里，同一段文案会出现多次，所以按内容去重、只要求至少命中一处。
+    for dart_rel in ("lib/l10n/app_localizations_en.dart", "lib/l10n/app_localizations_zh.dart"):
+        dart_text = (REPO_ROOT / dart_rel).read_text(encoding="utf-8")
+        seen: set[str] = set()
+        for key in sorted(keys):
+            # 带占位符的 key 生成的是方法而非 getter，按「声明到第一个分号」切块两种都覆盖。
+            for declared in re.finditer(rf"\bString (?:get )?{re.escape(key)}\b", dart_text):
+                start = declared.start()
+                end = dart_text.index(";", start)
+                block = dart_text[start:end]
+                if "Kelivo" not in block or block in seen:
+                    continue
+                seen.add(block)
+                edits.append((dart_rel, block, block.replace("Kelivo", label), -1))
+    return edits
+
 
 def scan_forbidden() -> list[str]:
     hits: list[str] = []
@@ -104,6 +163,13 @@ def scan_forbidden() -> list[str]:
             for needle in FORBIDDEN:
                 if needle in line:
                     hits.append(f"{rel}:{lineno}: {needle}")
+    for lang in L10N_LANGS:
+        rel = f"lib/l10n/app_{lang}.arb"
+        for match in ARB_ENTRY.finditer((REPO_ROOT / rel).read_text(encoding="utf-8")):
+            if match.group("key") in L10N_SKIP_KEYS:
+                continue
+            if re.search(r"Kelivo(?!\.)", match.group("value")):
+                hits.append(f"{rel}: {match.group('key')}")
     return hits
 
 
@@ -121,7 +187,7 @@ def main() -> int:
         )
         return 1
 
-    edits = build_edits(args.app_id, args.label)
+    edits = build_edits(args.app_id, args.label) + build_l10n_edits(args.label)
     problems: list[str] = []
     for rel, old, new, want in edits:
         path = REPO_ROOT / rel
@@ -129,7 +195,11 @@ def main() -> int:
             problems.append(f"{rel}: 文件不存在")
             continue
         got = path.read_text(encoding="utf-8").count(old)
-        if got != want:
+        if want < 0:
+            # -1：同一段文案在 zh 文件里会出现多次，判据只要求命中过。
+            if got < 1:
+                problems.append(f"{rel}: 未命中: {old[:70]}")
+        elif got != want:
             problems.append(f"{rel}: 期望 {want} 处、实际 {got} 处: {old}")
 
     if problems:
