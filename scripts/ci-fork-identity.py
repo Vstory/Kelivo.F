@@ -22,6 +22,10 @@ GRADLE = "android/app/build.gradle.kts"
 MANIFEST = "android/app/src/main/AndroidManifest.xml"
 PROGUARD = "android/app/proguard-rules.pro"
 MAIN_DART = "lib/main.dart"
+ABOUT_PAGE = "lib/features/settings/pages/about_page.dart"
+BROWSER_PAGE = "lib/features/browser/pages/browser_page.dart"
+NOTIFICATION_SERVICE = "lib/core/services/notification_service.dart"
+TRAY_CONTROLLER = "lib/desktop/desktop_tray_controller.dart"
 
 DEFAULT_APP_ID = "com.psyche.kelivo.fork"
 DEFAULT_LABEL = "Kelivo.F"
@@ -104,6 +108,43 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
             f'<string name="phone_control_service_label">{label} 手機控制</string>',
             1,
         ),
+        # 移动端关于页顶部的应用名是**硬编码字面量**，不走 arb（桌面端 about_pane.dart 用的是
+        #   l10n.aboutPageAppName）⇒ 只改 l10n 时手机上的「关于」仍顶着上游名字，两端口径不一。
+        #   连带 ValueKey 一起匹配：单改那一行字面量容易在别的 'Kelivo' 上误命中。
+        (
+            ABOUT_PAGE,
+            "                              'Kelivo',\n"
+            "                              key: const ValueKey('about-page-app-name'),",
+            f"                              '{label}',\n"
+            f"                              key: const ValueKey('about-page-app-name'),",
+            1,
+        ),
+        # 浏览器起始页那个 38px 大标题同样是写死的。
+        (
+            BROWSER_PAGE,
+            "              Text(\n"
+            "                'Kelivo',\n"
+            "                style: TextStyle(\n"
+            "                  fontSize: 38,",
+            f"              Text(\n"
+            f"                '{label}',\n"
+            f"                style: TextStyle(\n"
+            f"                  fontSize: 38,",
+            1,
+        ),
+        # 通知 ticker（状态栏滚动那一行）与桌面托盘 tooltip：都没有 l10n，属可见身份。
+        (
+            NOTIFICATION_SERVICE,
+            "ticker: 'Kelivo',",
+            f"ticker: '{label}',",
+            1,
+        ),
+        (
+            TRAY_CONTROLLER,
+            "await trayManager.setToolTip('Kelivo');",
+            f"await trayManager.setToolTip('{label}');",
+            1,
+        ),
     ]
 
 
@@ -113,6 +154,11 @@ FORBIDDEN = [
     "title: 'Kelivo'",
     "versionCode = flutter.versionCode",
     "versionName = flutter.versionName",
+    # 下面四条对应「不走 l10n 的可见身份」：漏改不会报错，只会在界面上露出上游名。
+    "                              'Kelivo',",
+    "                'Kelivo',",
+    "ticker: 'Kelivo',",
+    "setToolTip('Kelivo')",
 ]
 
 L10N_LANGS = ("en", "zh", "zh_Hans", "zh_Hant")
@@ -175,7 +221,15 @@ def build_l10n_edits(label: str) -> list[tuple[str, str, str, int]]:
 
 def scan_forbidden() -> list[str]:
     hits: list[str] = []
-    for rel in (GRADLE, MANIFEST, MAIN_DART):
+    for rel in (
+        GRADLE,
+        MANIFEST,
+        MAIN_DART,
+        ABOUT_PAGE,
+        BROWSER_PAGE,
+        NOTIFICATION_SERVICE,
+        TRAY_CONTROLLER,
+    ):
         text = (REPO_ROOT / rel).read_text(encoding="utf-8")
         for lineno, line in enumerate(text.splitlines(), 1):
             for needle in FORBIDDEN:
