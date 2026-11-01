@@ -23,6 +23,7 @@ MANIFEST = "android/app/src/main/AndroidManifest.xml"
 PROGUARD = "android/app/proguard-rules.pro"
 MAIN_DART = "lib/main.dart"
 ABOUT_PAGE = "lib/features/settings/pages/about_page.dart"
+ABOUT_PANE = "lib/desktop/setting/about_pane.dart"
 BROWSER_PAGE = "lib/features/browser/pages/browser_page.dart"
 NOTIFICATION_SERVICE = "lib/core/services/notification_service.dart"
 TRAY_CONTROLLER = "lib/desktop/desktop_tray_controller.dart"
@@ -145,6 +146,47 @@ def build_edits(app_id: str, label: str) -> list[tuple[str, str, str, int]]:
             f"await trayManager.setToolTip('{label}');",
             1,
         ),
+        # 上游关于页只有一条指向 Chevey339/kelivo 的 GitHub 行；本 fork 的构建包再加一条指回
+        # fork 仓库。移动端与桌面端各一套行组件（_iosNavRow / _DeskNavRow），两边都要插。
+        # 锚点连带下一行的 aboutPageSystem 一起匹配，单看 _iosDivider 会在同文件里命中多处。
+        (
+            ABOUT_PAGE,
+            "              _iosDivider(context),\n"
+            "              _iosNavRow(\n"
+            "                context,\n"
+            "                icon: Lucide.Phone,\n"
+            "                label: l10n.aboutPageSystem,",
+            "              _iosNavRow(\n"
+            "                context,\n"
+            "                icon: Lucide.GitFork,\n"
+            f"                label: '{label}',\n"
+            "                onTap: () => _openUrl('https://github.com/Vstory/Kelivo.F'),\n"
+            "              ),\n"
+            "              _iosDivider(context),\n"
+            "              _iosNavRow(\n"
+            "                context,\n"
+            "                icon: Lucide.Phone,\n"
+            "                label: l10n.aboutPageSystem,",
+            1,
+        ),
+        (
+            ABOUT_PANE,
+            "                  const _DeskRowDivider(),\n"
+            "                  _DeskInfoRow(\n"
+            "                    icon: lucide.Lucide.Phone,\n"
+            "                    label: l10n.aboutPageSystem,",
+            "                  _DeskNavRow(\n"
+            "                    icon: lucide.Lucide.GitFork,\n"
+            f"                    label: '{label}',\n"
+            "                    onTap: () =>\n"
+            "                        _openUrl('https://github.com/Vstory/Kelivo.F'),\n"
+            "                  ),\n"
+            "                  const _DeskRowDivider(),\n"
+            "                  _DeskInfoRow(\n"
+            "                    icon: lucide.Lucide.Phone,\n"
+            "                    label: l10n.aboutPageSystem,",
+            1,
+        ),
     ]
 
 
@@ -226,6 +268,7 @@ def scan_forbidden() -> list[str]:
         MANIFEST,
         MAIN_DART,
         ABOUT_PAGE,
+        ABOUT_PANE,
         BROWSER_PAGE,
         NOTIFICATION_SERVICE,
         TRAY_CONTROLLER,
