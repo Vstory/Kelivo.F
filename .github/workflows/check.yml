@@ -1,8 +1,13 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# 检查门禁：源码类改动即跑，五道门（格式 / l10n 生成物 / 静态分析 / 测试）。
-#   步骤搬自上游 .github/workflows/pr-check.yml —— 上游那份只在 pull_request→master
-#   触发，而 master 全是直推（无 merge commit、无 PR 编号），那套检查实际从未运行过。
-#   流程与 build-ci-release.yml 对齐：任意分支 push 触发、同分支只留最新一次。
+# 检查门禁：源码类改动即跑。步骤搬自上游 pr-check.yml —— 上游那份只在
+#   pull_request→master 触发，而 master 全是直推（无 merge commit、无 PR 编号），
+#   那套检查实际从未运行过。流程与 build-ci-release.yml 对齐：任意分支 push 触发、
+#   同分支只留最新一次。
+#
+#   拆成两个 job：test/ 下 948+ 个测试文件串行跑要 25 分钟（实测 1531s），
+#   按文件轮转切 4 片并行后墙上时间降到个位数分钟；静态检查只需跑一次，
+#   与测试分片并行，不必每片重复。两个 job 各自恢复 Flutter SDK（缓存命中约 16s），
+#   因此 setup 步骤是重复的 —— YAML anchor 会让可读性变差，这里就显式重复。
 # ══════════════════════════════════════════════════════════════════════════════
 name: Checks · Flutter 3.47
 
@@ -12,7 +17,7 @@ on:
   push:
     # ⚠️ 必须显式写 branches：只写 paths 时标签推送也会触发
     branches: ['**']
-    # 只有源码类改动才跑全量测试；纯文档 / CI 配置 / 资源改动不进来
+    # 只有源码类改动才跑；纯文档 / 资源改动不进来
     paths:
       - 'lib/**'
       - 'test/**'
@@ -26,18 +31,19 @@ on:
       - '.github/workflows/check.yml'
   workflow_dispatch:
 
-# 同一分支只留最新一次检查：新提交 push 上来就取消还在跑的旧 run。
+# 同一分支只留最新一次检查：新提交 push 上来就取消还在跑的旧 run（连同其 4 个分片）。
 concurrency:
   group: checks-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  FLUTTER_VERSION: '3.47.6'
+
 jobs:
-  checks:
-    name: Analyze / Test / L10n / Format
+  static:
+    name: Format / L10n / Analyze
     runs-on: ubuntu-26.04
-    timeout-minutes: 90
-    env:
-      FLUTTER_VERSION: '3.47.6'
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -116,13 +122,75 @@ jobs:
       - name: dart analyze
         run: dart analyze --fatal-infos lib test integration_test
 
-      - name: flutter test
-        run: flutter test
-
       - name: dart analyze (markstream)
         working-directory: dependencies/markstream
         run: dart analyze --fatal-infos
 
+      # markstream 只有 45 个测试文件（37s），留在静态 job 里，不再单独分片。
       - name: flutter test (markstream)
         working-directory: dependencies/markstream
         run: flutter test
+
+  test:
+    name: Test (${{ matrix.shard }}/4)
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    strategy:
+      # 一片失败不影响其他片跑完：要一次看全到底哪几片红。
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Restore Flutter SDK
+        id: flutter-sdk
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/flutter
+          key: flutter-${{ runner.os }}-${{ env.FLUTTER_VERSION }}
+
+      - name: Install Flutter
+        if: steps.flutter-sdk.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/flutter.tar.xz \
+            "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
+          rm -rf "$HOME/flutter"
+          tar xf /tmp/flutter.tar.xz -C "$HOME"
+
+      - name: Expose Flutter
+        run: |
+          set -euo pipefail
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+          git config --global --add safe.directory "$HOME/flutter"
+          "$HOME/flutter/bin/flutter" --version
+
+      - name: Cache pub
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-${{ env.FLUTTER_VERSION }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.FLUTTER_VERSION }}-pub-
+
+      - name: Flutter pub get
+        run: flutter pub get --enforce-lockfile
+
+      # 按排序后的文件名轮转切片：同一文件永远落在同一片，分片结果可复现。
+      # 注意 git 的 pathspec `test/**/*_test.dart` 不匹配 test/ 顶层的 81 个文件，
+      # 必须用 `git ls-files test` 再 grep 后缀，否则会静默漏测。
+      - name: flutter test (shard ${{ matrix.shard }}/4)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(git ls-files test | grep -E '_test\.dart$' | sort \
+            | awk -v n=4 -v i=${{ matrix.shard }} 'NR % n == i % n')
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "分片 ${{ matrix.shard }} 没有测试文件，跳过。"
+            exit 0
+          fi
+          echo "分片 ${{ matrix.shard }}/4：${#files[@]} 个测试文件"
+          flutter test "${files[@]}"
