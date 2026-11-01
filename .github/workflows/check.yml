@@ -43,11 +43,40 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: subosito/flutter-action@v2
+      # 与 build-ci-release.yml 同因：本仓库「只认完整 SHA」的策略会连 action 内嵌的
+      # 引用一起拦（subosito/flutter-action 内部用未钉 SHA 的 actions/cache），
+      # 因此不引第三方 action，直接下官方 SDK 包。
+      - name: Restore Flutter SDK
+        id: flutter-sdk
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
+          path: ~/flutter
+          key: flutter-${{ runner.os }}-${{ env.FLUTTER_VERSION }}
+
+      - name: Install Flutter
+        if: steps.flutter-sdk.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/flutter.tar.xz \
+            "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
+          rm -rf "$HOME/flutter"
+          tar xf /tmp/flutter.tar.xz -C "$HOME"
+
+      # 命中与否都要走一遍：GITHUB_PATH 只对后续步骤生效。
+      - name: Expose Flutter
+        run: |
+          set -euo pipefail
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+          git config --global --add safe.directory "$HOME/flutter"
+          "$HOME/flutter/bin/flutter" --version
+
+      - name: Cache pub
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-${{ env.FLUTTER_VERSION }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.FLUTTER_VERSION }}-pub-
 
       - name: Flutter pub get
         run: flutter pub get --enforce-lockfile
