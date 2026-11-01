@@ -15,6 +15,7 @@ import '../../../core/models/quote_ref.dart';
 import '../../../core/services/chat/chat_service.dart';
 import 'dart:async';
 import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show MissingPluginException, Clipboard, ClipboardData;
@@ -728,6 +729,7 @@ class _HomePageState extends State<HomePage>
 
   Widget _buildPage(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
+    final desktop = !kIsWeb && _controller.isDesktopPlatform;
     final cs = Theme.of(context).colorScheme;
     final settings = context.watch<SettingsProvider>();
     final assistant = context.watch<AssistantProvider>().currentAssistant;
@@ -744,7 +746,10 @@ class _HomePageState extends State<HomePage>
         ? _controller.currentConversation!.title
         : _controller.titleForLocale();
 
-    if (width >= AppBreakpoints.tablet) {
+    _controller.setCompactDesktopLayout(
+      desktop && width < AppBreakpoints.tablet,
+    );
+    if (desktop || width >= AppBreakpoints.tablet) {
       return _buildTabletLayout(
         context,
         title: title,
@@ -910,15 +915,20 @@ class _HomePageState extends State<HomePage>
       title: title,
       providerName: providerName,
       modelDisplay: modelDisplay,
+      compact:
+          _controller.isDesktopPlatform &&
+          MediaQuery.sizeOf(context).width < AppBreakpoints.tablet,
       tabletSidebarOpen: _controller.tabletSidebarOpen,
       embeddedSidebarWidth: _controller.embeddedSidebarWidth,
       sidebarMinWidth: HomePageController.sidebarMinWidth,
       sidebarMaxWidth: HomePageController.sidebarMaxWidth,
       onToggleSidebar: _controller.toggleTabletSidebar,
       onSelectConversation: (id) {
+        _controller.closeCompactSidebar();
         _controller.switchConversationAnimated(id);
       },
       onNewConversation: () async {
+        _controller.closeCompactSidebar();
         await _controller.createNewConversationAnimated();
       },
       onCreateNewConversation: () async {
@@ -935,12 +945,14 @@ class _HomePageState extends State<HomePage>
       globalSearchMode: _controller.isGlobalSearchMode,
       globalSearchQuery: _controller.globalSearchQuery,
       onGlobalSearchQueryChanged: _controller.setGlobalSearchQuery,
-      onOpenGlobalSearchResult: (convId, msgId, surfaceKey) =>
-          _controller.openGlobalSearchResult(
-            conversationId: convId,
-            messageId: msgId,
-            surfaceKey: surfaceKey,
-          ),
+      onOpenGlobalSearchResult: (convId, msgId, surfaceKey) {
+        _controller.closeCompactSidebar();
+        return _controller.openGlobalSearchResult(
+          conversationId: convId,
+          messageId: msgId,
+          surfaceKey: surfaceKey,
+        );
+      },
       onSelectModel: () =>
           showModelSelectSheet(context, controller: _controller),
       onSidebarWidthChanged: _controller.updateSidebarWidth,
@@ -1666,8 +1678,12 @@ class _HomePageState extends State<HomePage>
   Future<void> _openContextUsagePopover() async {
     final conversationId = _controller.currentConversation?.id;
     if (conversationId == null || conversationId.isEmpty) return;
+    final imageTarget = _mediaController.capture();
     await showContextUsagePopover(
       context,
+      onAttachImage: (path) {
+        if (imageTarget.isValid) imageTarget.addImages([path]);
+      },
       anchorKey: _inputBarKey,
       conversationId: conversationId,
       draftText: formatQuotedMessage(
@@ -1836,6 +1852,7 @@ class _HomePageState extends State<HomePage>
   }
 
   void _showContextManagementSheet() async {
+    final imageTarget = _mediaController.capture();
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1847,6 +1864,9 @@ class _HomePageState extends State<HomePage>
         return SafeArea(
           top: false,
           child: ContextManagementSheet(
+            onAttachImage: (path) {
+              if (imageTarget.isValid) imageTarget.addImages([path]);
+            },
             conversationId: _controller.currentConversation?.id,
             draftText: formatQuotedMessage(
               _inputController.text,
