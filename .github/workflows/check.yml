@@ -1,0 +1,99 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# 检查门禁：源码类改动即跑，五道门（格式 / l10n 生成物 / 静态分析 / 测试）。
+#   步骤搬自上游 .github/workflows/pr-check.yml —— 上游那份只在 pull_request→master
+#   触发，而 master 全是直推（无 merge commit、无 PR 编号），那套检查实际从未运行过。
+#   流程与 build-ci-release.yml 对齐：任意分支 push 触发、同分支只留最新一次。
+# ══════════════════════════════════════════════════════════════════════════════
+name: Checks · Flutter 3.47
+
+run-name: "Checks · Flutter 3.47 · ${{ github.ref_name }}"
+
+on:
+  push:
+    # ⚠️ 必须显式写 branches：只写 paths 时标签推送也会触发
+    branches: ['**']
+    # 只有源码类改动才跑全量测试；纯文档 / CI 配置 / 资源改动不进来
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'integration_test/**'
+      - 'dependencies/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'l10n.yaml'
+      - 'analysis_options.yaml'
+      - 'build.yaml'
+      - '.github/workflows/check.yml'
+  workflow_dispatch:
+
+# 同一分支只留最新一次检查：新提交 push 上来就取消还在跑的旧 run。
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Analyze / Test / L10n / Format
+    runs-on: ubuntu-26.04
+    timeout-minutes: 90
+    env:
+      FLUTTER_VERSION: '3.47.6'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get --enforce-lockfile
+
+      - name: Flutter pub get (markstream)
+        working-directory: dependencies/markstream
+        run: flutter pub get --enforce-lockfile
+
+      # 只查本次 push 改动过的文件：上游另有存量未格式化文件，全量查会常年红。
+      # 新分支首推 / 强推时 github.event.before 是全零 sha，git diff 会直接报错 ⇒ 跳过。
+      - name: Dart format (changed files only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_SHA="${{ github.event.before }}"
+          HEAD_SHA="${{ github.sha }}"
+          if [ -z "$BASE_SHA" ] || [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            echo "无可用基准提交（新分支首推或手动触发），跳过格式检查。"
+            exit 0
+          fi
+          files="$(git diff --diff-filter=ACMR --name-only "$BASE_SHA" "$HEAD_SHA" -- \
+            | grep -E '^(lib|test|integration_test|dependencies/markstream/(lib|test))/.*\.dart$' || true)"
+          if [ -z "$files" ]; then
+            echo "No changed Dart files to format-check."
+            exit 0
+          fi
+          echo "Format-checking files:"
+          echo "$files"
+          dart format --output=none --set-exit-if-changed $files
+
+      # 生成物是提交在仓库里的实体文件，重跑 gen-l10n 后出现差异 ⇒ 改了 arb 却没跟生成物。
+      - name: Generate l10n and ensure committed outputs
+        run: |
+          flutter gen-l10n
+          git diff --exit-code -- lib/l10n
+
+      - name: dart analyze
+        run: dart analyze --fatal-infos lib test integration_test
+
+      - name: flutter test
+        run: flutter test
+
+      - name: dart analyze (markstream)
+        working-directory: dependencies/markstream
+        run: dart analyze --fatal-infos
+
+      - name: flutter test (markstream)
+        working-directory: dependencies/markstream
+        run: flutter test
