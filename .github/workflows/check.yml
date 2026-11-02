@@ -28,6 +28,8 @@ on:
       - 'l10n.yaml'
       - 'analysis_options.yaml'
       - 'build.yaml'
+      # fork 改写脚本：锚点上跟着上游源码走，改脚本或上游改写法都要能验证
+      - 'scripts/**'
       - '.github/workflows/check.yml'
   workflow_dispatch:
 
@@ -112,6 +114,12 @@ jobs:
           echo "Format-checking files:"
           echo "$files"
           dart format --output=none --set-exit-if-changed $files
+
+      # fork 的改动靠 scripts/fork_edits/ 注入，锚的是上游源码里的具体写法；上游改写那些
+      # 片段时，这里先红，不必等出包流水线在构建阶段才失败。dry-run 只读，不改工作区。
+      - name: Fork edit anchors (dry run)
+        shell: bash
+        run: python3 scripts/ci-fork-identity.py --dry-run >/dev/null
 
       # 生成物是提交在仓库里的实体文件，重跑 gen-l10n 后出现差异 ⇒ 改了 arb 却没跟生成物。
       - name: Generate l10n and ensure committed outputs
