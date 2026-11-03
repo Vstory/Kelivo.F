@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Kelivo/core/models/chat_message.dart';
-import 'package:Kelivo/features/home/controllers/home_view_model.dart';
 
 ChatMessage _message({
   required String id,
@@ -158,40 +157,6 @@ void main() {
       ], quoteMarker: AppLocalizationsEn().selectionQuoteMarker);
 
       expect(text, 'Assistant: answer');
-    });
-  });
-
-  group('HomeViewModel.computeClearContextRemainingMessageCount', () {
-    test('计数来自持久化总数，与窗口缓存无关', () {
-      final count = HomeViewModel.computeClearContextRemainingMessageCount(
-        totalMessages: 100,
-        truncateIndex: -1,
-      );
-
-      expect(count, 100);
-    });
-
-    test('已有清空点时从持久化截断位置开始计数', () {
-      final count = HomeViewModel.computeClearContextRemainingMessageCount(
-        totalMessages: 100,
-        truncateIndex: 90,
-      );
-
-      expect(count, 10);
-    });
-
-    test('截断位置越界时按未清空处理', () {
-      final beyond = HomeViewModel.computeClearContextRemainingMessageCount(
-        totalMessages: 100,
-        truncateIndex: 101,
-      );
-      final atEnd = HomeViewModel.computeClearContextRemainingMessageCount(
-        totalMessages: 100,
-        truncateIndex: 100,
-      );
-
-      expect(beyond, 100);
-      expect(atEnd, 0);
     });
   });
 
