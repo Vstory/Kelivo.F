@@ -21,6 +21,7 @@ Future<void> showContextUsagePopover(
   required String conversationId,
   required String draftText,
   ValueChanged<String>? onAttachImage,
+  Future<void> Function()? onOperations,
 }) async {
   final keyContext = anchorKey.currentContext;
   if (keyContext == null) return;
@@ -41,12 +42,19 @@ Future<void> showContextUsagePopover(
 
   var requestSetWindow = false;
   var requestImages = false;
+  var requestOperations = false;
   await showDesktopGlassPopover(
     context,
     anchorRect: anchorRect,
     width: (size.width - 16).clamp(260.0, 720.0),
     builder: (ctx, handle) => _ContextUsagePopoverContent(
       conversationId: conversationId,
+      onOperations: onOperations == null
+          ? null
+          : () async {
+              requestOperations = true;
+              await handle.close();
+            },
       onImages: () async {
         requestImages = true;
         await handle.close();
@@ -58,6 +66,10 @@ Future<void> showContextUsagePopover(
     ),
   );
   if (!context.mounted) return;
+  if (requestOperations) {
+    await onOperations!();
+    return;
+  }
   if (requestImages) {
     await showImageContextPanel(
       context,
@@ -87,10 +99,12 @@ class _ContextUsagePopoverContent extends StatelessWidget {
     required this.conversationId,
     required this.onRequestSetWindow,
     required this.onImages,
+    this.onOperations,
   });
 
   final String conversationId;
   final Future<void> Function() onImages;
+  final Future<void> Function()? onOperations;
   final Future<void> Function() onRequestSetWindow;
 
   @override
@@ -98,6 +112,9 @@ class _ContextUsagePopoverContent extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final usage = context.watch<ContextUsageService>();
     final snapshot = usage.snapshot(conversationId) ?? usage.current;
+    final refreshLabel = snapshot?.state == ContextUsageState.failed
+        ? l10n.retry
+        : l10n.contextUsageRefresh;
     final showSetWindow =
         snapshot != null &&
         snapshot.contextWindow == null &&
@@ -116,8 +133,8 @@ class _ContextUsagePopoverContent extends StatelessWidget {
             ContextUsageBreakdown(
               snapshot: snapshot,
               headerTrailing: IosIconButton(
-                tooltip: l10n.contextUsageRefresh,
-                semanticLabel: l10n.contextUsageRefresh,
+                tooltip: refreshLabel,
+                semanticLabel: refreshLabel,
                 icon: Lucide.RefreshCw,
                 size: 16,
                 onTap: () => usage.refresh(conversationId, force: true),
@@ -132,6 +149,15 @@ class _ContextUsagePopoverContent extends StatelessWidget {
                 ).colorScheme.onSurface.withValues(alpha: 0.08),
               ),
             ),
+            if (onOperations != null) ...[
+              _ActionRow(
+                icon: Lucide.History,
+                label: l10n.contextOperationsTitle,
+                description: l10n.contextOperationsDescription,
+                onTap: () => unawaited(onOperations!()),
+              ),
+              const SizedBox(height: 8),
+            ],
             _ActionRow(
               icon: Lucide.Image,
               label: l10n.imageContextTitle,
