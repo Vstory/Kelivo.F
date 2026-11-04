@@ -16,14 +16,16 @@ FORK_REPO_URL = "https://github.com/Vstory/Kelivo.F"
 
 def build_edits(label: str):
     return [
-        # 锚点连带下一行的 aboutPageSystem 一起匹配，单看 _iosDivider 会在同文件里命中多处。
+        # 插在上游 GitHub 行之后、许可证之前。锚点连带下一行的许可证行一起匹配，
+        # 单看 _iosDivider 会在同文件里命中多处。
         (
             ABOUT_PAGE,
             "              _iosDivider(context),\n"
             "              _iosNavRow(\n"
             "                context,\n"
-            "                icon: Lucide.Phone,\n"
-            "                label: l10n.aboutPageSystem,",
+            "                icon: Lucide.FileText,\n"
+            "                label: l10n.aboutPageLicense,",
+            "              _iosDivider(context),\n"
             "              _iosNavRow(\n"
             "                context,\n"
             "                icon: Lucide.GitFork,\n"
@@ -33,16 +35,17 @@ def build_edits(label: str):
             "              _iosDivider(context),\n"
             "              _iosNavRow(\n"
             "                context,\n"
-            "                icon: Lucide.Phone,\n"
-            "                label: l10n.aboutPageSystem,",
+            "                icon: Lucide.FileText,\n"
+            "                label: l10n.aboutPageLicense,",
             1,
         ),
         (
             ABOUT_PANE,
             "                  const _DeskRowDivider(),\n"
-            "                  _DeskInfoRow(\n"
-            "                    icon: lucide.Lucide.Phone,\n"
-            "                    label: l10n.aboutPageSystem,",
+            "                  _DeskNavRow(\n"
+            "                    icon: lucide.Lucide.FileText,\n"
+            "                    label: l10n.aboutPageLicense,",
+            "                  const _DeskRowDivider(),\n"
             "                  _DeskNavRow(\n"
             "                    icon: lucide.Lucide.GitFork,\n"
             f"                    label: '{label}',\n"
@@ -50,9 +53,9 @@ def build_edits(label: str):
             f"                        _openUrl('{FORK_REPO_URL}'),\n"
             "                  ),\n"
             "                  const _DeskRowDivider(),\n"
-            "                  _DeskInfoRow(\n"
-            "                    icon: lucide.Lucide.Phone,\n"
-            "                    label: l10n.aboutPageSystem,",
+            "                  _DeskNavRow(\n"
+            "                    icon: lucide.Lucide.FileText,\n"
+            "                    label: l10n.aboutPageLicense,",
             1,
         ),
     ]
