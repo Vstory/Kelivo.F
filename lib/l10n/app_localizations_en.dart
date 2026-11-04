@@ -9,6 +9,19 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get avatarInputInvalid =>
+      'Enter a valid icon name or an HTTP(S) image URL.';
+
+  @override
+  String get modelAvatarTitle => 'Model icon';
+
+  @override
+  String get avatarColor => 'Color';
+
+  @override
+  String get avatarMonochrome => 'Monochrome';
+
+  @override
   String get settingsSearchHint => 'Search settings';
 
   @override
@@ -2911,6 +2924,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleSubtitle =>
       'Use a lighter background, a thin border, and more line spacing for inline code.';
+
+  @override
+  String get displaySettingsPageUseLegacyCodeBlockStyleTitle =>
+      'Legacy code block style';
+
+  @override
+  String get displaySettingsPageUseLegacyCodeBlockStyleSubtitle =>
+      'Restore the previous colors, rounded corners, and spacing for code blocks.';
 
   @override
   String get displaySettingsPageEnableUserMarkdownTitle =>

@@ -9,6 +9,18 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get avatarInputInvalid => '请输入有效的图标名称或 HTTP(S) 图片链接。';
+
+  @override
+  String get modelAvatarTitle => '模型图标';
+
+  @override
+  String get avatarColor => '彩色';
+
+  @override
+  String get avatarMonochrome => '单色';
+
+  @override
   String get settingsSearchHint => '搜索设置';
 
   @override
@@ -2804,6 +2816,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleSubtitle =>
       '为行内代码使用较浅的底色、细边框和更宽松的行距。';
+
+  @override
+  String get displaySettingsPageUseLegacyCodeBlockStyleTitle => '旧版代码块样式';
+
+  @override
+  String get displaySettingsPageUseLegacyCodeBlockStyleSubtitle =>
+      '恢复代码块原有的配色、圆角和间距。';
 
   @override
   String get displaySettingsPageEnableUserMarkdownTitle => '用户消息 Markdown 渲染';
@@ -15138,6 +15157,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   AppLocalizationsZhHans() : super('zh_Hans');
 
   @override
+  String get avatarInputInvalid => '请输入有效的图标名称或 HTTP(S) 图片链接。';
+
+  @override
+  String get modelAvatarTitle => '模型图标';
+
+  @override
+  String get avatarColor => '彩色';
+
+  @override
+  String get avatarMonochrome => '单色';
+
+  @override
   String get settingsSearchHint => '搜索设置';
 
   @override
@@ -17933,6 +17964,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleSubtitle =>
       '为行内代码使用较浅的底色、细边框和更宽松的行距。';
+
+  @override
+  String get displaySettingsPageUseLegacyCodeBlockStyleTitle => '旧版代码块样式';
+
+  @override
+  String get displaySettingsPageUseLegacyCodeBlockStyleSubtitle =>
+      '恢复代码块原有的配色、圆角和间距。';
 
   @override
   String get displaySettingsPageEnableUserMarkdownTitle => '用户消息 Markdown 渲染';
@@ -30123,6 +30161,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   AppLocalizationsZhHant() : super('zh_Hant');
 
   @override
+  String get avatarInputInvalid => '請輸入有效的圖示名稱或 HTTP(S) 圖片連結。';
+
+  @override
+  String get modelAvatarTitle => '模型圖示';
+
+  @override
+  String get avatarColor => '彩色';
+
+  @override
+  String get avatarMonochrome => '單色';
+
+  @override
   String get settingsSearchHint => '搜尋設定';
 
   @override
@@ -32918,6 +32968,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleSubtitle =>
       '為行內程式碼使用較淺的底色、細邊框和更寬鬆的行距。';
+
+  @override
+  String get displaySettingsPageUseLegacyCodeBlockStyleTitle => '舊版程式碼區塊樣式';
+
+  @override
+  String get displaySettingsPageUseLegacyCodeBlockStyleSubtitle =>
+      '還原程式碼區塊原有的配色、圓角和間距。';
 
   @override
   String get displaySettingsPageEnableUserMarkdownTitle => '使用者訊息 Markdown 渲染';

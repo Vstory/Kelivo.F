@@ -1,4 +1,9 @@
 {
+  "avatarInputInvalid": "Enter a valid icon name or an HTTP(S) image URL.",
+  "modelAvatarTitle": "Model icon",
+  "avatarColor": "Color",
+  "avatarMonochrome": "Monochrome",
+
   "settingsSearchHint": "Search settings",
   "settingsSearchCancel": "Cancel",
   "settingsSearchClear": "Clear search",
@@ -1311,6 +1316,8 @@
   "displaySettingsPageEnableMathSubtitle": "Render LaTeX math (inline and block)",
   "displaySettingsPageUseLegacyInlineCodeStyleTitle": "Legacy inline code style",
   "displaySettingsPageUseLegacyInlineCodeStyleSubtitle": "Use a lighter background, a thin border, and more line spacing for inline code.",
+  "displaySettingsPageUseLegacyCodeBlockStyleTitle": "Legacy code block style",
+  "displaySettingsPageUseLegacyCodeBlockStyleSubtitle": "Restore the previous colors, rounded corners, and spacing for code blocks.",
   "displaySettingsPageEnableUserMarkdownTitle": "Render user messages with Markdown",
   "displaySettingsPageEnableReasoningMarkdownTitle": "Render reasoning (thinking) with Markdown",
   "displaySettingsPageEnableAssistantMarkdownTitle": "Render assistant messages with Markdown",

@@ -100,6 +100,30 @@ abstract class AppLocalizations {
     Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
   ];
 
+  /// No description provided for @avatarInputInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid icon name or an HTTP(S) image URL.'**
+  String get avatarInputInvalid;
+
+  /// No description provided for @modelAvatarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Model icon'**
+  String get modelAvatarTitle;
+
+  /// No description provided for @avatarColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get avatarColor;
+
+  /// No description provided for @avatarMonochrome.
+  ///
+  /// In en, this message translates to:
+  /// **'Monochrome'**
+  String get avatarMonochrome;
+
   /// No description provided for @settingsSearchHint.
   ///
   /// In en, this message translates to:
@@ -5379,6 +5403,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use a lighter background, a thin border, and more line spacing for inline code.'**
   String get displaySettingsPageUseLegacyInlineCodeStyleSubtitle;
+
+  /// No description provided for @displaySettingsPageUseLegacyCodeBlockStyleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy code block style'**
+  String get displaySettingsPageUseLegacyCodeBlockStyleTitle;
+
+  /// No description provided for @displaySettingsPageUseLegacyCodeBlockStyleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore the previous colors, rounded corners, and spacing for code blocks.'**
+  String get displaySettingsPageUseLegacyCodeBlockStyleSubtitle;
 
   /// No description provided for @displaySettingsPageEnableUserMarkdownTitle.
   ///
