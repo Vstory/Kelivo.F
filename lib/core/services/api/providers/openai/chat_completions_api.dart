@@ -1,3 +1,5 @@
+import '../../../../models/image_context.dart';
+import '../../request_history_context.dart';
 import '../../request_image_context.dart';
 import '../../../custom_request_merger.dart';
 import '../../../../models/provider_oauth.dart';
@@ -34,6 +36,9 @@ Map<String, dynamic> copyChatCompletionMessage(Map<String, dynamic> m) {
   final out = <String, dynamic>{
     'role': role,
     'content': m.containsKey('content') ? (m['content'] ?? '') : '',
+    if (m[historySourceKey] != null) historySourceKey: m[historySourceKey],
+    if (m[imageContextOwnerKey] != null)
+      imageContextOwnerKey: m[imageContextOwnerKey],
   };
 
   // Preserve optional name (some providers support it on non-tool roles).
@@ -286,20 +291,16 @@ Future<List<Map<String, dynamic>>> buildOpenAIChatCompletionMessages(
   // message (same pattern as Responses shouldAttachAssistantImage).
   // Use last *user* index — not array-tail — so tool follow-ups that append
   // assistant tool_calls / tool results still receive stashed assistant media.
-  int lastUserIndex = -1;
-  for (int i = messages.length - 1; i >= 0; i--) {
-    if ((messages[i]['role'] ?? '').toString() == 'user') {
-      lastUserIndex = i;
-      break;
-    }
-  }
+  final lastUserIndex = lastUserInputIndex(messages);
   final pendingAssistantMediaUrls = <String>[];
   final pendingToolImageParts = <Map<String, dynamic>>[];
+  Object? pendingToolOwner;
   void flushToolImages() {
     if (pendingToolImageParts.isEmpty) return;
     out.add({
       'role': 'user',
       'content': [...pendingToolImageParts],
+      if (pendingToolOwner != null) historySourceKey: pendingToolOwner,
     });
     pendingToolImageParts.clear();
   }
@@ -345,6 +346,7 @@ Future<List<Map<String, dynamic>>> buildOpenAIChatCompletionMessages(
           ...nativeParts,
         ];
       }
+      RequestHistoryContext.mark(m, [message]);
       out.add(message);
     }
 
@@ -647,6 +649,7 @@ Future<List<Map<String, dynamic>>> buildOpenAIChatCompletionMessages(
       outMsg['content'] = result.text;
       addMessage(outMsg);
       if (result.imageUrls.isNotEmpty) {
+        pendingToolOwner = m[historySourceKey];
         pendingToolImageParts.add({
           'type': 'text',
           'text': 'Image returned by ${m['name']} (${m['tool_call_id']}):',
@@ -943,6 +946,7 @@ Stream<StreamChunk> runOpenAIChatCompletionsToolFollowUps({
       maybeAddStreamingUsageOptions(body2, stream: true, config: config);
       applyOpenAIResolvedRequest(
         body2,
+        config: config,
         spec: spec,
         reasoning: reasoning,
         transport: ReasoningTransport.chatCompletions,
@@ -981,6 +985,8 @@ Stream<StreamChunk> runOpenAIChatCompletionsToolFollowUps({
           final errorBody = await resp2.stream.bytesToString();
           throw HttpException('HTTP ${resp2.statusCode}: $errorBody');
         }
+      } on ImageContextBudgetException {
+        rethrow;
       } on ProviderOAuthException {
         rethrow;
       } on HttpException {
@@ -1020,6 +1026,7 @@ Stream<StreamChunk> runOpenAIChatCompletionsToolFollowUps({
       final approxTotal = approxPromptTokens + (chars / 4).round();
       return emitDone(
         ids: StreamChunkIds('finish'),
+        finishReason: lastRound?.finishReason,
         reasoningDetails: includeReasoningDetailsOnDone
             ? reasoningDetails()
             : null,

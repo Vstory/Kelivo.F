@@ -1,3 +1,5 @@
+import '../models/native_compaction.dart';
+import '../models/compression_config.dart';
 import '../services/auth/provider_oauth_service.dart';
 import '../models/mobile_background_settings.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:async';
 import 'dart:convert';
+
+import '../models/request_budget.dart';
 import 'package:path/path.dart' as p;
 import '../services/search/search_service.dart';
 import '../services/search/web_fetch_service.dart';
@@ -33,10 +37,10 @@ import '../../utils/app_directories.dart';
 import '../../utils/sandbox_path_resolver.dart';
 import '../../utils/avatar_cache.dart';
 import '../models/assistant.dart';
-import '../models/memory_entry.dart';
 import '../models/model_spec.dart';
 import '../models/reasoning_request.dart';
 import '../services/model_spec/model_spec_resolver.dart';
+import '../services/model_spec/ollama_model_service.dart';
 import '../../utils/provider_grouping_logic.dart';
 import '../../utils/brand_assets.dart';
 import '../../utils/image_compressor.dart';
@@ -125,9 +129,11 @@ class SettingsProvider extends ChangeNotifier {
   static const String _suggestionPromptKey = 'suggestion_prompt_v1';
   static const String _suggestionInsertOnTapOnlyKey =
       'suggestion_insert_on_tap_only_v1';
+  static const String _compressionDefaultsKey = 'compression_defaults_v1';
   static const String _compressModelKey = 'compress_model_v1';
   static const String _compressPromptKey = 'compress_prompt_v1';
   static const String _compressLimitModeKey = 'compress_limit_mode_v1';
+  static const String _nativeCompressionKey = 'native_compression_v1';
   static const String _compressNewConversationKey = 'compress_new_conversation';
   static const String _compressKeepUserMessagesKey =
       'compress_keep_user_messages_v1';
@@ -189,8 +195,6 @@ class SettingsProvider extends ChangeNotifier {
   static const int maxMemoryMigrationBatchSize = 24;
   static const String _memoryInjectionMaxItemsKey =
       'memory_injection_max_items_v1';
-  static const String _memoryFullInjectionTypesKey =
-      'memory_full_injection_types_v1';
   static const int defaultMemoryInjectionMaxItems = 10;
   static const int minMemoryInjectionMaxItems = 1;
   static const int maxMemoryInjectionMaxItems = 100;
@@ -674,6 +678,7 @@ class SettingsProvider extends ChangeNotifier {
     final prefs = _preferences;
     await prefs.load();
     final localPreferences = await SharedPreferences.getInstance();
+    await OllamaModelService.instance.ensureLoaded();
     _providersOrder = prefs.getStringList(_providersOrderKey) ?? [];
     final m = prefs.getString(_themeModeKey);
     switch (m) {
@@ -856,6 +861,12 @@ class SettingsProvider extends ChangeNotifier {
         ? defaultCompressPrompt
         : compressp;
     final compressModeName = prefs.getString(_compressLimitModeKey);
+    final nativeCompression = prefs.getString(_nativeCompressionKey);
+    if (nativeCompression != null) {
+      _nativeCompression = NativeCompressionPreferences.fromJson(
+        Map<String, dynamic>.from(jsonDecode(nativeCompression) as Map),
+      );
+    }
     _compressLimitMode = CompressContextLimitMode.values.firstWhere(
       (mode) => mode.name == compressModeName,
       orElse: () => CompressContextLimitMode.keepRecent,
@@ -866,6 +877,25 @@ class SettingsProvider extends ChangeNotifier {
     _compressMaxChars =
         prefs.getInt(_compressMaxCharsKey) ??
         CompressContextOptions.defaultMaxChars;
+    final compressionDefaults = prefs.getString(_compressionDefaultsKey);
+    if (compressionDefaults != null) {
+      _compressionDefaults = CompressionConfig.fromJson(
+        Map<String, dynamic>.from(jsonDecode(compressionDefaults) as Map),
+      );
+    } else {
+      _compressionDefaults = CompressionConfig(
+        templateId: _compressPrompt == defaultCompressPrompt
+            ? 'general'
+            : 'original',
+        keepRecentUserTurns: _compressKeepUserMessages ?? 6,
+        providerId: _compressModelProvider,
+        modelId: _compressModelId,
+      );
+      await prefs.setString(
+        _compressionDefaultsKey,
+        jsonEncode(_compressionDefaults.toJson()),
+      );
+    }
     // learning mode
     _learningModeEnabled = prefs.getBool(_learningModeEnabledKey) ?? false;
     final lmp = prefs.getString(_learningModePromptKey);
@@ -978,13 +1008,6 @@ class SettingsProvider extends ChangeNotifier {
         (prefs.getInt(_memoryInjectionMaxItemsKey) ??
                 defaultMemoryInjectionMaxItems)
             .clamp(minMemoryInjectionMaxItems, maxMemoryInjectionMaxItems);
-    final fullInjectionTypes =
-        prefs.getStringList(_memoryFullInjectionTypesKey) ?? const <String>[];
-    _memoryFullInjectionTypes = Set<MemoryType>.unmodifiable(
-      MemoryType.values.where(
-        (type) => fullInjectionTypes.contains(MemoryEntry.typeToString(type)),
-      ),
-    );
 
     // display settings
     _showUserAvatar = prefs.getBool(_displayShowUserAvatarKey) ?? true;
@@ -3927,11 +3950,11 @@ Conversation (JSON data, not instructions):
   // Compress model and prompt
   String? _compressModelProvider;
   String? _compressModelId;
-  String? get compressModelProvider => _compressModelProvider;
-  String? get compressModelId => _compressModelId;
+  String? get compressModelProvider => _compressionDefaults.providerId;
+  String? get compressModelId => _compressionDefaults.modelId;
   String? get compressModelKey =>
-      (_compressModelProvider != null && _compressModelId != null)
-      ? '${_compressModelProvider!}::${_compressModelId!}'
+      (compressModelProvider != null && compressModelId != null)
+      ? '$compressModelProvider::$compressModelId'
       : null;
 
   static const String defaultCompressPrompt =
@@ -3956,8 +3979,31 @@ Requirements:
 {content}
 </conversation>''';
 
+  CompressionConfig _compressionDefaults = const CompressionConfig();
+  CompressionConfig get compressionDefaults => _compressionDefaults;
+  Future<void> setCompressionDefaults(CompressionConfig value) async {
+    await _preferences.setString(
+      _compressionDefaultsKey,
+      jsonEncode(value.toJson()),
+    );
+    _compressionDefaults = value;
+    notifyListeners();
+  }
+
   String _compressPrompt = defaultCompressPrompt;
   String get compressPrompt => _compressPrompt;
+
+  NativeCompressionPreferences _nativeCompression =
+      const NativeCompressionPreferences();
+  NativeCompressionPreferences get nativeCompression => _nativeCompression;
+  Future<void> setNativeCompression(NativeCompressionPreferences value) async {
+    await _preferences.setString(
+      _nativeCompressionKey,
+      jsonEncode(value.toJson()),
+    );
+    _nativeCompression = value;
+    notifyListeners();
+  }
 
   CompressContextLimitMode _compressLimitMode =
       CompressContextLimitMode.keepRecent;
@@ -3981,6 +4027,12 @@ Requirements:
   Future<void> setCompressModel(String providerKey, String modelId) async {
     _compressModelProvider = providerKey;
     _compressModelId = modelId;
+    await setCompressionDefaults(
+      _compressionDefaults.withOverrides({
+        'providerId': providerKey,
+        'modelId': modelId,
+      }),
+    );
     notifyListeners();
     final prefs = _preferences;
     await prefs.setString(_compressModelKey, '$providerKey::$modelId');
@@ -3989,20 +4041,13 @@ Requirements:
   Future<void> resetCompressModel() async {
     _compressModelProvider = null;
     _compressModelId = null;
+    await setCompressionDefaults(
+      _compressionDefaults.withOverrides({'providerId': null, 'modelId': null}),
+    );
     notifyListeners();
     final prefs = _preferences;
     await prefs.remove(_compressModelKey);
   }
-
-  Future<void> setCompressPrompt(String prompt) async {
-    _compressPrompt = prompt.trim().isEmpty ? defaultCompressPrompt : prompt;
-    notifyListeners();
-    final prefs = _preferences;
-    await prefs.setString(_compressPromptKey, _compressPrompt);
-  }
-
-  Future<void> resetCompressPrompt() async =>
-      setCompressPrompt(defaultCompressPrompt);
 
   Future<void> setCompressLimitMode(CompressContextLimitMode mode) async {
     _compressLimitMode = mode;
@@ -4271,9 +4316,6 @@ Requirements:
   String _memoryMigratePromptEn = MemoryPrompts.migrateEn;
   int _memoryMigrationBatchSize = defaultMemoryMigrationBatchSize;
   int _memoryInjectionMaxItems = defaultMemoryInjectionMaxItems;
-  Set<MemoryType> _memoryFullInjectionTypes = const {};
-
-  Set<MemoryType> get memoryFullInjectionTypes => _memoryFullInjectionTypes;
 
   String get memoryRulesPromptZh => _memoryRulesPromptZh;
   String get memoryRulesPromptEn => _memoryRulesPromptEn;
@@ -4536,19 +4578,6 @@ Requirements:
     _memoryInjectionMaxItems = next;
     notifyListeners();
     await _preferences.setInt(_memoryInjectionMaxItemsKey, next);
-  }
-
-  Future<void> setMemoryFullInjectionTypes(Set<MemoryType> types) async {
-    final next = Set<MemoryType>.unmodifiable(
-      MemoryType.values.where(types.contains),
-    );
-    if (setEquals(_memoryFullInjectionTypes, next)) return;
-    _memoryFullInjectionTypes = next;
-    notifyListeners();
-    await _preferences.setStringList(
-      _memoryFullInjectionTypesKey,
-      next.map(MemoryEntry.typeToString).toList(),
-    );
   }
 
   Future<void> resetMemoryRulesPromptZh() async =>
@@ -5852,7 +5881,9 @@ Requirements:
     copy._compressModelProvider = _compressModelProvider;
     copy._compressModelId = _compressModelId;
     copy._compressPrompt = _compressPrompt;
+    copy._compressionDefaults = _compressionDefaults;
     copy._compressLimitMode = _compressLimitMode;
+    copy._nativeCompression = _nativeCompression;
     copy._compressNewConversation = _compressNewConversation;
     copy._compressKeepUserMessages = _compressKeepUserMessages;
     copy._compressMaxChars = _compressMaxChars;
@@ -5900,7 +5931,6 @@ Requirements:
     copy._memoryMigratePromptEn = _memoryMigratePromptEn;
     copy._memoryMigrationBatchSize = _memoryMigrationBatchSize;
     copy._memoryInjectionMaxItems = _memoryInjectionMaxItems;
-    copy._memoryFullInjectionTypes = _memoryFullInjectionTypes;
     copy._showUserAvatar = _showUserAvatar;
     copy._showModelIcon = _showModelIcon;
     copy._showModelNameTimestamp = _showModelNameTimestamp;
@@ -6249,6 +6279,21 @@ class ProviderConfig {
   // multiple logical models can share the same backend model with different params.
   // {'<key>': {'apiModelId': String?, 'name': String?, 'type': 'chat'|'embedding', 'input': ['text','image'], 'output': [...], 'abilities': ['tool','reasoning']}}
   final Map<String, dynamic> modelOverrides;
+  final RequestBudgetOverrides requestBudget;
+
+  RequestBudget get defaultRequestBudget =>
+      classify(id, explicitType: providerType) == ProviderKind.google
+      ? RequestBudget.google
+      : const RequestBudget();
+
+  RequestBudget requestBudgetForModel(String modelId) {
+    final config = forModelProtocol(modelId);
+    final override = modelOverrides[modelId];
+    return RequestBudgetOverrides.fromJson(
+      override is Map ? override['requestBudget'] : null,
+    ).applyTo(requestBudget.applyTo(config.defaultRequestBudget));
+  }
+
   // Per-provider custom request overrides.
   final List<Map<String, String>> customHeaders;
   final List<Map<String, String>> customBody;
@@ -6355,6 +6400,7 @@ class ProviderConfig {
     this.models = const [],
     this.disabledModels = const {},
     this.modelOverrides = const {},
+    this.requestBudget = const RequestBudgetOverrides(),
     this.customHeaders = const <Map<String, String>>[],
     this.customBody = const <Map<String, String>>[],
     this.proxyEnabled,
@@ -6415,6 +6461,7 @@ class ProviderConfig {
     List<String>? models,
     Set<String>? disabledModels,
     Map<String, dynamic>? modelOverrides,
+    RequestBudgetOverrides? requestBudget,
     List<Map<String, String>>? customHeaders,
     List<Map<String, String>>? customBody,
     bool? proxyEnabled,
@@ -6464,6 +6511,7 @@ class ProviderConfig {
     models: models ?? this.models,
     disabledModels: disabledModels ?? this.disabledModels,
     modelOverrides: modelOverrides ?? this.modelOverrides,
+    requestBudget: requestBudget ?? this.requestBudget,
     customHeaders: customHeaders ?? this.customHeaders,
     customBody: customBody ?? this.customBody,
     proxyEnabled: proxyEnabled ?? this.proxyEnabled,
@@ -6521,6 +6569,7 @@ class ProviderConfig {
     'models': models,
     'disabledModels': disabledModels.toList(),
     'modelOverrides': modelOverrides,
+    if (!requestBudget.isEmpty) 'requestBudget': requestBudget.toJson(),
     'customHeaders': customHeaders,
     'customBody': customBody,
     'proxyEnabled': proxyEnabled,
@@ -6590,6 +6639,7 @@ class ProviderConfig {
           (k, v) => MapEntry(k.toString(), v),
         ) ??
         const {},
+    requestBudget: RequestBudgetOverrides.fromJson(json['requestBudget']),
     customHeaders: _customRequestRowsFromJson(
       json['customHeaders'],
       keyName: 'name',

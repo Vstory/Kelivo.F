@@ -1,10 +1,12 @@
+import 'package:Kelivo/core/models/image_context.dart';
+import 'package:Kelivo/core/models/request_budget.dart';
+import 'package:Kelivo/core/services/api/request_image_context.dart';
 import 'package:Kelivo/core/database/business_settings_router.dart';
 import 'package:Kelivo/core/database/business_preferences.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Kelivo/core/models/compress_context_options.dart';
 import 'package:Kelivo/core/models/model_spec.dart';
 import 'package:Kelivo/core/providers/settings_provider.dart';
 import 'package:Kelivo/core/services/auth/provider_oauth_service.dart';
@@ -56,6 +58,86 @@ void main() {
     await settings.loaded;
   });
   tearDown(() => settings.dispose());
+
+  for (final provider in [
+    OAuthProvider.chatgpt,
+    OAuthProvider.claude,
+    OAuthProvider.grok,
+  ]) {
+    test('final OAuth body respects local budget: $provider', () async {
+      final original = config(provider: provider, expired: false);
+      await settings.setProviderConfig(original.id, original);
+      final service = ProviderOAuthService()..bind(settings);
+      addTearDown(service.dispose);
+      var sends = 0;
+      var wireBytes = 0;
+      final client = service.authenticatedClient(
+        MockClient((request) async {
+          sends++;
+          wireBytes = request.bodyBytes.length;
+          return http.Response('{}', 200);
+        }),
+        original,
+      );
+      addTearDown(client.close);
+      final payload = provider == OAuthProvider.claude
+          ? {
+              'model': 'claude-sonnet-4-6',
+              'messages': [
+                {'role': 'user', 'content': 'hi'},
+              ],
+              'max_tokens': 100,
+            }
+          : {
+              'model': 'plain-model',
+              'input': [
+                {'role': 'user', 'content': 'hi'},
+              ],
+            };
+      final path = provider == OAuthProvider.claude
+          ? '/messages'
+          : '/responses';
+      Future<void> send() async {
+        final request =
+            http.Request('POST', Uri.parse('${provider.baseUrl}$path'))
+              ..headers['content-type'] = 'application/json'
+              ..body = await RequestImageContext.encodeBody(payload);
+        await (await client.send(request)).stream.drain<void>();
+      }
+
+      await send();
+      final expected = wireBytes;
+      final rawSize = utf8.encode(jsonEncode(payload)).length;
+      expect(expected, greaterThan(rawSize));
+      final blocked = RequestImageContext(
+        settings: const ImageContextSettings(),
+        images: [],
+        budget: RequestBudget(bodyBytes: rawSize),
+      );
+      await expectLater(
+        blocked.run(() async* {
+          await send();
+          yield 0;
+        }).drain<void>(),
+        throwsA(
+          isA<ImageContextBudgetException>()
+              .having((e) => e.actual, 'final wire bytes', expected)
+              .having((e) => e.limit, 'body budget', rawSize),
+        ),
+      );
+      expect(sends, 1);
+      final exact = RequestImageContext(
+        settings: const ImageContextSettings(),
+        images: [],
+        budget: RequestBudget(bodyBytes: expected),
+      );
+      await exact.run(() async* {
+        await send();
+        yield 0;
+      }).drain<void>();
+      expect(sends, 2);
+    });
+  }
 
   test(
     'Codex sync stores service tiers scoped to the authenticated session',
@@ -1506,10 +1588,6 @@ void main() {
         'grok-4.7-build-fast',
       );
       expect(fastSpec.contextWindow, 500000);
-      expect(
-        compressRequestCharBudget(contextWindowTokens: fastSpec.contextWindow),
-        100000,
-      );
       expect(
         synced.modelOverrides['grok-4.7-build-fast']['abilities'],
         contains('reasoning'),

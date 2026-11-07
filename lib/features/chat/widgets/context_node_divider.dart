@@ -1,3 +1,4 @@
+import '../../../shared/widgets/ios_tactile.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -106,7 +107,9 @@ class _ContextOperationDividerState extends State<ContextOperationDivider> {
         : '${operation!.isFixedStart
                   ? l10n.contextFixedStart
                   : operation.isCompression
-                  ? l10n.contextDividerCompressed
+                  ? operation.isNative
+                        ? l10n.compressionNativeLabel
+                        : l10n.contextDividerCompressed
                   : l10n.homePageClearContext}'
               '${operation.isCompression && operation.isEdited ? ' · ${l10n.contextDividerEdited}' : ''}';
     final undoLabel = operation?.isFixedStart == true
@@ -230,26 +233,16 @@ class _ContextOperationDividerState extends State<ContextOperationDivider> {
                                   child: SizedBox(
                                     width: undoSize,
                                     height: undoSize,
-                                    child: IconButton(
+                                    child: IosIconButton(
                                       key: ValueKey(
                                         'undo-context-${operation.id}',
                                       ),
-                                      onPressed: widget.onUndo,
+                                      onTap: widget.onUndo,
+                                      icon: LucideIcons.x,
+                                      size: 12,
+                                      minSize: undoSize,
                                       padding: EdgeInsets.zero,
-                                      constraints: BoxConstraints.tightFor(
-                                        width: undoSize,
-                                        height: undoSize,
-                                      ),
-                                      style: IconButton.styleFrom(
-                                        focusColor: cs.primary.withValues(
-                                          alpha: .15,
-                                        ),
-                                      ),
-                                      icon: Icon(
-                                        LucideIcons.x,
-                                        size: 12,
-                                        color: color,
-                                      ),
+                                      color: color,
                                     ),
                                   ),
                                 ),

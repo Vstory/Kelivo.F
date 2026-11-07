@@ -1,8 +1,10 @@
+import '../../../../models/image_context.dart';
 import '../../request_image_context.dart';
 import '../../../custom_request_merger.dart';
 import '../../../../models/provider_oauth.dart';
 import 'dart:async';
 import 'dart:convert';
+import '../../native_compaction_context.dart';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -229,6 +231,7 @@ Stream<StreamChunk> runOpenAIResponsesToolFollowUps({
   StreamRoundRunner? retryRound,
 }) async* {
   var usage = initialUsage;
+  String? finishReason;
   var chars = approxCompletionChars;
   var round = streamRound;
   var currentInput = <Map<String, dynamic>>[...initialInput];
@@ -278,11 +281,13 @@ Stream<StreamChunk> runOpenAIResponsesToolFollowUps({
       };
       applyOpenAIResolvedRequest(
         body2,
+        config: config,
         spec: spec,
         reasoning: reasoning,
         transport: ReasoningTransport.responses,
       );
       final extraCfg = customBody(config, modelId, assistantBody: extraBody);
+      validateNativeCompactionOverrides(body2, extraCfg);
       CustomRequestMerger.applyBody(body2, extraCfg);
       applyServiceTier(body2, config, serviceTier);
       if (promptCacheKey != null) {
@@ -318,6 +323,8 @@ Stream<StreamChunk> runOpenAIResponsesToolFollowUps({
           final errorBody = await resp2.stream.bytesToString();
           throw HttpException('HTTP ${resp2.statusCode}: $errorBody');
         }
+      } on ImageContextBudgetException {
+        rethrow;
       } on ProviderOAuthException {
         rethrow;
       } on HttpException {
@@ -330,6 +337,7 @@ Stream<StreamChunk> runOpenAIResponsesToolFollowUps({
         final raw = await decodeUtf8Stream(resp2.stream);
         throwIfInBandStreamError(raw);
         final obj = jsonDecode(raw) as Map;
+        finishReason = responsesFinishReason(obj);
         for (final chunk
             in ResponsesStreamDecoder(
               sourceId: 'round-$round',
@@ -394,6 +402,7 @@ Stream<StreamChunk> runOpenAIResponsesToolFollowUps({
           sourceId: 'round-${round++}',
         );
         yield* decodeSseEvents(parseSseEventStrings(s2), followUpDecoder);
+        finishReason = followUpDecoder.finishReason;
         usage = followUpDecoder.usage ?? usage;
         chars += followUpDecoder.approxCompletionChars;
         outputItemsForAppend = followUpDecoder.outputItems;
@@ -427,6 +436,7 @@ Stream<StreamChunk> runOpenAIResponsesToolFollowUps({
       final approxTotal = approxPromptTokens + (chars / 4).round();
       return emitDone(
         ids: StreamChunkIds('finish'),
+        finishReason: finishReason,
         usage: usage,
         totalTokens: usage?.totalTokens ?? approxTotal,
       );

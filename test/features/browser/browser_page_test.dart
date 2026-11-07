@@ -1,3 +1,4 @@
+import 'package:Kelivo/theme/app_font_weights.dart';
 import 'package:Kelivo/features/browser/widgets/browser_text_field.dart';
 import 'dart:async';
 import 'dart:ui' as ui;

@@ -1,3 +1,10 @@
+import 'providers/openai/native_compaction.dart';
+import 'providers/openai/responses_request.dart';
+import '../../models/native_compaction.dart';
+import 'native_compaction_context.dart';
+import 'generation/model_request_attempts.dart';
+import '../../models/compress_context_options.dart' show isContextLengthError;
+import 'request_history_context.dart';
 import 'request_image_context.dart';
 import '../auth/provider_oauth_service.dart';
 import 'dart:async';
@@ -38,6 +45,82 @@ export 'generation/tool_loop_runner.dart';
 export 'stream/stream_chunk_emit.dart';
 
 class ChatApiService {
+  static Future<NativeCompactionPayload> compactHistory({
+    required ProviderConfig config,
+    required String modelId,
+    required List<Map<String, dynamic>> messages,
+    required String requestId,
+    required String conversationId,
+    List<Map<String, dynamic>>? tools,
+    RequestImageContext? imageContext,
+    Map<String, String>? extraHeaders,
+    bool Function()? isCancelled,
+  }) async {
+    final token = CancelToken();
+    _activeCancelTokens.remove(requestId)?.cancel('replaced');
+    _activeCancelTokens[requestId] = token;
+    final timeout = Timer(
+      const Duration(minutes: 5),
+      () => token.cancel('timeout'),
+    );
+    http.Client? client;
+    void check() {
+      if (token.isCancelled || (isCancelled?.call() ?? false)) {
+        throw StateError('cancelled');
+      }
+    }
+
+    try {
+      check();
+      config = await Future.any<ProviderConfig>([
+        ProviderOAuthService.instance.resolve(config),
+        _whenCancelled(token).then((_) => throw StateError('cancelled')),
+      ]);
+      check();
+      validateNativeCompactionScope(messages, config);
+      config = nativeResponsesConfig(config);
+      final body = await buildOpenAIResponsesBody(
+        config,
+        modelId,
+        RequestHistoryContext.identify(messages),
+        tools: tools,
+        stream: config.oauthProvider == OAuthProvider.chatgpt,
+      );
+      check();
+      final projected =
+          await imageContext?.project(body, preserveSources: true) ?? body;
+      check();
+      client = ProviderOAuthService.instance.authenticatedClient(
+        providerHttpClient(config, cancelToken: token, logRequests: false),
+        config,
+      );
+      final authenticatedClient = client;
+      Future<NativeCompactionPayload> sendCompact() => requestNativeCompaction(
+        authenticatedClient,
+        config,
+        modelId,
+        projected,
+        extraHeaders: providerSessionHeaders(
+          config,
+          conversationId: conversationId,
+          extraHeaders: extraHeaders,
+        ),
+        conversationId: conversationId,
+      );
+      final result = await (imageContext == null
+          ? sendCompact()
+          : imageContext.run(() => Stream.fromFuture(sendCompact())).first);
+      check();
+      return result;
+    } finally {
+      timeout.cancel();
+      client?.close();
+      if (identical(_activeCancelTokens[requestId], token)) {
+        _activeCancelTokens.remove(requestId);
+      }
+    }
+  }
+
   static final Map<String, CancelToken> _activeCancelTokens =
       <String, CancelToken>{};
 
@@ -247,6 +330,7 @@ class ChatApiService {
     bool textOnly = false,
     AutoRetryOptions? retryOverride,
     RequestImageContext? imageContext,
+    RequestHistoryContext? historyContext,
   }) async* {
     final sessionToken = CancelToken();
     final toolCancellation = ToolCallCancellation(
@@ -274,6 +358,13 @@ class ChatApiService {
       if (textOnly) config = _textOnlyConfig(config, modelId);
       if (config.oauthProvider == OAuthProvider.chatgpt) stream = true;
       config = config.forModelProtocol(modelId);
+      final nativeHistory = hasNativeCompaction(messages);
+      final nativeTransport =
+          nativeHistory || historyContext?.nativeCompression == true;
+      if (nativeTransport) {
+        validateNativeCompactionScope(messages, config);
+        config = nativeResponsesConfig(config);
+      }
       final options = retryOverride ?? AutoRetryConfig.current;
       final sessionHeaders = providerSessionHeaders(
         config,
@@ -285,13 +376,20 @@ class ChatApiService {
         explicitType: config.providerType,
       );
       final useOpenAIImagesApi =
+          !nativeTransport &&
           !textOnly &&
           kind == ProviderKind.openai &&
           allowImagesApiRouting &&
           shouldUseOpenAIImagesApi(config, modelId);
       final useZhipuLayoutParsing =
-          !textOnly && shouldUseZhipuLayoutParsing(config, modelId);
-      final unicodeSafeMessages = _sanitizeMessages(messages);
+          !nativeTransport &&
+          !textOnly &&
+          shouldUseZhipuLayoutParsing(config, modelId);
+      final unicodeSafeMessages = _sanitizeMessages(
+        historyContext == null
+            ? messages
+            : RequestHistoryContext.identify(messages),
+      );
       final spec = _stripSpecForRequest(
         spec: ModelSpecResolver.instance.spec(config, modelId),
         keepImages:
@@ -325,11 +423,13 @@ class ChatApiService {
           options: options,
           isCancelled: () => sessionToken.isCancelled,
           cancelled: _whenCancelled(sessionToken),
-          shouldRetry: (error) => shouldRetryError(
-            error,
-            options,
-            retryOnNetworkError: retryNetworkErrors ? null : false,
-          ),
+          shouldRetry: (error) =>
+              !isContextLengthError(error) &&
+              shouldRetryError(
+                error,
+                options,
+                retryOnNetworkError: retryNetworkErrors ? null : false,
+              ),
           retryEvent: emitRetryUi
               ? (attempt, delay, error) => RetryPending(
                   attempt: attempt + 1,
@@ -342,13 +442,25 @@ class ChatApiService {
           attemptStartEvent: emitRetryUi
               ? () => const RetryAttemptStart()
               : null,
-          attempt: (_) => carrySplitSurrogates(sendRound()),
+          attempt: (_) => carrySplitSurrogates(
+            historyContext == null
+                ? sendRound()
+                : historyContext.recoverOverflow(sendRound),
+          ),
         );
       }
 
       Stream<StreamChunk> inImageContext(
         Stream<StreamChunk> Function() action,
-      ) => imageContext == null ? action() : imageContext.run(action);
+      ) {
+        Stream<StreamChunk> withImages() => imageContext == null
+            ? RequestImageContext.without(action)
+            : imageContext.run(action);
+        return historyContext == null
+            ? RequestHistoryContext.without(withImages)
+            : historyContext.run(withImages);
+      }
+
       yield* retryRound(
         () => inImageContext(
           () => toolCancellation.runStream(
@@ -457,7 +569,9 @@ class ChatApiService {
     final cancelToken = CancelToken();
     _bridgeCancel(sessionToken, cancelToken);
     final client = ProviderOAuthService.instance.authenticatedClient(
-      providerHttpClient(config, cancelToken: cancelToken),
+      ModelRequestAttempts.wrap(
+        providerHttpClient(config, cancelToken: cancelToken),
+      ),
       config,
     );
     try {
@@ -670,6 +784,7 @@ class ChatApiService {
       if (chunk is RetryAttemptStart) {
         onRetry?.call(null);
       }
+      if (textOnly && chunk is Usage && chunk.estimated) continue;
       handler.handle(chunk);
       if (chunk is Usage) onUsage?.call(chunk);
     }

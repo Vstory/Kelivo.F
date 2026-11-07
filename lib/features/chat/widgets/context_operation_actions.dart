@@ -320,7 +320,9 @@ Future<void> showContextOperationDetails(
     title: operation.isFixedStart
         ? l10n.contextFixedStart
         : operation.isCompression
-        ? l10n.contextDetailTitle
+        ? operation.isNative
+              ? l10n.compressionNativeLabel
+              : l10n.contextDetailTitle
         : l10n.contextDetailClearTitle,
     maxWidth: operation.isCompression ? 560 : 500,
     builder: (detailContext) => ContextOperationContent(
@@ -335,7 +337,7 @@ Future<void> showContextOperationDetails(
           ? l10n.contextDetailSuperseded
           : '',
       onClose: () => Navigator.of(detailContext).pop(),
-      onSave: operation.revoked
+      onSave: operation.revoked || operation.isNative
           ? null
           : (summary) => changeContextOperationWithConfirmation(
               context,
@@ -495,34 +497,55 @@ Future<void> showContextOperations(
   required ValueChanged<ContextCompressionTask> onRetry,
   required ValueChanged<ContextCompressionTask> onAdjust,
   required ValueChanged<String> onOpenConversation,
-}) => _showContextContent(
-  context,
-  title: AppLocalizations.of(context)!.contextOperationsTitle,
-  builder: (panelContext) {
-    void leave(VoidCallback action) {
-      Navigator.of(panelContext).pop();
-      action();
-    }
+}) async {
+  final service = chat.contextCompression;
+  final viewedTask = service.taskFor(conversationId);
+  await _showContextContent(
+    context,
+    title: AppLocalizations.of(context)!.contextOperationsTitle,
+    builder: (panelContext) {
+      void leave(VoidCallback action) {
+        Navigator.of(panelContext).pop();
+        action();
+      }
 
-    return ContextOperationsPanel(
-      chat: chat,
-      conversationId: conversationId,
-      messageLimit: messageLimit,
-      onOpenOperation: (operation) => leave(() => onOpenOperation(operation)),
-      onRetry: (task) => leave(() => onRetry(task)),
-      onAdjust: (task) => leave(() => onAdjust(task)),
-      onReview: (task) => leave(
-        () => showCompressionReview(
-          context,
-          chat: chat,
-          task: task,
-          onRecompress: () => onAdjust(task),
+      return ContextOperationsPanel(
+        chat: chat,
+        conversationId: conversationId,
+        messageLimit: messageLimit,
+        onOpenOperation: (operation) => leave(() => onOpenOperation(operation)),
+        onRetry: (task) => leave(() => onRetry(task)),
+        onAdjust: (task) => leave(() => onAdjust(task)),
+        onReview: (task) => leave(
+          () => showCompressionReview(
+            context,
+            chat: chat,
+            task: task,
+            onRecompress: () => onAdjust(task),
+          ),
         ),
-      ),
-      onOpenConversation: (id) => leave(() => onOpenConversation(id)),
-    );
-  },
-);
+        onOpenConversation: (id) => leave(() => onOpenConversation(id)),
+      );
+    },
+  );
+  // Viewing a completed result acknowledges its notice. Do not dismiss a task
+  // that still needs attention, or a replacement started from this panel.
+  if (viewedTask?.phase != CompressionPhase.completed ||
+      !identical(service.taskFor(conversationId), viewedTask)) {
+    return;
+  }
+  try {
+    await service.dismiss(conversationId);
+  } catch (error) {
+    if (context.mounted) {
+      showAppSnackBar(
+        context,
+        message: error.toString(),
+        type: NotificationType.error,
+      );
+    }
+  }
+}
 
 Future<void> showCompressionReview(
   BuildContext context, {
@@ -571,7 +594,8 @@ Future<void> showCompressionReview(
     ]);
   }
 
-  if (!PlatformUtils.isDesktopTarget && task.phase == CompressionPhase.review) {
+  final canEdit = task.phase == CompressionPhase.review && !operation.isNative;
+  if (!PlatformUtils.isDesktopTarget && canEdit) {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ContextSummaryEditorPage(
@@ -589,12 +613,12 @@ Future<void> showCompressionReview(
     title: AppLocalizations.of(context)!.contextTaskReview,
     builder: (detailContext) => ContextOperationContent(
       operation: operation,
-      initiallyEditing: task.phase == CompressionPhase.review,
+      initiallyEditing: canEdit,
       budget: task.budget,
       showHeader: PlatformUtils.isDesktopTarget,
       onClose: () => Navigator.of(detailContext).pop(),
       estimateSummary: estimate,
-      onSave: task.phase != CompressionPhase.review ? null : save,
+      onSave: canEdit ? save : null,
       onRecompress: onRecompress == null
           ? null
           : () {
