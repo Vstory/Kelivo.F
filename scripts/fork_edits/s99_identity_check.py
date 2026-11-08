@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
+# SCRIPT_VERSION=1.1.0    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
 """收尾校验：改写完之后不许再残留上游身份。
 
 前面各步都按「期望原文命中几次」校验过，但它们只保证自己那段被改到；这里从结果反查，
 漏改的可见身份（尤其不走 l10n 的那几处硬编码）不会报错，只会在界面上露出来。
+l10n 与 phone_control 按文件 glob 反查 —— 上游加语言（2026-11 加 ru / ko / tr）时，
+写死清单的检查会跟着一起漏。
 """
 
 from __future__ import annotations
@@ -21,9 +24,6 @@ FILES = (
     "lib/features/browser/pages/browser_page.dart",
     "lib/core/services/notification_service.dart",
     "lib/desktop/desktop_tray_controller.dart",
-    "android/app/src/main/res/values/phone_control.xml",
-    "android/app/src/main/res/values-zh-rCN/phone_control.xml",
-    "android/app/src/main/res/values-zh-rTW/phone_control.xml",
 )
 
 FORBIDDEN = (
@@ -38,7 +38,6 @@ FORBIDDEN = (
     "setToolTip('Kelivo')",
 )
 
-L10N_LANGS = ("en", "zh", "zh_Hans", "zh_Hant")
 L10N_SKIP_KEYS = {
     "aboutPageQQGroupOne",
     "aboutPageQQGroupTwo",
@@ -47,6 +46,7 @@ L10N_SKIP_KEYS = {
 ARB_ENTRY = re.compile(
     r'^\s*"(?P<key>[^"@][^"]*)"\s*:\s*"(?P<value>[^"]*)"\s*,?\s*$', re.MULTILINE
 )
+LABEL_LINE = 'name="phone_control_service_label">'
 
 
 def main() -> int:
@@ -62,13 +62,18 @@ def main() -> int:
             for needle in FORBIDDEN:
                 if needle in line:
                     hits.append(f"{rel}:{lineno}: {needle}")
-    for lang in L10N_LANGS:
-        rel = f"lib/l10n/app_{lang}.arb"
-        for match in ARB_ENTRY.finditer((REPO_ROOT / rel).read_text(encoding="utf-8")):
+    for arb in sorted((REPO_ROOT / "lib/l10n").glob("app_*.arb")):
+        rel = str(arb.relative_to(REPO_ROOT))
+        for match in ARB_ENTRY.finditer(arb.read_text(encoding="utf-8")):
             if match.group("key") in L10N_SKIP_KEYS:
                 continue
             if "Kelivo" in match.group("value").replace(args.label, ""):
                 hits.append(f"{rel}: {match.group('key')}")
+    for xml in sorted(REPO_ROOT.glob("android/app/src/main/res/values*/phone_control.xml")):
+        rel = str(xml.relative_to(REPO_ROOT))
+        for lineno, line in enumerate(xml.read_text(encoding="utf-8").splitlines(), 1):
+            if LABEL_LINE in line and "Kelivo" in line.replace(args.label, ""):
+                hits.append(f"{rel}:{lineno}: 无障碍服务名未改名")
 
     if hits:
         print("::error::改写后仍残留上游身份：", file=sys.stderr)
