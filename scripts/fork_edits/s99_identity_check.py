@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SCRIPT_VERSION=1.1.0    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
+# SCRIPT_VERSION=1.1.1    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
 """收尾校验：改写完之后不许再残留上游身份。
 
 前面各步都按「期望原文命中几次」校验过，但它们只保证自己那段被改到；这里从结果反查，
@@ -43,8 +43,10 @@ L10N_SKIP_KEYS = {
     "aboutPageQQGroupTwo",
     "aboutPageQQGroupThree",
 }
+# 值里可能出现 \" 转义引号（tr 的备份文案就是），只写 [^"]* 会把整条漏掉。
 ARB_ENTRY = re.compile(
-    r'^\s*"(?P<key>[^"@][^"]*)"\s*:\s*"(?P<value>[^"]*)"\s*,?\s*$', re.MULTILINE
+    r'^\s*"(?P<key>[^"@][^"]*)"\s*:\s*"(?P<value>(?:[^"\\]|\\.)*)"\s*,?\s*$',
+    re.MULTILINE,
 )
 LABEL_LINE = 'name="phone_control_service_label">'
 
@@ -74,6 +76,18 @@ def main() -> int:
         for lineno, line in enumerate(xml.read_text(encoding="utf-8").splitlines(), 1):
             if LABEL_LINE in line and "Kelivo" in line.replace(args.label, ""):
                 hits.append(f"{rel}:{lineno}: 无障碍服务名未改名")
+    # 生成物也要查：arb 改对了但生成物漏改时界面露的是旧名。key 名（aboutPageKelivoSearch*）
+    # 与 QQ 群文案不算残留，生成器写的 /// 文档注释里带原文也不影响运行。
+    for dart in sorted((REPO_ROOT / "lib/l10n").glob("app_localizations_*.dart")):
+        rel = str(dart.relative_to(REPO_ROOT))
+        for lineno, line in enumerate(dart.read_text(encoding="utf-8").splitlines(), 1):
+            if "Kelivo" not in line.replace(args.label, ""):
+                continue
+            if "aboutPageKelivoSearch" in line or "aboutPageQQGroup" in line:
+                continue
+            if line.lstrip().startswith("///"):
+                continue
+            hits.append(f"{rel}:{lineno}: 生成物文案未改名")
 
     if hits:
         print("::error::改写后仍残留上游身份：", file=sys.stderr)
