@@ -19,11 +19,14 @@ L10N_SKIP_KEYS = {
     "aboutPageQQGroupTwo",
     "aboutPageQQGroupThree",
 }
+# 值里可能出现 \" 转义引号（tr 的备份文案就是），只写 [^"]* 会把整条漏掉。
 ARB_ENTRY = re.compile(
-    r'^\s*"(?P<key>[^"@][^"]*)"\s*:\s*"(?P<value>[^"]*)"\s*,?\s*$', re.MULTILINE
+    r'^\s*"(?P<key>[^"@][^"]*)"\s*:\s*"(?P<value>(?:[^"\\]|\\.)*)"\s*,?\s*$',
+    re.MULTILINE,
 )
 # 每份 arb 至少这么多处含 Kelivo：低于此说明上游改了写法，或某语言的文案被换过一轮
 MIN_RENAMED_PER_ARB = 20
+STATEMENT_END = re.compile(r";[ \t]*$", re.MULTILINE)
 
 
 def build_edits(label: str):
@@ -65,11 +68,15 @@ def build_edits(label: str):
         dart_text = dart.read_text(encoding="utf-8")
         seen: set[str] = set()
         for key in sorted(keys):
-            # 带占位符的 key 生成的是方法而非 getter，按「声明到第一个分号」切块两种都覆盖。
+            # 带占位符的 key 生成的是方法而非 getter，按「声明到语句结束」切块两种都覆盖。
+            # 结束符要认行尾分号：文案本身可能含分号（tr 的备份说明就有），
+            # 取第一个分号会把字符串截断在中间，整块也就看不到 Kelivo 了。
             for declared in re.finditer(rf"\bString (?:get )?{re.escape(key)}\b", dart_text):
                 start = declared.start()
-                end = dart_text.index(";", start)
-                block = dart_text[start:end]
+                end_match = STATEMENT_END.search(dart_text, start)
+                if not end_match:
+                    fail(f"{dart_rel}: {key} 的声明找不到语句结束")
+                block = dart_text[start:end_match.start()]
                 if "Kelivo" not in block or block in seen:
                     continue
                 seen.add(block)
