@@ -16676,7 +16676,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get compressionNativeScopeChanged =>
-      'Bu yerel bağlam başka bir bağlantıya veya hesaba ait. Sıkıştırmayı geri alın ya da devam etmeden önce orijinal geçmişten bir metin özeti oluşturun.';
+      'Bu yerel bağlam başka bir bağlantıya veya hesaba ait. Özgün bağlantıyla devam edin ya da sıkıştırmayı geri alın veya özgün içeriği barındıran sohbette metin özeti oluşturun.';
 
   @override
   String get compressionNativeTokenHint =>
@@ -16684,7 +16684,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get compressionNativeCopyHint =>
-      'Yeni sohbet, yerel sıkıştırmanın geri alınabilmesi için orijinal mesajları korur.';
+      'Yeni sohbet yalnızca tam yerel sıkıştırma sonucunu ve korunan son turları saklar. Özgün içerik kaynak sohbette kalır ve burada geri alınarak kurtarılamaz.';
 
   @override
   String get compressionNativeInputOverride =>
@@ -16742,4 +16742,59 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get themePaletteCustom => 'Özel';
+
+  @override
+  String get compressionNativeImported => 'Yerel bağlam yüklendi';
+
+  @override
+  String get compressionNativeImportedDescription =>
+      'Bu sohbet, tam yerel sıkıştırma sonucu ve korunan son turlarla başlar. Sonuç metin olarak görüntülenemez veya düzenlenemez. Önceki özgün içerik kaynak sohbette kalır, bu nedenle burada geri alınarak kurtarılamaz.';
+
+  @override
+  String get compressionNativeOpenSource => 'Kaynak sohbeti aç';
+
+  @override
+  String get compressionNativeOriginalsUnavailable =>
+      'Bu sohbette içe aktarılan yerel bağlama ait özgün içerik yok. Yerel sıkıştırmayla devam edin veya özgün içeriği görüntülemek ya da özetlemek için kaynak sohbete dönün.';
+
+  @override
+  String get compressionNativeTemporaryCopyHint =>
+      'Yeni geçici sohbet yalnızca tam yerel sıkıştırma sonucunu ve korunan son turları tutar. Kaynak geçici sohbetten ayrılmak, onu ve aktarılmayan orijinalleri siler; bunlar burada geri yüklenemez.';
+
+  @override
+  String get compressionNativeSourceUnavailable =>
+      'Bu sohbet tam yerel sıkıştırma sonucunu ve korunan son turları tutar. Kaynak sohbet artık kullanılamıyor. Buraya kopyalanmayan orijinaller geri yüklenemez ve yerel sonuç metin olarak okunamaz veya düzenlenemez.';
+
+  @override
+  String get modelDetailSheetImageGenerationModel => 'Görsel modeli';
+
+  @override
+  String get modelDetailSheetImageGenerationAuto => 'Otomatik';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexity => 'Görsel karmaşıklığı';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityDefault => 'Varsayılan';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityLow => 'Düşük';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityMedium => 'Orta';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityHigh => 'Yüksek';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityDescription =>
+      'Görsel planlamayı sohbet akıl yürütmesinden bağımsız olarak kontrol eder. Varsayılan, sunucu davranışını kullanır ve sohbet akıl yürütmesini devralabilir.';
+
+  @override
+  String get modelDetailSheetImageGenerationOAuthHint =>
+      'ChatGPT ile oturum açma farklı bir görsel modeli kullanabilir. Model ve karmaşıklık ayarları sunucu desteğine bağlıdır.';
+
+  @override
+  String get imageGenerationComplexityErrorHint =>
+      'Sohbet akıl yürütmesini Otomatik, görsel karmaşıklığını Varsayılan olarak ayarlayıp görsel oluşturmayı yeniden deneyin. ChatGPT ile oturum açma farklı bir görsel modeli kullanabilir veya açık karmaşıklığı reddedebilir.';
 }

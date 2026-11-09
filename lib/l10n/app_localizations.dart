@@ -29202,10 +29202,10 @@ abstract class AppLocalizations {
   /// **'The service did not return a complete native compaction result. The original context is unchanged.'**
   String get compressionNativeIncomplete;
 
-  /// Error shown when a native context belongs to a different connection or account, advising undo or a text summary.
+  /// Error when native context belongs to a different connection or account. Return to the original connection; undo or text-summary regeneration is only possible in a chat containing the originals, which may be the source chat of imported context. No placeholders.
   ///
   /// In en, this message translates to:
-  /// **'This native context belongs to another connection or account. Undo its compaction, or create a text summary from the original history before continuing.'**
+  /// **'This native context belongs to another connection or account. Continue with the original connection, or undo the compaction or create a text summary in the chat that contains the originals.'**
   String get compressionNativeScopeChanged;
 
   /// Hint stating that token usage for opaque native context is determined by the service; also used as the opaque usage state label.
@@ -29214,10 +29214,10 @@ abstract class AppLocalizations {
   /// **'Token usage for opaque native context is determined by the service.'**
   String get compressionNativeTokenHint;
 
-  /// Hint in the compression dialog noting that a new conversation keeps original messages so native compaction can be undone.
+  /// Hint in the compression dialog when native compaction and new chat are selected. Only the complete provider output and retained recent turns are copied; original history remains in the source chat and cannot be restored by undo in the new chat. No placeholders.
   ///
   /// In en, this message translates to:
-  /// **'A new conversation keeps original messages so native compaction can be undone.'**
+  /// **'The new chat keeps only the complete native compaction result and retained recent turns. Originals stay in the source chat and cannot be restored by undoing here.'**
   String get compressionNativeCopyHint;
 
   /// Error shown when a custom input field would override native compression data, asking the user to remove the input override first.
@@ -29321,6 +29321,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom'**
   String get themePaletteCustom;
+
+  /// Title for an imported native compaction at the start of a new chat, shown in the timeline, context operation list and details. It is opaque context carried over from another chat, not a locally undoable compression. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Native context loaded'**
+  String get compressionNativeImported;
+
+  /// Description in imported native context details. Explains which data this chat owns, that the provider result is opaque, and that earlier originals must be viewed or restored in the source chat rather than through local undo. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'This chat starts with the complete native compaction result and retained recent turns. The result cannot be read or edited as text. Earlier originals remain in the source chat, so they cannot be restored by undoing here.'**
+  String get compressionNativeImportedDescription;
+
+  /// Action in imported native context details to open the source conversation containing the earlier originals. Source means the originating chat, not source code. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Open source chat'**
+  String get compressionNativeOpenSource;
+
+  /// Message when undo or text-summary regeneration would require originals absent from an imported native context. Also shown in compression options when the selected range includes such context. Directs users to native compaction or the source chat. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'This chat has no originals for the imported native context. Continue with native compaction, or return to the source chat to view or summarize the originals.'**
+  String get compressionNativeOriginalsUnavailable;
+
+  /// Warning in the compression dialog when native compaction creates a new temporary chat. The app discards the source temporary chat when switching away, so originals outside the retained tail are deleted and cannot be restored from the new chat. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'The new temporary chat keeps only the complete native compaction result and retained recent turns. Leaving the source temporary chat deletes it and the originals not carried over; they cannot be restored here.'**
+  String get compressionNativeTemporaryCopyHint;
+
+  /// Description in imported native context details when the source conversation has been deleted or discarded. Explains that this chat still owns the complete opaque result and retained tail, but cannot restore absent originals. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'This chat keeps the complete native compaction result and retained recent turns. The source chat is no longer available. Originals not copied here cannot be restored, and the native result cannot be read or edited as text.'**
+  String get compressionNativeSourceUnavailable;
+
+  /// Label of the hosted image generation model picker in a chat model’s built-in tools settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Image model'**
+  String get modelDetailSheetImageGenerationModel;
+
+  /// Default image model option in built-in tools settings. Omits the tool model parameter so the server chooses the image model.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get modelDetailSheetImageGenerationAuto;
+
+  /// Label of the image planning effort picker in built-in tools settings, separate from chat reasoning effort and rendering quality.
+  ///
+  /// In en, this message translates to:
+  /// **'Image complexity'**
+  String get modelDetailSheetImageGenerationComplexity;
+
+  /// Default image complexity option. Omits complexity and uses server behavior, which may inherit the chat reasoning effort.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get modelDetailSheetImageGenerationComplexityDefault;
+
+  /// Low image planning complexity option in the built-in image generation tool settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get modelDetailSheetImageGenerationComplexityLow;
+
+  /// Medium image planning complexity option in the built-in image generation tool settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get modelDetailSheetImageGenerationComplexityMedium;
+
+  /// High image planning complexity option in the built-in image generation tool settings.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get modelDetailSheetImageGenerationComplexityHigh;
+
+  /// Help text below image complexity in built-in tools settings. Explain that an explicit level is independent, while omitting the field may inherit outer chat reasoning.
+  ///
+  /// In en, this message translates to:
+  /// **'Controls image planning separately from chat reasoning. Default uses server behavior and may inherit chat reasoning.'**
+  String get modelDetailSheetImageGenerationComplexityDescription;
+
+  /// Hint in image generation settings for ChatGPT/Codex OAuth providers. The server may replace the requested image model or reject explicit complexity.
+  ///
+  /// In en, this message translates to:
+  /// **'ChatGPT sign-in may use a different image model. Model and complexity settings depend on server support.'**
+  String get modelDetailSheetImageGenerationOAuthHint;
+
+  /// Actionable hint appended after the original provider error when ChatGPT/Codex OAuth image generation rejects a complexity level. Preserve the original error; do not automatically retry or alter chat settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Set chat reasoning to Auto and image complexity to Default, then retry image generation. ChatGPT sign-in may use a different image model or reject explicit complexity.'**
+  String get imageGenerationComplexityErrorHint;
 }
 
 class _AppLocalizationsDelegate

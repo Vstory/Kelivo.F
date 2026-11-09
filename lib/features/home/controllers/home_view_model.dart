@@ -1491,6 +1491,8 @@ class HomeViewModel extends ChangeNotifier {
             modelId: model,
             assistantId: conversation.assistantId,
             messagesOverride: selection.input,
+            // Coverage is recorded from this selection, so never trim it again.
+            applyMessageLimit: false,
             forceResponses: true,
             promptTime: referenceTime,
           );
@@ -1709,6 +1711,9 @@ class HomeViewModel extends ChangeNotifier {
       snapshot.operations,
       options,
     );
+    if (selection.missingOriginals) {
+      throw StateError('native_compaction_originals_unavailable');
+    }
     final messages = await _chatService.messagesForCompression(
       selection.input,
       includeAttachmentsAndTools: options.includeAttachmentsAndTools,

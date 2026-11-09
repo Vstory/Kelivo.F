@@ -16872,7 +16872,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get compressionNativeScopeChanged =>
-      'Этот нативный контекст принадлежит другому подключению или аккаунту. Отмените его сжатие или создайте текстовую сводку из исходной истории, прежде чем продолжить.';
+      'Этот нативный контекст принадлежит другому подключению или аккаунту. Продолжите с исходным подключением либо отмените сжатие или создайте текстовое резюме в чате, содержащем оригиналы.';
 
   @override
   String get compressionNativeTokenHint =>
@@ -16880,7 +16880,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get compressionNativeCopyHint =>
-      'Новый чат сохраняет исходные сообщения, чтобы нативное сжатие можно было отменить.';
+      'Новый чат сохраняет только полный результат нативного сжатия и сохранённые последние реплики. Оригиналы остаются в исходном чате, и их нельзя восстановить отменой здесь.';
 
   @override
   String get compressionNativeInputOverride =>
@@ -16938,4 +16938,60 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get themePaletteCustom => 'Пользовательская';
+
+  @override
+  String get compressionNativeImported => 'Нативный контекст загружен';
+
+  @override
+  String get compressionNativeImportedDescription =>
+      'Этот чат начинается с полного результата нативного сжатия и сохранённых последних реплик. Результат нельзя просмотреть или отредактировать как текст. Более ранние оригиналы остаются в исходном чате, поэтому их нельзя восстановить отменой здесь.';
+
+  @override
+  String get compressionNativeOpenSource => 'Открыть исходный чат';
+
+  @override
+  String get compressionNativeOriginalsUnavailable =>
+      'В этом чате нет оригиналов для загруженного нативного контекста. Продолжите с нативным сжатием или вернитесь в исходный чат, чтобы просмотреть оригиналы или создать текстовое резюме.';
+
+  @override
+  String get compressionNativeTemporaryCopyHint =>
+      'Новый временный чат сохраняет только полный результат нативного сжатия и сохранённые последние ходы. При выходе из исходного временного чата он и не перенесённые оригиналы удаляются; восстановить их здесь невозможно.';
+
+  @override
+  String get compressionNativeSourceUnavailable =>
+      'Этот чат сохраняет полный результат нативного сжатия и сохранённые последние ходы. Исходный чат больше недоступен. Оригиналы, не скопированные сюда, восстановить невозможно, а нативный результат нельзя просмотреть или отредактировать как текст.';
+
+  @override
+  String get modelDetailSheetImageGenerationModel => 'Модель изображений';
+
+  @override
+  String get modelDetailSheetImageGenerationAuto => 'Авто';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexity =>
+      'Сложность изображения';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityDefault => 'По умолчанию';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityLow => 'Низкая';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityMedium => 'Средняя';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityHigh => 'Высокая';
+
+  @override
+  String get modelDetailSheetImageGenerationComplexityDescription =>
+      'Управляет планированием изображения отдельно от рассуждений чата. «По умолчанию» использует поведение сервера и может наследовать уровень рассуждений чата.';
+
+  @override
+  String get modelDetailSheetImageGenerationOAuthHint =>
+      'Вход через ChatGPT может использовать другую модель изображений. Настройки модели и сложности зависят от поддержки сервера.';
+
+  @override
+  String get imageGenerationComplexityErrorHint =>
+      'Установите рассуждения чата в «Авто», а сложность изображения — в «По умолчанию», затем повторите генерацию изображения. Вход через ChatGPT может использовать другую модель изображений или отклонять явную сложность.';
 }
