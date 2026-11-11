@@ -1608,7 +1608,9 @@
   "@contextUsagePartialSummary": {
     "description": "Summary in the context usage panel and input-bar tooltip when OpenAI native compaction is present. Only readable content has been estimated; the encrypted compaction block's input token count is unknown. tokens is the already-formatted subtotal, such as 42k, not the full context total.",
     "placeholders": {
-      "tokens": { "type": "String" }
+      "tokens": {
+        "type": "String"
+      }
     }
   },
   "contextUsageBucketNativeCompaction": "Native compaction",
@@ -1623,7 +1625,9 @@
   "@contextUsageLastRequestInput": {
     "description": "Separate line below the native-compaction context usage breakdown showing input tokens reported by the last matching model request, not the current estimated window or the compaction operation's output usage. tokens is an already-formatted token count such as 42k.",
     "placeholders": {
-      "tokens": { "type": "String" }
+      "tokens": {
+        "type": "String"
+      }
     }
   },
   "contextUsageStateNone": "No data yet",
@@ -4084,14 +4088,23 @@
     },
     "description": "Row in the token detail popup showing total generation duration in seconds; {value} is the formatted number."
   },
-  "tokenDetailFirstToken": "{value}s (first token)",
-  "@tokenDetailFirstToken": {
+  "tokenDetailFirstResponse": "{value}s (first response)",
+  "@tokenDetailFirstResponse": {
     "placeholders": {
       "value": {
         "type": "String"
       }
     },
-    "description": "Row in the token detail popup showing time to first token in seconds; {value} is the formatted number."
+    "description": "Row in the token detail popup showing seconds from request preparation to the first client-received reasoning-start event or non-empty output, whichever arrives first. This is response activity, not the server's hidden reasoning-token time. {value} is the formatted duration in seconds."
+  },
+  "tokenDetailFirstOutput": "{value}s (first output)",
+  "@tokenDetailFirstOutput": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    },
+    "description": "Row in the token detail popup showing seconds from request preparation to the first non-empty content received, such as a public reasoning summary, answer text, tool input, image or file. A reasoning-start event alone does not count. {value} is the formatted duration in seconds."
   },
   "tokenDetailTotalTokens": "{count} tokens",
   "@tokenDetailTotalTokens": {
@@ -7979,13 +7992,13 @@
   "compressionNearLimit": "Context is near its estimated capacity. You can keep chatting or compress manually.",
   "compressionKeepTurns": "Keep recent",
   "compressionKeepHint": "A turn includes a user message, its replies and tools.",
-  "compressionLength": "Summary limit (tokens)",
+  "compressionLength": "Summary target (tokens)",
   "compressionTrigger": "Start at",
   "compressionTarget": "Compress to",
   "compressionWindow": "Planning window",
   "compressionRequests": "Maximum calls",
-  "compressionReference": "Reference active world books and memory",
-  "compressionReferenceHint": "Reference explains names and rules; it is not evidence that events happened or characters know them.",
+  "compressionReference": "Reference world books and historical memory",
+  "compressionReferenceHint": "Scan only the selected history for world books and use its saved memory snapshots. References explain names and rules; they do not establish events or character knowledge.",
   "compressionToolReferences": "Reference consumed tool results",
   "compressionToolReferencesHint": "Only with tool access. Keeps the latest unread results and allows exact, read-only recall.",
   "compressionSummaryScan": "Include summaries in world book keyword matching",
@@ -21356,7 +21369,7 @@
     "description": "Hint text explaining that a turn includes a user message plus its replies and tool content."
   },
   "@compressionLength": {
-    "description": "Number-field label for the summary output token limit."
+    "description": "Compression summary settings: target maximum length of visible summary text in tokens, separate from the total generation limit including reasoning."
   },
   "@compressionTrigger": {
     "description": "Number-field label for the context-usage percentage that starts automatic compression."
@@ -21371,10 +21384,10 @@
     "description": "Number-field label for the maximum number of model calls allowed."
   },
   "@compressionReference": {
-    "description": "Switch label for including active world books and memory as reference during summarization."
+    "description": "Compression option to include world books evaluated on the selected history and memory snapshots frozen in that history, rather than current live memory or retained messages."
   },
   "@compressionReferenceHint": {
-    "description": "Hint clarifying that reference material explains names/rules but is not evidence events occurred or characters know them."
+    "description": "Compression reference help: restrict dynamic reference sources to the selected historical range, and distinguish explanatory background from events or character knowledge. No placeholders."
   },
   "@compressionToolReferences": {
     "description": "Switch label for replacing already-consumed tool results with references."
@@ -21787,5 +21800,57 @@
   "workspaceEnvNativeShellSave": "Save",
   "@workspaceEnvNativeShellSave": {
     "description": "Button in the desktop default shell dialog; validates and saves the executable path or automatic detection setting."
+  },
+  "desktopAutostartTitle": "Launch at startup",
+  "@desktopAutostartTitle": {
+    "description": "Desktop display settings, tray section: switch to register Kelivo to start when the user logs in to this device. Disabled by default."
+  },
+  "desktopAutostartDescription": "Start Kelivo when you sign in to this computer.",
+  "@desktopAutostartDescription": {
+    "description": "Tooltip for the desktop launch-at-startup switch. This is a device-local operating system setting."
+  },
+  "desktopAutostartHiddenTitle": "Hide to tray on automatic startup",
+  "@desktopAutostartHiddenTitle": {
+    "description": "Desktop display settings, tray section: switch to keep the main window hidden only when the system starts Kelivo at login."
+  },
+  "desktopAutostartHiddenDescription": "Requires launch at startup and the tray icon. Opening Kelivo manually still shows the window.",
+  "@desktopAutostartHiddenDescription": {
+    "description": "Tooltip for hiding the desktop window on automatic startup. Explains prerequisites and that manual launches remain visible."
+  },
+  "desktopAutostartUnsupported": "Launch at startup requires macOS 13 or later.",
+  "@desktopAutostartUnsupported": {
+    "description": "Desktop startup switch tooltip when the current macOS version does not support the system login-item API."
+  },
+  "desktopAutostartError": "Could not apply the startup setting. Check this app in your system startup or login-item settings and try again.",
+  "@desktopAutostartError": {
+    "description": "Desktop startup setting failure tooltip and error notification, including when system approval is required. No placeholders."
+  },
+  "compressionOutputBudget": "Total output limit (tokens)",
+  "compressionOutputBudgetHint": "Includes reasoning and summary text. Leave blank to use the summary target, or set a higher limit for thinking without lengthening the summary. The model output limit still applies.",
+  "@compressionOutputBudget": {
+    "description": "Optional number field in compression summary settings for total generated tokens, including reasoning and visible summary. Blank uses the summary target. No placeholders."
+  },
+  "@compressionOutputBudgetHint": {
+    "description": "Help below the compression total output limit field: reasoning consumes the same budget, an independent higher limit does not increase the desired summary length, blank follows the summary target, and model output limits still apply. No placeholders."
+  },
+  "responseOutputLimitReached": "Response truncated: the output limit includes reasoning. Increase the output limit or reduce reasoning before retrying.",
+  "@responseOutputLimitReached": {
+    "description": "Persistent notice below an assistant reply stopped by max_output_tokens when the latest request is not known to be near the context window limit. Explains that reasoning also consumes the output allowance."
+  },
+  "responseContextLimitReached": "Response truncated: this request used {inputTokens} input tokens, close to the {contextWindow}-token context limit. Shorten the context before retrying.",
+  "@responseContextLimitReached": {
+    "description": "Persistent notice below a truncated assistant reply when the final HTTP response input usage is at least 95 percent of the configured context window. Does not attribute the limit to images. inputTokens is that single request input usage; contextWindow is the model context capacity.",
+    "placeholders": {
+      "inputTokens": {
+        "type": "int"
+      },
+      "contextWindow": {
+        "type": "int"
+      }
+    }
+  },
+  "responseRetryWithoutImages": "Retry without images (keep originals)",
+  "@responseRetryWithoutImages": {
+    "description": "Action below a truncated assistant reply whose final request contained images. Regenerates once with all image inputs omitted for that generation, including tool follow-ups, without deleting attachments or changing saved settings."
   }
 }

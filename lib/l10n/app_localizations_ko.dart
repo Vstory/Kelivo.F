@@ -8598,8 +8598,13 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String tokenDetailFirstToken(String value) {
-    return '$value초 (첫 토큰)';
+  String tokenDetailFirstResponse(String value) {
+    return '$value초 (첫 응답)';
+  }
+
+  @override
+  String tokenDetailFirstOutput(String value) {
+    return '$value초 (첫 출력)';
   }
 
   @override
@@ -15648,7 +15653,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get compressionKeepHint => '한 턴에는 사용자 메시지와 그에 대한 답변 및 도구 내용이 포함됩니다.';
 
   @override
-  String get compressionLength => '요약 상한 (토큰)';
+  String get compressionLength => '요약 목표 (토큰)';
 
   @override
   String get compressionTrigger => '시작 기준';
@@ -15663,11 +15668,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get compressionRequests => '최대 호출';
 
   @override
-  String get compressionReference => '현재 적용 중인 세계관과 기억 참조';
+  String get compressionReference => '세계관 책과 과거 기억 참조';
 
   @override
   String get compressionReferenceHint =>
-      '참조는 인물 이름과 규칙을 이해하기 위한 것이며, 사건이 발생했거나 캐릭터가 알고 있음을 의미하지 않습니다.';
+      '선택한 기록에 대해서만 세계관 책을 트리거하고, 그 안에 저장된 기억 스냅샷을 사용합니다. 참조는 인물 이름과 규칙을 이해하기 위한 것이며, 사건이 이미 발생했거나 캐릭터가 알고 있음을 의미하지 않습니다.';
 
   @override
   String get compressionToolReferences => '이미 읽은 도구 결과를 참조로 대체';
@@ -16222,4 +16227,43 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get workspaceEnvNativeShellSave => '저장';
+
+  @override
+  String get desktopAutostartTitle => '시작 시 실행';
+
+  @override
+  String get desktopAutostartDescription => '이 컴퓨터에 로그인하면 Kelivo를 시작합니다.';
+
+  @override
+  String get desktopAutostartHiddenTitle => '자동 시작 시 트레이로 숨기기';
+
+  @override
+  String get desktopAutostartHiddenDescription =>
+      '시작 시 실행과 트레이 아이콘이 필요합니다. Kelivo를 직접 열면 창이 계속 표시됩니다.';
+
+  @override
+  String get desktopAutostartUnsupported => '시작 시 실행은 macOS 13 이상이 필요합니다.';
+
+  @override
+  String get desktopAutostartError =>
+      '시작 설정을 적용할 수 없습니다. 시스템 시작 항목 또는 로그인 항목 설정에서 이 앱을 확인한 후 다시 시도하세요.';
+
+  @override
+  String get compressionOutputBudget => '총 출력 한도 (토큰)';
+
+  @override
+  String get compressionOutputBudgetHint =>
+      '추론과 요약 본문을 포함합니다. 비워 두면 요약 목표를 사용하며, 사고를 켤 때 이 한도만 높여도 요약 목표 길이는 늘어나지 않습니다. 실제 한도는 여전히 모델 출력 한도의 제약을 받습니다.';
+
+  @override
+  String get responseOutputLimitReached =>
+      '응답이 잘렸습니다: 출력 한도에 추론이 포함됩니다. 출력 한도를 늘리거나 추론을 줄인 후 다시 시도하세요.';
+
+  @override
+  String responseContextLimitReached(int inputTokens, int contextWindow) {
+    return '응답이 잘렸습니다: 이번 요청은 입력 토큰 $inputTokens개를 사용해 $contextWindow 토큰 컨텍스트 한도에 근접했습니다. 컨텍스트를 줄인 후 다시 시도하세요.';
+  }
+
+  @override
+  String get responseRetryWithoutImages => '이미지 없이 재시도(원본 유지)';
 }

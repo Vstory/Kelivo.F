@@ -8840,8 +8840,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String tokenDetailFirstToken(String value) {
-    return '${value}s (first token)';
+  String tokenDetailFirstResponse(String value) {
+    return '${value}s (first response)';
+  }
+
+  @override
+  String tokenDetailFirstOutput(String value) {
+    return '${value}s (first output)';
   }
 
   @override
@@ -16146,7 +16151,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'A turn includes a user message, its replies and tools.';
 
   @override
-  String get compressionLength => 'Summary limit (tokens)';
+  String get compressionLength => 'Summary target (tokens)';
 
   @override
   String get compressionTrigger => 'Start at';
@@ -16161,11 +16166,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get compressionRequests => 'Maximum calls';
 
   @override
-  String get compressionReference => 'Reference active world books and memory';
+  String get compressionReference =>
+      'Reference world books and historical memory';
 
   @override
   String get compressionReferenceHint =>
-      'Reference explains names and rules; it is not evidence that events happened or characters know them.';
+      'Scan only the selected history for world books and use its saved memory snapshots. References explain names and rules; they do not establish events or character knowledge.';
 
   @override
   String get compressionToolReferences => 'Reference consumed tool results';
@@ -16735,4 +16741,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workspaceEnvNativeShellSave => 'Save';
+
+  @override
+  String get desktopAutostartTitle => 'Launch at startup';
+
+  @override
+  String get desktopAutostartDescription =>
+      'Start Kelivo when you sign in to this computer.';
+
+  @override
+  String get desktopAutostartHiddenTitle => 'Hide to tray on automatic startup';
+
+  @override
+  String get desktopAutostartHiddenDescription =>
+      'Requires launch at startup and the tray icon. Opening Kelivo manually still shows the window.';
+
+  @override
+  String get desktopAutostartUnsupported =>
+      'Launch at startup requires macOS 13 or later.';
+
+  @override
+  String get desktopAutostartError =>
+      'Could not apply the startup setting. Check this app in your system startup or login-item settings and try again.';
+
+  @override
+  String get compressionOutputBudget => 'Total output limit (tokens)';
+
+  @override
+  String get compressionOutputBudgetHint =>
+      'Includes reasoning and summary text. Leave blank to use the summary target, or set a higher limit for thinking without lengthening the summary. The model output limit still applies.';
+
+  @override
+  String get responseOutputLimitReached =>
+      'Response truncated: the output limit includes reasoning. Increase the output limit or reduce reasoning before retrying.';
+
+  @override
+  String responseContextLimitReached(int inputTokens, int contextWindow) {
+    return 'Response truncated: this request used $inputTokens input tokens, close to the $contextWindow-token context limit. Shorten the context before retrying.';
+  }
+
+  @override
+  String get responseRetryWithoutImages =>
+      'Retry without images (keep originals)';
 }

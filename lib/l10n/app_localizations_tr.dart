@@ -8905,8 +8905,13 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String tokenDetailFirstToken(String value) {
-    return '${value}s (ilk token)';
+  String tokenDetailFirstResponse(String value) {
+    return '${value}sn (ilk yanıt)';
+  }
+
+  @override
+  String tokenDetailFirstOutput(String value) {
+    return '${value}sn (ilk çıktı)';
   }
 
   @override
@@ -16241,7 +16246,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bir tur, bir kullanıcı mesajını ve onun yanıtlarını ve araçlarını içerir.';
 
   @override
-  String get compressionLength => 'Özet sınırı (token)';
+  String get compressionLength => 'Özet hedefi (token)';
 
   @override
   String get compressionTrigger => 'Başlangıç';
@@ -16257,11 +16262,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get compressionReference =>
-      'Etkin dünya kitaplarını ve belleği referans al';
+      'Dünya kitaplarına ve geçmiş belleğe başvur';
 
   @override
   String get compressionReferenceHint =>
-      'Referans, adları ve kuralları açıklar; olayların gerçekleştiğine veya karakterlerin bunları bildiğine dair kanıt değildir.';
+      'Dünya kitapları için yalnızca seçili geçmişi tarayın ve kaydedilmiş bellek anlık görüntülerini kullanın. Başvurular adları ve kuralları açıklar; olayların gerçekleştiğini veya karakterlerin bildiğini göstermez.';
 
   @override
   String get compressionToolReferences =>
@@ -16833,4 +16838,46 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get workspaceEnvNativeShellSave => 'Kaydet';
+
+  @override
+  String get desktopAutostartTitle => 'Başlangıçta başlat';
+
+  @override
+  String get desktopAutostartDescription =>
+      'Bu bilgisayarda oturum açtığınızda Kelivo\'yu başlat.';
+
+  @override
+  String get desktopAutostartHiddenTitle => 'Otomatik başlatmada tepsiye gizle';
+
+  @override
+  String get desktopAutostartHiddenDescription =>
+      'Başlangıçta başlatma ve tepsi simgesi gerektirir. Kelivo\'yu elle açtığınızda pencere yine görünür.';
+
+  @override
+  String get desktopAutostartUnsupported =>
+      'Başlangıçta başlatma için macOS 13 veya üstü gerekir.';
+
+  @override
+  String get desktopAutostartError =>
+      'Başlangıç ayarı uygulanamadı. Sistem başlangıç veya oturum açma öğeleri ayarlarında bu uygulamayı kontrol edip tekrar deneyin.';
+
+  @override
+  String get compressionOutputBudget => 'Toplam çıktı sınırı (token)';
+
+  @override
+  String get compressionOutputBudgetHint =>
+      'Akıl yürütme ve özet metnini içerir. Özet hedefini kullanmak için boş bırakın veya özeti uzatmadan düşünmek için daha yüksek bir sınır belirleyin. Model çıktı sınırı yine de geçerlidir.';
+
+  @override
+  String get responseOutputLimitReached =>
+      'Yanıt kesildi: çıktı sınırı akıl yürütmeyi de kapsar. Yeniden denemeden önce çıktı sınırını artırın veya akıl yürütmeyi azaltın.';
+
+  @override
+  String responseContextLimitReached(int inputTokens, int contextWindow) {
+    return 'Yanıt kesildi: bu istek $inputTokens giriş token\'ı kullandı ve $contextWindow token\'lık bağlam sınırına yaklaştı. Yeniden denemeden önce bağlamı kısaltın.';
+  }
+
+  @override
+  String get responseRetryWithoutImages =>
+      'Görseller olmadan yeniden dene (orijinalleri koru)';
 }

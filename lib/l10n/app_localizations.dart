@@ -15979,11 +15979,17 @@ abstract class AppLocalizations {
   /// **'{value}s'**
   String tokenDetailDuration(String value);
 
-  /// Row in the token detail popup showing time to first token in seconds; {value} is the formatted number.
+  /// Row in the token detail popup showing seconds from request preparation to the first client-received reasoning-start event or non-empty output, whichever arrives first. This is response activity, not the server's hidden reasoning-token time. {value} is the formatted duration in seconds.
   ///
   /// In en, this message translates to:
-  /// **'{value}s (first token)'**
-  String tokenDetailFirstToken(String value);
+  /// **'{value}s (first response)'**
+  String tokenDetailFirstResponse(String value);
+
+  /// Row in the token detail popup showing seconds from request preparation to the first non-empty content received, such as a public reasoning summary, answer text, tool input, image or file. A reasoning-start event alone does not count. {value} is the formatted duration in seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}s (first output)'**
+  String tokenDetailFirstOutput(String value);
 
   /// Label showing the total token count, used in the token display widget and stats usage chart; {count} is the number.
   ///
@@ -28482,10 +28488,10 @@ abstract class AppLocalizations {
   /// **'A turn includes a user message, its replies and tools.'**
   String get compressionKeepHint;
 
-  /// Number-field label for the summary output token limit.
+  /// Compression summary settings: target maximum length of visible summary text in tokens, separate from the total generation limit including reasoning.
   ///
   /// In en, this message translates to:
-  /// **'Summary limit (tokens)'**
+  /// **'Summary target (tokens)'**
   String get compressionLength;
 
   /// Number-field label for the context-usage percentage that starts automatic compression.
@@ -28512,16 +28518,16 @@ abstract class AppLocalizations {
   /// **'Maximum calls'**
   String get compressionRequests;
 
-  /// Switch label for including active world books and memory as reference during summarization.
+  /// Compression option to include world books evaluated on the selected history and memory snapshots frozen in that history, rather than current live memory or retained messages.
   ///
   /// In en, this message translates to:
-  /// **'Reference active world books and memory'**
+  /// **'Reference world books and historical memory'**
   String get compressionReference;
 
-  /// Hint clarifying that reference material explains names/rules but is not evidence events occurred or characters know them.
+  /// Compression reference help: restrict dynamic reference sources to the selected historical range, and distinguish explanatory background from events or character knowledge. No placeholders.
   ///
   /// In en, this message translates to:
-  /// **'Reference explains names and rules; it is not evidence that events happened or characters know them.'**
+  /// **'Scan only the selected history for world books and use its saved memory snapshots. References explain names and rules; they do not establish events or character knowledge.'**
   String get compressionReferenceHint;
 
   /// Switch label for replacing already-consumed tool results with references.
@@ -29477,6 +29483,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get workspaceEnvNativeShellSave;
+
+  /// Desktop display settings, tray section: switch to register Kelivo to start when the user logs in to this device. Disabled by default.
+  ///
+  /// In en, this message translates to:
+  /// **'Launch at startup'**
+  String get desktopAutostartTitle;
+
+  /// Tooltip for the desktop launch-at-startup switch. This is a device-local operating system setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Kelivo when you sign in to this computer.'**
+  String get desktopAutostartDescription;
+
+  /// Desktop display settings, tray section: switch to keep the main window hidden only when the system starts Kelivo at login.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide to tray on automatic startup'**
+  String get desktopAutostartHiddenTitle;
+
+  /// Tooltip for hiding the desktop window on automatic startup. Explains prerequisites and that manual launches remain visible.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires launch at startup and the tray icon. Opening Kelivo manually still shows the window.'**
+  String get desktopAutostartHiddenDescription;
+
+  /// Desktop startup switch tooltip when the current macOS version does not support the system login-item API.
+  ///
+  /// In en, this message translates to:
+  /// **'Launch at startup requires macOS 13 or later.'**
+  String get desktopAutostartUnsupported;
+
+  /// Desktop startup setting failure tooltip and error notification, including when system approval is required. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not apply the startup setting. Check this app in your system startup or login-item settings and try again.'**
+  String get desktopAutostartError;
+
+  /// Optional number field in compression summary settings for total generated tokens, including reasoning and visible summary. Blank uses the summary target. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Total output limit (tokens)'**
+  String get compressionOutputBudget;
+
+  /// Help below the compression total output limit field: reasoning consumes the same budget, an independent higher limit does not increase the desired summary length, blank follows the summary target, and model output limits still apply. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Includes reasoning and summary text. Leave blank to use the summary target, or set a higher limit for thinking without lengthening the summary. The model output limit still applies.'**
+  String get compressionOutputBudgetHint;
+
+  /// Persistent notice below an assistant reply stopped by max_output_tokens when the latest request is not known to be near the context window limit. Explains that reasoning also consumes the output allowance.
+  ///
+  /// In en, this message translates to:
+  /// **'Response truncated: the output limit includes reasoning. Increase the output limit or reduce reasoning before retrying.'**
+  String get responseOutputLimitReached;
+
+  /// Persistent notice below a truncated assistant reply when the final HTTP response input usage is at least 95 percent of the configured context window. Does not attribute the limit to images. inputTokens is that single request input usage; contextWindow is the model context capacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Response truncated: this request used {inputTokens} input tokens, close to the {contextWindow}-token context limit. Shorten the context before retrying.'**
+  String responseContextLimitReached(int inputTokens, int contextWindow);
+
+  /// Action below a truncated assistant reply whose final request contained images. Regenerates once with all image inputs omitted for that generation, including tool follow-ups, without deleting attachments or changing saved settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry without images (keep originals)'**
+  String get responseRetryWithoutImages;
 }
 
 class _AppLocalizationsDelegate

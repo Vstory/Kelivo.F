@@ -276,6 +276,8 @@ class HomeViewModel extends ChangeNotifier {
       _compressionStates[task.conversationId] = state;
       if (task.phase == CompressionPhase.completed &&
           task.resultConversationId == null) {
+        queueChanged =
+            _pausedQueuedInputs.remove(task.conversationId) || queueChanged;
         unawaited(_drainQueuedInputIfReady(task.conversationId));
       } else if ((task.phase == CompressionPhase.review || !task.active) &&
           _queuedInputs.containsKey(task.conversationId)) {
@@ -740,6 +742,7 @@ class HomeViewModel extends ChangeNotifier {
     ChatMessage message, {
     bool assistantAsNewReply = false,
     bool allowImagesApiRouting = true,
+    bool omitImages = false,
     String? expectedContextState,
   }) async {
     final conversation = _chatService
@@ -760,6 +763,7 @@ class HomeViewModel extends ChangeNotifier {
 
     final result = await _chatActions.regenerateAtMessage(
       expectedContextState: expectedContextState,
+      omitImages: omitImages,
       message: message,
       conversation: conversation,
       assistantOverride: assistant,
@@ -1585,29 +1589,13 @@ class HomeViewModel extends ChangeNotifier {
               chatModel.modelId == null
           ? null
           : (selection) async =>
-                (await _messageGenerationService.previewContextAssembly(
+                _messageGenerationService.compressionReferenceText(
                   promptTime: referenceTime,
                   conversationId: conversationId,
-                  providerKey: chatModel.providerKey!,
                   modelId: chatModel.modelId!,
                   assistantId: conversation.assistantId,
-                  messagesOverride: selection.effective,
-                )).referenceText,
-      loadContinuation: (selection) async {
-        final recent = selection.retained.reversed
-            .take(2)
-            .toList()
-            .reversed
-            .toList();
-        final text = await _chatService.messagesForCompression(
-          recent,
-          quoteMarker: quoteMarker,
-        );
-        return buildConversationTextForCompression(
-          text,
-          quoteMarker: quoteMarker,
-        );
-      },
+                  messages: selection.input,
+                ),
       generate: (prompt, requestId, maxTokens, onUsage) =>
           ChatApiService.generateMessage(
             conversationId: conversationId,
@@ -1713,13 +1701,11 @@ class HomeViewModel extends ChangeNotifier {
       quoteMarker: request.quoteMarker,
     );
     final background = await request.loadReference?.call(selection) ?? '';
-    final continuation = await request.loadContinuation?.call(selection) ?? '';
     final planner = CompressionPlanner(
       request: request,
       materials: [],
       previousSummary: '',
       background: background,
-      continuation: continuation,
     );
     return _previewCompressionMaterials(
       planner,
