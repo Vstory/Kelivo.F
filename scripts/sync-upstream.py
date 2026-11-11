@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SCRIPT_VERSION=1.0.0    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
+# SCRIPT_VERSION=1.0.1    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
 """同步上游：fetch → 合并 → fork 锚点门禁 → 经统一操作器预演并推送 → 打印新 CI 链接。
 
 裸跑即预演（只看计划和上游新增，不动仓库、不推远端）；真跑要显式 --yes。
@@ -81,13 +81,17 @@ def workspace_dirty() -> bool:
     return bool(out(git("status", "--porcelain")))
 
 
-def report_plan(upstream_ref: str) -> int:
+def report_plan(upstream_ref: str, branch: str) -> int:
     count = int(out(git("rev-list", "--count", f"HEAD..{upstream_ref}")) or 0)
-    ahead = int(out(git("rev-list", "--count", f"{upstream_ref}..HEAD")) or 0)
+    # 与上游比出的「领先」数含历轮合并提交，对判断该推什么没意义；推送看的是相对 origin
+    origin_ref = f"origin/{branch}"
+    has_origin = git("rev-parse", "--verify", "--quiet", origin_ref).returncode == 0
+    ahead = int(out(git("rev-list", "--count", f"{origin_ref}..HEAD")) or 0) if has_origin else -1
+    ahead_text = f"{ahead} 个待推送" if ahead >= 0 else "远端 ref 未知"
     if count == 0:
-        log(f"上游 {upstream_ref} 无新提交；本地领先 {ahead} 个提交")
+        log(f"上游 {upstream_ref} 无新提交；本地相对 {origin_ref}: {ahead_text}")
         return 0
-    log(f"上游 {upstream_ref} 有 {count} 个新提交（本地领先 {ahead} 个）：")
+    log(f"上游 {upstream_ref} 有 {count} 个新提交（本地相对 {origin_ref}: {ahead_text}）：")
     log(out(git("log", "--oneline", "--no-decorate", f"HEAD..{upstream_ref}")))
     log(f"规模：{out(git('diff', '--shortstat', f'HEAD...{upstream_ref}'))}")
     return count
@@ -168,7 +172,10 @@ def main() -> int:
         log("::error::fetch 失败：\n" + (fetched.stderr or "").strip())
         return 2
 
-    pending = report_plan(upstream_ref)
+    if git("fetch", "origin", branch, "--quiet").returncode != 0:
+        log(f"提示：fetch origin 失败，待推送数按现有 origin/{branch} ref 估算")
+
+    pending = report_plan(upstream_ref, branch)
 
     if not args.yes:
         print(f"预演：{pending} 个上游提交待合并，推送目标 {slug}/{branch}；加 --yes 执行")
