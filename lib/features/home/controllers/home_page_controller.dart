@@ -1729,36 +1729,29 @@ class HomePageController extends ChangeNotifier {
     bool? allowImagesApiRouting,
   }) async {
     if (currentConversation == null) return;
-    final projected = await _chatService.loadSelectedMessageProjections(
-      message.conversationId,
-    );
-    if (!_context.mounted) return;
     final deletingTail = _context
         .read<SettingsProvider>()
         .regenerateDeleteTrailingMessages;
-    final versioning = _messageGenerationService
-        .calculateRegenerationVersioning(
-          message: message,
-          messages: projected,
-          assistantAsNewReply: assistantAsNewReply,
-        );
+    final source = await _chatService.loadRegenerationSourceGroups(
+      message.conversationId,
+      message.id,
+      assistantAsNewReply: assistantAsNewReply,
+      deleteTrailingMessages: deletingTail,
+    );
+    if (!_context.mounted ||
+        currentConversation?.id != message.conversationId) {
+      return;
+    }
     final affectedGroups = {
-      if (versioning.targetGroupId != null) versioning.targetGroupId!,
+      if (source.targetGroupId != null) source.targetGroupId!,
+      ...source.removedGroups,
     };
-    final removedGroups = deletingTail && versioning.lastKeep >= 0
-        ? projected
-              .skip(versioning.lastKeep + 1)
-              .map(ContextHistory.group)
-              .where((group) => group != versioning.targetGroupId)
-              .toSet()
-        : <String>{};
-    affectedGroups.addAll(removedGroups);
     final approved = await confirmContextSourceMutation(
       _context,
       chat: _chatService,
       conversationId: message.conversationId,
       groups: affectedGroups,
-      removedGroups: removedGroups,
+      removedGroups: source.removedGroups,
     );
     if (approved == null) return;
     _warmupSerial++;
@@ -2060,8 +2053,14 @@ class HomePageController extends ChangeNotifier {
   Future<CompressionRequestPreview> previewCompressionRequest(
     String id,
     CompressContextOptions options,
-    CompressionConfig config,
-  ) => _viewModel.previewCompressionRequest(id, options, config);
+    CompressionConfig config, {
+    required Future<ConversationContextHistory> history,
+  }) => _viewModel.previewCompressionRequest(
+    id,
+    options,
+    config,
+    history: history,
+  );
 
   Future<String?> compressContext({
     required CompressContextOptions options,

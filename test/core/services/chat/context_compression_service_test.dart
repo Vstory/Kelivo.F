@@ -74,6 +74,7 @@ void main() {
   });
   CompressionRequest request(
     Future<String> Function(String, String) generate, {
+    Future<String> Function(CompressionSelection)? loadReference,
     CompressContextOptions options = const CompressContextOptions(
       mode: CompressContextLimitMode.keepRecent,
       keepUserMessages: 6,
@@ -84,6 +85,7 @@ void main() {
     generate: (prompt, id, _, _) async =>
         TextGenerationResult(parts: [TextPart(await generate(prompt, id))]),
     quoteMarker: AppLocalizationsEn().selectionQuoteMarker,
+    loadReference: loadReference,
   );
   Future<void> until(bool Function() condition) async {
     for (var i = 0; i < 500; i++) {
@@ -128,6 +130,82 @@ void main() {
     model: 'private-provider/private-model',
     quoteMarker: AppLocalizationsEn().selectionQuoteMarker,
     compactNative: compact,
+  );
+
+  for (final native in [false, true]) {
+    for (final fails in [false, true]) {
+      test(
+        'finished tasks release source callbacks: native=$native failed=$fails',
+        () async {
+          final request = CompressionRequest(
+            options: CompressContextOptions(
+              mode: CompressContextLimitMode.keepRecent,
+              keepUserMessages: 1,
+              native: native,
+            ),
+            model: 'test',
+            quoteMarker: AppLocalizationsEn().selectionQuoteMarker,
+            loadReference: (_) async => 'current reference',
+            generate: native
+                ? null
+                : (_, _, _, _) async {
+                    if (fails) throw StateError('model failed');
+                    return const TextGenerationResult(
+                      parts: [TextPart('short summary')],
+                    );
+                  },
+            compactNative: !native
+                ? null
+                : (_, _) async {
+                    if (fails) throw StateError('model failed');
+                    return nativePayload('completed');
+                  },
+          );
+          await compression.start(id, request);
+          final phase = fails
+              ? CompressionPhase.failed
+              : CompressionPhase.completed;
+          await until(
+            () =>
+                compression.taskFor(id)!.phase == phase &&
+                compression.taskFor(id)!.request == null,
+          );
+          expect(compression.taskFor(id)!.validateReferences, isNull);
+        },
+      );
+    }
+  }
+
+  test(
+    'review releases generation inputs and still applies the saved candidate',
+    () async {
+      await compression.start(
+        id,
+        request(
+          (_, _) async => 'reviewed summary',
+          options: const CompressContextOptions(
+            mode: CompressContextLimitMode.keepRecent,
+            keepUserMessages: 1,
+            previewOnly: true,
+          ),
+          loadReference: (_) async => 'current reference',
+        ),
+      );
+      await until(
+        () => compression.taskFor(id)!.phase == CompressionPhase.review,
+      );
+      // Let the run finish its final status write before inspecting cleanup.
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      final task = compression.taskFor(id)!;
+      expect(task.request, isNull);
+      expect(task.validateReferences, isNull);
+      await compression.applyReviewed(id, task.summary);
+      expect(task.phase, CompressionPhase.completed);
+      expect(
+        (await chat.loadContextOperations(id)).single.summary,
+        'reviewed summary',
+      );
+    },
   );
 
   test(
@@ -607,6 +685,7 @@ void main() {
         reloaded.operations.single.id,
       );
       final copy = await chat.loadContextSnapshot(continued.id);
+      expect(continued.title, 'Original (1)');
       expect(copy.operations, hasLength(1));
       expect(
         copy.operations.single.nativePayload!.output,
@@ -627,6 +706,7 @@ void main() {
         copy.operations.single.id,
       );
       final againSnapshot = await chat.loadContextSnapshot(again.id);
+      expect(again.title, 'Original (2)');
       expect(againSnapshot.messages, hasLength(3));
       expect(againSnapshot.operations.single.nativeSourceConversationId, id);
       await chat.changeContextOperation(
@@ -668,6 +748,7 @@ void main() {
         title: 'private',
         temporary: true,
       );
+      await chat.createConversation(title: 'private (1)', activate: false);
       chat.setCurrentConversation(temporary.id);
       for (var i = 0; i < 3; i++) {
         await chat.addMessage(
@@ -690,6 +771,7 @@ void main() {
       );
       final target = compression.taskFor(temporary.id)!.resultConversationId!;
       expect(chat.isTemporaryConversation(target), isTrue);
+      expect(chat.getConversation(target)!.title, 'private (2)');
       final copy = await chat.loadContextSnapshot(target);
       expect(await repo.getConversation(target), isNull);
       expect(await repo.readContextOperations(target), isEmpty);
@@ -875,10 +957,12 @@ void main() {
       request((_, _) {
         entered = true;
         return hold.future;
-      }),
+      }, loadReference: (_) async => 'current reference'),
     );
     await until(() => entered);
     await compression.cancel(id);
+    expect(compression.taskFor(id)!.request, isNull);
+    expect(compression.taskFor(id)!.validateReferences, isNull);
     hold.complete('late summary');
     await Future<void>.delayed(const Duration(milliseconds: 50));
     expect(compression.taskFor(id)!.phase, CompressionPhase.cancelled);
@@ -1419,6 +1503,7 @@ void main() {
         title: 'temporary',
         temporary: true,
       );
+      await chat.createConversation(title: 'temporary (1)', activate: false);
       for (var i = 0; i < 3; i++) {
         await chat.addMessage(
           conversationId: temporary.id,
@@ -1448,6 +1533,7 @@ void main() {
       );
       final target = compression.taskFor(temporary.id)!.resultConversationId!;
       expect(chat.isTemporaryConversation(target), isTrue);
+      expect(chat.getConversation(target)!.title, 'temporary (2)');
       expect(await repo.getConversation(target), isNull);
       expect(await repo.compression.overrides(temporary.id), isEmpty);
       expect(await repo.compression.overrides(target), isEmpty);
