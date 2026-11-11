@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SCRIPT_VERSION=1.0.1    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
+# SCRIPT_VERSION=1.0.2    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
 """同步上游：fetch → 合并 → fork 锚点门禁 → 经统一操作器预演并推送 → 打印新 CI 链接。
 
 裸跑即预演（只看计划和上游新增，不动仓库、不推远端）；真跑要显式 --yes。
@@ -65,12 +65,22 @@ def origin_slug() -> str:
     return match.group(1)
 
 
+def tool_entry() -> Path | None:
+    # 操作器是包目录（python3 100_System/tools/github 走 __main__.py），也可能被装成单文件
+    if GITHUB_TOOL.is_file():
+        return GITHUB_TOOL
+    if GITHUB_TOOL.is_dir() and (GITHUB_TOOL / "__main__.py").is_file():
+        return GITHUB_TOOL
+    return None
+
+
 def require_tool() -> str:
-    if not GITHUB_TOOL.is_file():
+    entry = tool_entry()
+    if entry is None:
         log(f"::error::找不到统一操作器 {GITHUB_TOOL}")
         log("设 PKB_ROOT 指向知识库根，或手动推送：cd 到仓库后 `github push -C . -R <owner/name> --branch main`")
         raise SystemExit(4)
-    return str(GITHUB_TOOL)
+    return str(entry)
 
 
 def tool(*args: str) -> subprocess.CompletedProcess:
