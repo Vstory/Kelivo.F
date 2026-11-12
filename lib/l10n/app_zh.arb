@@ -3808,6 +3808,9 @@
   "workspaceEnvCleanupIncomplete": "沙箱已就绪，但部分旧文件未能清理，仍占用存储空间。",
   "workspaceEnvErrorResetFailed": "未能完成沙箱重置，请重试。",
   "workspaceEnvErrorPatchFailed": "无法完成沙箱配置。",
+  "workspaceEnvErrorRepairInterrupted": "沙盒修复已中断，现有沙盒已保留。请重试以完成修复。",
+  "workspaceEnvErrorRepairTimeout": "沙盒修复超时，请检查网络连接后重试。现有沙盒已保留。",
+  "workspaceEnvRepairRestartBanner": "未能在限定时间内确认沙盒修复已停止。请完全退出并重新打开 Kelivo 后重试。现有沙盒已保留。",
   "workspaceEnvErrorCancelled": "安装已取消。",
   "workspaceEnvErrorGeneric": "安装沙箱时出错。",
   "workspaceEnvChipInstall": "安装沙箱",
@@ -6031,6 +6034,18 @@
   "compressionRecipeCreateHint": "在「更多设置」中将当前配置保存为方案。",
   "compressionTurnUnit": "轮",
   "compressionCallUnit": "次",
+  "compressionRequestTimeout": "压缩请求超时",
+  "compressionMinuteUnit": "分钟",
+  "compressionRequestTimeoutDefault": "默认",
+  "compressionRequestTimeoutHint": "输入正数，单位为分钟。留空沿用现有行为（原生压缩默认 5 分钟）。分段摘要的每段生成和合并请求分别计时。",
+  "compressionRequestTimedOut": "压缩请求超时（已等待 {minutes} 分钟）",
+  "@compressionRequestTimedOut": {
+    "placeholders": {
+      "minutes": {
+        "type": "num"
+      }
+    }
+  },
   "compressionAdvancedOptions": "压缩细节",
   "compressionAdvancedHint": "参考内容、原文回读与调用限制",
   "compressionAutomaticWindow": "自动",

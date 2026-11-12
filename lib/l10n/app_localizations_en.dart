@@ -10470,6 +10470,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not finish setting up the sandbox.';
 
   @override
+  String get workspaceEnvErrorRepairInterrupted =>
+      'Sandbox repair was interrupted. The existing sandbox has been kept. Retry to finish the repair.';
+
+  @override
+  String get workspaceEnvErrorRepairTimeout =>
+      'Sandbox repair timed out. Check your network connection and retry. The existing sandbox has been kept.';
+
+  @override
+  String get workspaceEnvRepairRestartBanner =>
+      'Could not confirm that sandbox repair stopped within the time limit. Fully close and reopen Kelivo before retrying. The existing sandbox has been kept.';
+
+  @override
   String get workspaceEnvErrorCancelled => 'Installation was cancelled.';
 
   @override
@@ -16432,6 +16444,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get compressionCallUnit => 'calls';
+
+  @override
+  String get compressionRequestTimeout => 'Compression request timeout';
+
+  @override
+  String get compressionMinuteUnit => 'min';
+
+  @override
+  String get compressionRequestTimeoutDefault => 'Default';
+
+  @override
+  String get compressionRequestTimeoutHint =>
+      'Enter a positive number of minutes. Blank keeps the existing behavior (native compression: 5 minutes). Each summary segment and merge request is timed separately.';
+
+  @override
+  String compressionRequestTimedOut(num minutes) {
+    return 'Compression request timed out (waited $minutes min)';
+  }
 
   @override
   String get compressionAdvancedOptions => 'Compression details';

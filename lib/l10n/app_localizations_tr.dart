@@ -10538,6 +10538,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get workspaceEnvErrorPatchFailed => 'Sandbox kurulumu tamamlanamadı.';
 
   @override
+  String get workspaceEnvErrorRepairInterrupted =>
+      'Sandbox onarımı kesintiye uğradı. Mevcut sandbox korundu. Onarımı tamamlamak için yeniden deneyin.';
+
+  @override
+  String get workspaceEnvErrorRepairTimeout =>
+      'Sandbox onarımı zaman aşımına uğradı. Ağ bağlantınızı kontrol edip yeniden deneyin. Mevcut sandbox korundu.';
+
+  @override
+  String get workspaceEnvRepairRestartBanner =>
+      'Sandbox onarımının zaman sınırı içinde durduğu doğrulanamadı. Yeniden denemeden önce Kelivo\'yu tamamen kapatıp yeniden açın. Mevcut sandbox korundu.';
+
+  @override
   String get workspaceEnvErrorCancelled => 'Yükleme iptal edildi.';
 
   @override
@@ -16527,6 +16539,24 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get compressionCallUnit => 'çağrı';
+
+  @override
+  String get compressionRequestTimeout => 'Sıkıştırma isteği zaman aşımı';
+
+  @override
+  String get compressionMinuteUnit => 'dk';
+
+  @override
+  String get compressionRequestTimeoutDefault => 'Varsayılan';
+
+  @override
+  String get compressionRequestTimeoutHint =>
+      'Pozitif bir dakika değeri girin. Boş bırakılırsa mevcut davranış korunur (yerel sıkıştırma: 5 dakika). Her özet segmenti ve birleştirme isteği ayrı ayrı zamanlanır.';
+
+  @override
+  String compressionRequestTimedOut(num minutes) {
+    return 'Sıkıştırma isteği zaman aşımına uğradı ($minutes dk beklendi)';
+  }
 
   @override
   String get compressionAdvancedOptions => 'Sıkıştırma ayrıntıları';

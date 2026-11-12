@@ -10629,6 +10629,18 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось завершить настройку песочницы.';
 
   @override
+  String get workspaceEnvErrorRepairInterrupted =>
+      'Исправление песочницы было прервано. Существующая песочница сохранена. Повторите попытку, чтобы завершить исправление.';
+
+  @override
+  String get workspaceEnvErrorRepairTimeout =>
+      'Время ожидания исправления песочницы истекло. Проверьте подключение к сети и повторите попытку. Существующая песочница сохранена.';
+
+  @override
+  String get workspaceEnvRepairRestartBanner =>
+      'Не удалось подтвердить, что исправление песочницы остановилось в пределах отведённого времени. Полностью закройте и снова откройте Kelivo, прежде чем повторять попытку. Существующая песочница сохранена.';
+
+  @override
   String get workspaceEnvErrorCancelled => 'Установка отменена.';
 
   @override
@@ -16725,6 +16737,24 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get compressionCallUnit => 'вызовов';
+
+  @override
+  String get compressionRequestTimeout => 'Тайм-аут запроса сжатия';
+
+  @override
+  String get compressionMinuteUnit => 'мин';
+
+  @override
+  String get compressionRequestTimeoutDefault => 'По умолчанию';
+
+  @override
+  String get compressionRequestTimeoutHint =>
+      'Введите положительное число минут. Пустое поле сохраняет текущее поведение (нативное сжатие: 5 минут). Каждый сегмент сводки и запрос объединения учитываются по отдельности.';
+
+  @override
+  String compressionRequestTimedOut(num minutes) {
+    return 'Тайм-аут запроса сжатия (ожидание $minutes мин)';
+  }
 
   @override
   String get compressionAdvancedOptions => 'Детали сжатия';

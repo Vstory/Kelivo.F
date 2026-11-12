@@ -18739,6 +18739,24 @@ abstract class AppLocalizations {
   /// **'Could not finish setting up the sandbox.'**
   String get workspaceEnvErrorPatchFailed;
 
+  /// Error shown in the iOS workspace environment details after an interrupted or cancelled sandbox repair, including recovery on app startup. Explains that the existing filesystem was retained and the user can retry the in-place repair. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Sandbox repair was interrupted. The existing sandbox has been kept. Retry to finish the repair.'**
+  String get workspaceEnvErrorRepairInterrupted;
+
+  /// Error shown in the iOS workspace environment details when sandbox repair exceeds its time limit and the command has stopped. Explains that the existing filesystem was retained and suggests checking the network before retrying the in-place repair. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Sandbox repair timed out. Check your network connection and retry. The existing sandbox has been kept.'**
+  String get workspaceEnvErrorRepairTimeout;
+
+  /// Banner in iOS workspace environment details when a cancelled or timed-out repair command has not confirmed it stopped. Requires a full app restart before retrying so package transactions cannot overlap, and reassures that the existing filesystem was retained. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not confirm that sandbox repair stopped within the time limit. Fully close and reopen Kelivo before retrying. The existing sandbox has been kept.'**
+  String get workspaceEnvRepairRestartBanner;
+
   /// Message for the 'cancelled' code and cancelled dependency installs, stating installation was cancelled.
   ///
   /// In en, this message translates to:
@@ -28967,6 +28985,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'calls'**
   String get compressionCallUnit;
+
+  /// Numeric field label in Compress context > More settings, shown for both summary and native compression. Sets the total waiting limit of each individual model request.
+  ///
+  /// In en, this message translates to:
+  /// **'Compression request timeout'**
+  String get compressionRequestTimeout;
+
+  /// Minute unit suffix beside the compression request timeout numeric input. Keep it short to fit a narrow field suffix.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get compressionMinuteUnit;
+
+  /// Placeholder for an empty compression request timeout input. Empty preserves the current behavior of each mode, including the native compression default of five minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get compressionRequestTimeoutDefault;
+
+  /// Help text below the compression request timeout input in More settings. The value may contain decimals and limits total wait per model invocation, not idle time or the whole multi-request task.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a positive number of minutes. Blank keeps the existing behavior (native compression: 5 minutes). Each summary segment and merge request is timed separately.'**
+  String get compressionRequestTimeoutHint;
+
+  /// Compression task failure shown when the total deadline cancels a model request, distinct from user cancellation. minutes is the elapsed request limit in minutes, possibly fractional. Users can increase the timeout in More settings and retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Compression request timed out (waited {minutes} min)'**
+  String compressionRequestTimedOut(num minutes);
 
   /// Disclosure title in compression options and context operation widgets for advanced compression details.
   ///

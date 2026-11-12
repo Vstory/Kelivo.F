@@ -10019,6 +10019,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get workspaceEnvErrorPatchFailed => '无法完成沙箱配置。';
 
   @override
+  String get workspaceEnvErrorRepairInterrupted => '沙盒修复已中断，现有沙盒已保留。请重试以完成修复。';
+
+  @override
+  String get workspaceEnvErrorRepairTimeout => '沙盒修复超时，请检查网络连接后重试。现有沙盒已保留。';
+
+  @override
+  String get workspaceEnvRepairRestartBanner =>
+      '未能在限定时间内确认沙盒修复已停止。请完全退出并重新打开 Kelivo 后重试。现有沙盒已保留。';
+
+  @override
   String get workspaceEnvErrorCancelled => '安装已取消。';
 
   @override
@@ -15581,6 +15591,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get compressionCallUnit => '次';
+
+  @override
+  String get compressionRequestTimeout => '压缩请求超时';
+
+  @override
+  String get compressionMinuteUnit => '分钟';
+
+  @override
+  String get compressionRequestTimeoutDefault => '默认';
+
+  @override
+  String get compressionRequestTimeoutHint =>
+      '输入正数，单位为分钟。留空沿用现有行为（原生压缩默认 5 分钟）。分段摘要的每段生成和合并请求分别计时。';
+
+  @override
+  String compressionRequestTimedOut(num minutes) {
+    return '压缩请求超时（已等待 $minutes 分钟）';
+  }
 
   @override
   String get compressionAdvancedOptions => '压缩细节';
@@ -25934,6 +25962,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get workspaceEnvErrorPatchFailed => '无法完成沙箱配置。';
 
   @override
+  String get workspaceEnvErrorRepairInterrupted => '沙盒修复已中断，现有沙盒已保留。请重试以完成修复。';
+
+  @override
+  String get workspaceEnvErrorRepairTimeout => '沙盒修复超时，请检查网络连接后重试。现有沙盒已保留。';
+
+  @override
+  String get workspaceEnvRepairRestartBanner =>
+      '未能在限定时间内确认沙盒修复已停止。请完全退出并重新打开 Kelivo 后重试。现有沙盒已保留。';
+
+  @override
   String get workspaceEnvErrorCancelled => '安装已取消。';
 
   @override
@@ -31496,6 +31534,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get compressionCallUnit => '次';
+
+  @override
+  String get compressionRequestTimeout => '压缩请求超时';
+
+  @override
+  String get compressionMinuteUnit => '分钟';
+
+  @override
+  String get compressionRequestTimeoutDefault => '默认';
+
+  @override
+  String get compressionRequestTimeoutHint =>
+      '输入正数，单位为分钟。留空沿用现有行为（原生压缩默认 5 分钟）。分段摘要的每段生成和合并请求分别计时。';
+
+  @override
+  String compressionRequestTimedOut(num minutes) {
+    return '压缩请求超时（已等待 $minutes 分钟）';
+  }
 
   @override
   String get compressionAdvancedOptions => '压缩细节';
@@ -41850,6 +41906,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get workspaceEnvErrorPatchFailed => '無法完成沙箱設定。';
 
   @override
+  String get workspaceEnvErrorRepairInterrupted => '沙盒修復已中斷，現有沙盒已保留。請重試以完成修復。';
+
+  @override
+  String get workspaceEnvErrorRepairTimeout => '沙盒修復逾時，請檢查網路連線後重試。現有沙盒已保留。';
+
+  @override
+  String get workspaceEnvRepairRestartBanner =>
+      '未能在限定時間內確認沙盒修復已停止。請完全關閉並重新開啟 Kelivo 後重試。現有沙盒已保留。';
+
+  @override
   String get workspaceEnvErrorCancelled => '安裝已取消。';
 
   @override
@@ -47418,6 +47484,24 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get compressionCallUnit => '次';
+
+  @override
+  String get compressionRequestTimeout => '壓縮請求逾時';
+
+  @override
+  String get compressionMinuteUnit => '分鐘';
+
+  @override
+  String get compressionRequestTimeoutDefault => '預設';
+
+  @override
+  String get compressionRequestTimeoutHint =>
+      '輸入正數，單位為分鐘。留空沿用現有行為（原生壓縮預設 5 分鐘）。分段摘要的每段生成和合併請求分別計時。';
+
+  @override
+  String compressionRequestTimedOut(num minutes) {
+    return '壓縮請求逾時（已等待 $minutes 分鐘）';
+  }
 
   @override
   String get compressionAdvancedOptions => '壓縮細節';
