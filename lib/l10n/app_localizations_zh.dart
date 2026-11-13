@@ -2033,6 +2033,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backupProgressErrorCopied => '错误已复制';
 
   @override
+  String get backupProgressSkippedTitle => '备份完成，部分内容已跳过';
+
+  @override
+  String backupProgressSkippedMessage(int count) {
+    return '已跳过 $count 个无法读取的文件或目录，以下内容未包含在备份中。';
+  }
+
+  @override
   String get backupProgressPreparing => '准备中';
 
   @override
@@ -7251,7 +7259,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String logViewerRequestsCount(int count) {
-    return '$count 条请求';
+    return '已加载 $count 条请求';
   }
 
   @override
@@ -10940,17 +10948,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storageSpaceCategorySessionFiles => '会话文件';
 
   @override
-  String get storageSpaceCategorySessionFilesHint => '各对话的附件与输出。';
+  String get storageSpaceCategorySessionFilesHint =>
+      '工作区会话的附件副本与输出。普通聊天上传的附件列在“图片”和“文件”中。';
 
   @override
   String get storageSpaceManageSkills => '管理技能';
 
   @override
-  String get storageSessionFilesCleanOrphans => '清理无对话的会话文件';
+  String get storageSessionFilesCleanOrphans => '清理空目录与无对话目录';
 
   @override
   String storageSessionFilesCleanOrphansHint(String size) {
-    return '删除已无对应对话的会话目录。可回收 $size。';
+    return '清理空会话目录，以及已无对话且未被其他会话引用的目录。无对话目录占用 $size。';
   }
 
   @override
@@ -14233,9 +14242,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get compressTaskAbandon => '放弃';
 
   @override
-  String get browserAgentTimedOut => '操作超时，AI 已暂停';
-
-  @override
   String get compressCancelledSnack => '已取消，上下文没有改动。';
 
   @override
@@ -14732,7 +14738,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get contextUnknownLimit => '上限未知';
 
   @override
-  String get browserErrActionTimeout => '操作超时，结果未确认，请检查页面后允许继续';
+  String get browserErrActionTimeout => '操作超时，结果未确认。助手可先检查页面再继续。';
 
   @override
   String get toolPermissionRequestApprovalDesc =>
@@ -15961,6 +15967,66 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get responseRetryWithoutImages => '不发送图片重试（保留原图）';
+
+  @override
+  String get browserOperationTimeout => '操作超时';
+
+  @override
+  String get browserOperationTimeoutDescription =>
+      '单次浏览器操作的最长等待时间。超时后，助手可以检查页面状态。';
+
+  @override
+  String browserOperationTimeoutSeconds(int seconds) {
+    return '$seconds 秒';
+  }
+
+  @override
+  String get browserErrObservationRequired => '请先检查页面，确认上一操作的结果。';
+
+  @override
+  String get storageAttachmentRetention => '自动清理附件';
+
+  @override
+  String get storageAttachmentRetentionDays => '几天后清理';
+
+  @override
+  String get storageAttachmentRetentionImmediately => '立即清理';
+
+  @override
+  String get storageAttachmentRetentionHint => '删除消息或对话后，自动清理不再使用的图片和文件。';
+
+  @override
+  String get storageAttachmentUnused => '未使用';
+
+  @override
+  String storageAttachmentPending(String date) {
+    return '待清理 · $date';
+  }
+
+  @override
+  String storageAttachmentConversations(String names) {
+    return '对话：$names';
+  }
+
+  @override
+  String get storageAttachmentCleanUnused => '清理未使用';
+
+  @override
+  String get storageAttachmentProtectedHint => '仍在使用的文件不会被清理。';
+
+  @override
+  String storageAttachmentDeleteConfirm(int count) {
+    return '立即删除 $count 个未使用文件？仍在使用的文件会保留。';
+  }
+
+  @override
+  String get storageAttachmentRetentionDelayed => '延后清理';
+
+  @override
+  String get storageAttachmentRetentionInvalidDays => '请输入 1–3650 天。';
+
+  @override
+  String get storageAttachmentDetailsTitle => '文件信息';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -17992,6 +18058,14 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get backupProgressErrorCopied => '错误已复制';
 
   @override
+  String get backupProgressSkippedTitle => '备份完成，部分内容已跳过';
+
+  @override
+  String backupProgressSkippedMessage(int count) {
+    return '已跳过 $count 个无法读取的文件或目录，以下内容未包含在备份中。';
+  }
+
+  @override
   String get backupProgressPreparing => '准备中';
 
   @override
@@ -23210,7 +23284,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String logViewerRequestsCount(int count) {
-    return '$count 条请求';
+    return '已加载 $count 条请求';
   }
 
   @override
@@ -26899,17 +26973,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get storageSpaceCategorySessionFiles => '会话文件';
 
   @override
-  String get storageSpaceCategorySessionFilesHint => '各对话的附件与输出。';
+  String get storageSpaceCategorySessionFilesHint =>
+      '工作区会话的附件副本与输出。普通聊天上传的附件列在“图片”和“文件”中。';
 
   @override
   String get storageSpaceManageSkills => '管理技能';
 
   @override
-  String get storageSessionFilesCleanOrphans => '清理无对话的会话文件';
+  String get storageSessionFilesCleanOrphans => '清理空目录与无对话目录';
 
   @override
   String storageSessionFilesCleanOrphansHint(String size) {
-    return '删除已无对应对话的会话目录。可回收 $size。';
+    return '清理空会话目录，以及已无对话且未被其他会话引用的目录。无对话目录占用 $size。';
   }
 
   @override
@@ -30192,9 +30267,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get compressTaskAbandon => '放弃';
 
   @override
-  String get browserAgentTimedOut => '操作超时，AI 已暂停';
-
-  @override
   String get compressCancelledSnack => '已取消，上下文没有改动。';
 
   @override
@@ -30691,7 +30763,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get contextUnknownLimit => '上限未知';
 
   @override
-  String get browserErrActionTimeout => '操作超时，结果未确认，请检查页面后允许继续';
+  String get browserErrActionTimeout => '操作超时，结果未确认。助手可先检查页面再继续。';
 
   @override
   String get toolPermissionRequestApprovalDesc =>
@@ -31920,6 +31992,66 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get responseRetryWithoutImages => '不发送图片重试（保留原图）';
+
+  @override
+  String get browserOperationTimeout => '操作超时';
+
+  @override
+  String get browserOperationTimeoutDescription =>
+      '单次浏览器操作的最长等待时间。超时后，助手可以检查页面状态。';
+
+  @override
+  String browserOperationTimeoutSeconds(int seconds) {
+    return '$seconds 秒';
+  }
+
+  @override
+  String get browserErrObservationRequired => '请先检查页面，确认上一操作的结果。';
+
+  @override
+  String get storageAttachmentRetention => '自动清理附件';
+
+  @override
+  String get storageAttachmentRetentionDays => '几天后清理';
+
+  @override
+  String get storageAttachmentRetentionImmediately => '立即清理';
+
+  @override
+  String get storageAttachmentRetentionHint => '删除消息或对话后，自动清理不再使用的图片和文件。';
+
+  @override
+  String get storageAttachmentUnused => '未使用';
+
+  @override
+  String storageAttachmentPending(String date) {
+    return '待清理 · $date';
+  }
+
+  @override
+  String storageAttachmentConversations(String names) {
+    return '对话：$names';
+  }
+
+  @override
+  String get storageAttachmentCleanUnused => '清理未使用';
+
+  @override
+  String get storageAttachmentProtectedHint => '仍在使用的文件不会被清理。';
+
+  @override
+  String storageAttachmentDeleteConfirm(int count) {
+    return '立即删除 $count 个未使用文件？仍在使用的文件会保留。';
+  }
+
+  @override
+  String get storageAttachmentRetentionDelayed => '延后清理';
+
+  @override
+  String get storageAttachmentRetentionInvalidDays => '请输入 1–3650 天。';
+
+  @override
+  String get storageAttachmentDetailsTitle => '文件信息';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -33950,6 +34082,14 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get backupProgressErrorCopied => '錯誤已複製';
+
+  @override
+  String get backupProgressSkippedTitle => '備份完成，部分內容已略過';
+
+  @override
+  String backupProgressSkippedMessage(int count) {
+    return '已略過 $count 個無法讀取的檔案或目錄，以下內容未包含在備份中。';
+  }
 
   @override
   String get backupProgressPreparing => '準備中';
@@ -39170,7 +39310,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String logViewerRequestsCount(int count) {
-    return '$count 個請求';
+    return '已載入 $count 筆請求';
   }
 
   @override
@@ -42859,17 +42999,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get storageSpaceCategorySessionFiles => '會話檔案';
 
   @override
-  String get storageSpaceCategorySessionFilesHint => '各對話的附件與輸出。';
+  String get storageSpaceCategorySessionFilesHint =>
+      '工作區會話的附件副本與輸出。一般聊天上傳的附件列在「圖片」和「檔案」中。';
 
   @override
   String get storageSpaceManageSkills => '管理技能';
 
   @override
-  String get storageSessionFilesCleanOrphans => '清理無對話的會話檔案';
+  String get storageSessionFilesCleanOrphans => '清理空目錄與無對話目錄';
 
   @override
   String storageSessionFilesCleanOrphansHint(String size) {
-    return '刪除已無對應對話的會話目錄。可回收 $size。';
+    return '清理空會話目錄，以及已無對話且未被其他會話引用的目錄。無對話目錄佔用 $size。';
   }
 
   @override
@@ -46156,9 +46297,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get compressTaskAbandon => '放棄';
 
   @override
-  String get browserAgentTimedOut => '操作逾時，AI 已暫停';
-
-  @override
   String get compressCancelledSnack => '已取消，上下文沒有改動。';
 
   @override
@@ -46655,7 +46793,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get contextUnknownLimit => '上限未知';
 
   @override
-  String get browserErrActionTimeout => '操作逾時，結果未確認，請檢查頁面後允許繼續';
+  String get browserErrActionTimeout => '操作逾時，結果未確認。AI 可先檢查頁面再繼續。';
 
   @override
   String get toolPermissionRequestApprovalDesc =>
@@ -47886,4 +48024,64 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get responseRetryWithoutImages => '不傳送圖片重試（保留原圖）';
+
+  @override
+  String get browserOperationTimeout => '操作逾時';
+
+  @override
+  String get browserOperationTimeoutDescription =>
+      '單次瀏覽器指令的最長等待時間。逾時後，助手可以檢查頁面狀態。';
+
+  @override
+  String browserOperationTimeoutSeconds(int seconds) {
+    return '$seconds 秒';
+  }
+
+  @override
+  String get browserErrObservationRequired => '請先檢查頁面，確認上一操作的結果。';
+
+  @override
+  String get storageAttachmentRetention => '自動清理附件';
+
+  @override
+  String get storageAttachmentRetentionDays => '幾天後清理';
+
+  @override
+  String get storageAttachmentRetentionImmediately => '立即清理';
+
+  @override
+  String get storageAttachmentRetentionHint => '刪除訊息或對話後，自動清理不再使用的圖片和檔案。';
+
+  @override
+  String get storageAttachmentUnused => '未使用';
+
+  @override
+  String storageAttachmentPending(String date) {
+    return '待清理 · $date';
+  }
+
+  @override
+  String storageAttachmentConversations(String names) {
+    return '對話：$names';
+  }
+
+  @override
+  String get storageAttachmentCleanUnused => '清理未使用';
+
+  @override
+  String get storageAttachmentProtectedHint => '仍在使用的檔案不會被清理。';
+
+  @override
+  String storageAttachmentDeleteConfirm(int count) {
+    return '立即刪除 $count 個未使用檔案？仍在使用的檔案會保留。';
+  }
+
+  @override
+  String get storageAttachmentRetentionDelayed => '延後清理';
+
+  @override
+  String get storageAttachmentRetentionInvalidDays => '請輸入 1–3650 天。';
+
+  @override
+  String get storageAttachmentDetailsTitle => '檔案資訊';
 }

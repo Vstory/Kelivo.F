@@ -3946,6 +3946,18 @@ abstract class AppLocalizations {
   /// **'Error copied'**
   String get backupProgressErrorCopied;
 
+  /// Completion heading in the backup progress dialog when unreadable asset files or directories were skipped; the archive was created successfully but does not include those items.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup completed with skipped items'**
+  String get backupProgressSkippedTitle;
+
+  /// Warning above the skipped path list in the backup completion dialog. {count} is the number of unreadable files or directories omitted; an unreadable directory counts once including all its descendants.
+  ///
+  /// In en, this message translates to:
+  /// **'Unreadable files or directories skipped: {count}. They are not included in this backup.'**
+  String backupProgressSkippedMessage(int count);
+
   /// Progress phase label for the initial preparation stage of a backup or restore task.
   ///
   /// In en, this message translates to:
@@ -13729,10 +13741,10 @@ abstract class AppLocalizations {
   /// **'Open Logs Folder'**
   String get logViewerOpenFolder;
 
-  /// Header count label showing how many requests are in the log; {count} is the integer total.
+  /// Summary in the request log viewer. The count is the number of request instances loaded so far, not a total for the entire file; it increases as earlier pages load.
   ///
   /// In en, this message translates to:
-  /// **'{count} requests'**
+  /// **'{count} loaded requests'**
   String logViewerRequestsCount(int count);
 
   /// Field label for the request's numeric ID in the log entry detail summary.
@@ -20433,10 +20445,10 @@ abstract class AppLocalizations {
   /// **'Conversation files'**
   String get storageSpaceCategorySessionFiles;
 
-  /// Description of the conversation files category: attachments and outputs per conversation.
+  /// Storage Conversation files category help. Distinguishes workspace session copies and outputs from original uploads shown in Images/Files.
   ///
   /// In en, this message translates to:
-  /// **'Per-conversation attachments and outputs.'**
+  /// **'Workspace conversation attachments and outputs. Ordinary chat uploads are listed in Images and Files.'**
   String get storageSpaceCategorySessionFilesHint;
 
   /// Button label opening the skills management screen, used in the skills popover and storage page.
@@ -20445,16 +20457,16 @@ abstract class AppLocalizations {
   /// **'Manage skills'**
   String get storageSpaceManageSkills;
 
-  /// Button label to delete session folders that no longer have an associated conversation.
+  /// Storage Conversation files action. Removes empty roots including metadata-only folders and unreferenced orphan directories; other conversation references are protected.
   ///
   /// In en, this message translates to:
-  /// **'Clean orphaned conversation files'**
+  /// **'Clean empty and orphaned folders'**
   String get storageSessionFilesCleanOrphans;
 
-  /// Confirmation message for cleaning orphaned session files; {size} is the reclaimable space.
+  /// Confirmation for cleaning empty and orphaned conversation directories. size is the measured disk use of orphan directories before final reference protection checks.
   ///
   /// In en, this message translates to:
-  /// **'Deletes session folders that no longer have a conversation. Reclaimable: {size}.'**
+  /// **'Remove empty conversation folders and folders with no conversation or remaining references. Orphaned files occupy {size}.'**
   String storageSessionFilesCleanOrphansHint(String size);
 
   /// Text field label for the folder path when creating a desktop workspace.
@@ -26526,12 +26538,6 @@ abstract class AppLocalizations {
   /// **'Dismiss'**
   String get compressTaskAbandon;
 
-  /// Browser agent status chip label shown when an operation timed out and the AI was paused.
-  ///
-  /// In en, this message translates to:
-  /// **'Operation timed out; AI paused'**
-  String get browserAgentTimedOut;
-
   /// Snackbar confirming compression was cancelled and the current context is unchanged.
   ///
   /// In en, this message translates to:
@@ -27414,10 +27420,10 @@ abstract class AppLocalizations {
   /// **'unknown limit'**
   String get contextUnknownLimit;
 
-  /// Error message when a browser action timed out with unknown outcome; asks the user to check the page before letting the AI continue.
+  /// Browser tool error summary for a timed-out command with an unconfirmed outcome. Browser control remains available for the assistant to inspect the page; this does not request manual permission to resume.
   ///
   /// In en, this message translates to:
-  /// **'Operation timed out; outcome unknown. Check the page before allowing AI to continue.'**
+  /// **'Operation timed out; outcome unknown. AI can inspect the page before continuing.'**
   String get browserErrActionTimeout;
 
   /// Description of the approval-required permission mode: tools accessing files outside the workspace or running desktop commands ask before executing.
@@ -29609,6 +29615,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry without images (keep originals)'**
   String get responseRetryWithoutImages;
+
+  /// Browser settings row and picker title for the maximum wait for an individual native browser command.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation timeout'**
+  String get browserOperationTimeout;
+
+  /// Explanatory text in the browser operation-timeout picker. Describes the command deadline and that the assistant can inspect the page after a timeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum wait for a browser command. The assistant can check the page after a timeout.'**
+  String get browserOperationTimeoutDescription;
+
+  /// Selected value and picker option in browser operation-timeout settings. The integer seconds placeholder is the maximum command wait in seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} seconds'**
+  String browserOperationTimeoutSeconds(int seconds);
+
+  /// Browser tool error summary when a page-changing command was not sent because an earlier command timed out. The assistant must successfully read a snapshot or extract before further changes; no manual resume permission is needed.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspect the page before continuing; the previous operation is unconfirmed.'**
+  String get browserErrObservationRequired;
+
+  /// Settings button in the upper-right corner of the Storage Space overview, and its dialog title. Configures automatic deletion of unused chat images and files.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-clean attachments'**
+  String get storageAttachmentRetention;
+
+  /// Number field shown only when delayed automatic cleanup is selected. Enter a positive number of days to keep unused attachments before deleting them.
+  ///
+  /// In en, this message translates to:
+  /// **'Days before cleanup'**
+  String get storageAttachmentRetentionDays;
+
+  /// First option in the automatic attachment cleanup dialog. Selects zero-day retention without requiring the user to type zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean immediately'**
+  String get storageAttachmentRetentionImmediately;
+
+  /// Short introduction in the automatic attachment cleanup dialog. Explains the purpose in everyday language before the immediate/later choice.
+  ///
+  /// In en, this message translates to:
+  /// **'After you delete messages or chats, automatically remove images and files that are no longer used.'**
+  String get storageAttachmentRetentionHint;
+
+  /// Attachment badge when no conversation, draft or appearance reference remains and no automatic recycling deadline is recorded. Manual deletion is available.
+  ///
+  /// In en, this message translates to:
+  /// **'Unused'**
+  String get storageAttachmentUnused;
+
+  /// Attachment status showing the earliest scheduled cleanup date. date is a localized calendar date; cleanup may wait for the next maintenance run.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for cleanup · {date}'**
+  String storageAttachmentPending(String date);
+
+  /// Compact label below an attachment preview and in its information dialog. names lists every chat or branch using this file.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats: {names}'**
+  String storageAttachmentConversations(String names);
+
+  /// Action in the Images/Files list. Opens a confirmation to delete files that are no longer used; active files remain protected.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean unused'**
+  String get storageAttachmentCleanUnused;
+
+  /// Brief explanation in the Images/Files list and automatic cleanup dialog, also used as the in-use badge tooltip. Avoid technical reference-count terminology.
+  ///
+  /// In en, this message translates to:
+  /// **'Files still in use will be kept.'**
+  String get storageAttachmentProtectedHint;
+
+  /// Confirmation for manual storage attachment cleanup. count is the selected number; references are checked again before deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} unused files now? Files that are still in use will be kept.'**
+  String storageAttachmentDeleteConfirm(int count);
+
+  /// Second option in the automatic attachment cleanup dialog. Reveals a field for the number of days to wait before deleting unused attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean later'**
+  String get storageAttachmentRetentionDelayed;
+
+  /// Inline error below the delayed attachment cleanup number field. Only shown when the value is empty, zero, or above the maximum. Immediate cleanup has its own option.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 1–3650 days.'**
+  String get storageAttachmentRetentionInvalidDays;
+
+  /// Title of the information dialog opened by tapping an attachment status label. Shows its chats or cleanup status; this is not the automatic-cleanup settings dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'File info'**
+  String get storageAttachmentDetailsTitle;
 }
 
 class _AppLocalizationsDelegate

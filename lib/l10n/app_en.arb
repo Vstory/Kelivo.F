@@ -943,6 +943,19 @@
   },
   "backupProgressCopyError": "Copy error",
   "backupProgressErrorCopied": "Error copied",
+  "backupProgressSkippedTitle": "Backup completed with skipped items",
+  "@backupProgressSkippedTitle": {
+    "description": "Completion heading in the backup progress dialog when unreadable asset files or directories were skipped; the archive was created successfully but does not include those items."
+  },
+  "backupProgressSkippedMessage": "Unreadable files or directories skipped: {count}. They are not included in this backup.",
+  "@backupProgressSkippedMessage": {
+    "description": "Warning above the skipped path list in the backup completion dialog. {count} is the number of unreadable files or directories omitted; an unreadable directory counts once including all its descendants.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "backupProgressPreparing": "Preparing",
   "backupProgressSnapshotting": "Creating database snapshot",
   "backupProgressPacking": "Packing",
@@ -3418,14 +3431,14 @@
   "logViewerCurrentLog": "Current Log",
   "logViewerExport": "Export",
   "logViewerOpenFolder": "Open Logs Folder",
-  "logViewerRequestsCount": "{count} requests",
+  "logViewerRequestsCount": "{count} loaded requests",
   "@logViewerRequestsCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     },
-    "description": "Header count label showing how many requests are in the log; {count} is the integer total."
+    "description": "Summary in the request log viewer. The count is the number of request instances loaded so far, not a total for the entire file; it increases as earlier pages load."
   },
   "logViewerFieldId": "ID",
   "logViewerFieldMethod": "Method",
@@ -5562,17 +5575,17 @@
   "storageSpaceCategorySkills": "Skills",
   "storageSpaceCategorySkillsHint": "Installed skill files.",
   "storageSpaceCategorySessionFiles": "Conversation files",
-  "storageSpaceCategorySessionFilesHint": "Per-conversation attachments and outputs.",
+  "storageSpaceCategorySessionFilesHint": "Workspace conversation attachments and outputs. Ordinary chat uploads are listed in Images and Files.",
   "storageSpaceManageSkills": "Manage skills",
-  "storageSessionFilesCleanOrphans": "Clean orphaned conversation files",
-  "storageSessionFilesCleanOrphansHint": "Deletes session folders that no longer have a conversation. Reclaimable: {size}.",
+  "storageSessionFilesCleanOrphans": "Clean empty and orphaned folders",
+  "storageSessionFilesCleanOrphansHint": "Remove empty conversation folders and folders with no conversation or remaining references. Orphaned files occupy {size}.",
   "@storageSessionFilesCleanOrphansHint": {
     "placeholders": {
       "size": {
         "type": "String"
       }
     },
-    "description": "Confirmation message for cleaning orphaned session files; {size} is the reclaimable space."
+    "description": "Confirmation for cleaning empty and orphaned conversation directories. size is the measured disk use of orphan directories before final reference protection checks."
   },
   "workspaceDesktopFolderPath": "Folder path",
   "workspaceDesktopFolderMissing": "Choose an existing folder or enter its absolute path.",
@@ -7250,7 +7263,6 @@
     "description": "Detail line describing the summary input mode and its source; {mode} and {source} are filled in."
   },
   "compressTaskAbandon": "Dismiss",
-  "browserAgentTimedOut": "Operation timed out; AI paused",
   "compressCancelledSnack": "Cancelled. The context is unchanged.",
   "contextImpactClearTitle": "Undo the earlier clear?",
   "@contextBudgetInfo": {
@@ -7628,7 +7640,7 @@
   "contextTaskQueued": "Queued — waiting for compression",
   "contextNewConversation": "Create a new chat with the summary",
   "contextUnknownLimit": "unknown limit",
-  "browserErrActionTimeout": "Operation timed out; outcome unknown. Check the page before allowing AI to continue.",
+  "browserErrActionTimeout": "Operation timed out; outcome unknown. AI can inspect the page before continuing.",
   "toolPermissionRequestApprovalDesc": "Kelivo will ask before accessing files outside the workspace, running desktop commands, or using other tools that need approval.",
   "contextLimitedInputHint": "Only the selected character window is read. The rest of the replaced history is not included in the summary; original messages remain available.",
   "contextTaskCancelled": "Compression cancelled",
@@ -17748,13 +17760,13 @@
     "description": "Storage usage category label for per-conversation files; also passed into the clear-done message."
   },
   "@storageSpaceCategorySessionFilesHint": {
-    "description": "Description of the conversation files category: attachments and outputs per conversation."
+    "description": "Storage Conversation files category help. Distinguishes workspace session copies and outputs from original uploads shown in Images/Files."
   },
   "@storageSpaceManageSkills": {
     "description": "Button label opening the skills management screen, used in the skills popover and storage page."
   },
   "@storageSessionFilesCleanOrphans": {
-    "description": "Button label to delete session folders that no longer have an associated conversation."
+    "description": "Storage Conversation files action. Removes empty roots including metadata-only folders and unreferenced orphan directories; other conversation references are protected."
   },
   "@workspaceDesktopFolderPath": {
     "description": "Text field label for the folder path when creating a desktop workspace."
@@ -20555,9 +20567,6 @@
   "@compressTaskAbandon": {
     "description": "Destructive action label to dismiss/abandon a compression task."
   },
-  "@browserAgentTimedOut": {
-    "description": "Browser agent status chip label shown when an operation timed out and the AI was paused."
-  },
   "@compressCancelledSnack": {
     "description": "Snackbar confirming compression was cancelled and the current context is unchanged."
   },
@@ -20928,7 +20937,7 @@
     "description": "Fallback text shown when the context token limit is unknown."
   },
   "@browserErrActionTimeout": {
-    "description": "Error message when a browser action timed out with unknown outcome; asks the user to check the page before letting the AI continue."
+    "description": "Browser tool error summary for a timed-out command with an unconfirmed outcome. Browser control remains available for the assistant to inspect the page; this does not request manual permission to resume."
   },
   "@toolPermissionRequestApprovalDesc": {
     "description": "Description of the approval-required permission mode: tools accessing files outside the workspace or running desktop commands ask before executing."
@@ -21897,5 +21906,93 @@
   "responseRetryWithoutImages": "Retry without images (keep originals)",
   "@responseRetryWithoutImages": {
     "description": "Action below a truncated assistant reply whose final request contained images. Regenerates once with all image inputs omitted for that generation, including tool follow-ups, without deleting attachments or changing saved settings."
+  },
+  "browserOperationTimeout": "Operation timeout",
+  "browserOperationTimeoutDescription": "Maximum wait for a browser command. The assistant can check the page after a timeout.",
+  "browserOperationTimeoutSeconds": "{seconds} seconds",
+  "@browserOperationTimeout": {
+    "description": "Browser settings row and picker title for the maximum wait for an individual native browser command."
+  },
+  "@browserOperationTimeoutDescription": {
+    "description": "Explanatory text in the browser operation-timeout picker. Describes the command deadline and that the assistant can inspect the page after a timeout."
+  },
+  "@browserOperationTimeoutSeconds": {
+    "description": "Selected value and picker option in browser operation-timeout settings. The integer seconds placeholder is the maximum command wait in seconds.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "browserErrObservationRequired": "Inspect the page before continuing; the previous operation is unconfirmed.",
+  "@browserErrObservationRequired": {
+    "description": "Browser tool error summary when a page-changing command was not sent because an earlier command timed out. The assistant must successfully read a snapshot or extract before further changes; no manual resume permission is needed."
+  },
+  "storageAttachmentRetention": "Auto-clean attachments",
+  "@storageAttachmentRetention": {
+    "description": "Settings button in the upper-right corner of the Storage Space overview, and its dialog title. Configures automatic deletion of unused chat images and files."
+  },
+  "storageAttachmentRetentionDays": "Days before cleanup",
+  "@storageAttachmentRetentionDays": {
+    "description": "Number field shown only when delayed automatic cleanup is selected. Enter a positive number of days to keep unused attachments before deleting them."
+  },
+  "storageAttachmentRetentionImmediately": "Clean immediately",
+  "@storageAttachmentRetentionImmediately": {
+    "description": "First option in the automatic attachment cleanup dialog. Selects zero-day retention without requiring the user to type zero."
+  },
+  "storageAttachmentRetentionHint": "After you delete messages or chats, automatically remove images and files that are no longer used.",
+  "@storageAttachmentRetentionHint": {
+    "description": "Short introduction in the automatic attachment cleanup dialog. Explains the purpose in everyday language before the immediate/later choice."
+  },
+  "storageAttachmentUnused": "Unused",
+  "@storageAttachmentUnused": {
+    "description": "Attachment badge when no conversation, draft or appearance reference remains and no automatic recycling deadline is recorded. Manual deletion is available."
+  },
+  "storageAttachmentPending": "Waiting for cleanup · {date}",
+  "@storageAttachmentPending": {
+    "description": "Attachment status showing the earliest scheduled cleanup date. date is a localized calendar date; cleanup may wait for the next maintenance run.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "storageAttachmentConversations": "Chats: {names}",
+  "@storageAttachmentConversations": {
+    "description": "Compact label below an attachment preview and in its information dialog. names lists every chat or branch using this file.",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "storageAttachmentCleanUnused": "Clean unused",
+  "@storageAttachmentCleanUnused": {
+    "description": "Action in the Images/Files list. Opens a confirmation to delete files that are no longer used; active files remain protected."
+  },
+  "storageAttachmentProtectedHint": "Files still in use will be kept.",
+  "@storageAttachmentProtectedHint": {
+    "description": "Brief explanation in the Images/Files list and automatic cleanup dialog, also used as the in-use badge tooltip. Avoid technical reference-count terminology."
+  },
+  "storageAttachmentDeleteConfirm": "Delete {count} unused files now? Files that are still in use will be kept.",
+  "@storageAttachmentDeleteConfirm": {
+    "description": "Confirmation for manual storage attachment cleanup. count is the selected number; references are checked again before deletion.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageAttachmentRetentionDelayed": "Clean later",
+  "@storageAttachmentRetentionDelayed": {
+    "description": "Second option in the automatic attachment cleanup dialog. Reveals a field for the number of days to wait before deleting unused attachments."
+  },
+  "storageAttachmentRetentionInvalidDays": "Enter 1–3650 days.",
+  "@storageAttachmentRetentionInvalidDays": {
+    "description": "Inline error below the delayed attachment cleanup number field. Only shown when the value is empty, zero, or above the maximum. Immediate cleanup has its own option."
+  },
+  "storageAttachmentDetailsTitle": "File info",
+  "@storageAttachmentDetailsTitle": {
+    "description": "Title of the information dialog opened by tapping an attachment status label. Shows its chats or cleanup status; this is not the automatic-cleanup settings dialog."
   }
 }

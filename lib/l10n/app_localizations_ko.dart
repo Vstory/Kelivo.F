@@ -2076,6 +2076,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get backupProgressErrorCopied => '오류가 복사됨';
 
   @override
+  String get backupProgressSkippedTitle => '건너뛴 항목이 있는 상태로 백업 완료';
+
+  @override
+  String backupProgressSkippedMessage(int count) {
+    return '읽을 수 없는 파일 또는 디렉터리 건너뜀: $count개. 이 항목들은 이 백업에 포함되지 않습니다.';
+  }
+
+  @override
   String get backupProgressPreparing => '준비 중';
 
   @override
@@ -7361,7 +7369,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String logViewerRequestsCount(int count) {
-    return '요청 $count개';
+    return '요청 $count개 로드됨';
   }
 
   @override
@@ -11102,17 +11110,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get storageSpaceCategorySessionFiles => '대화 파일';
 
   @override
-  String get storageSpaceCategorySessionFilesHint => '대화별 첨부 파일 및 출력입니다.';
+  String get storageSpaceCategorySessionFilesHint =>
+      '작업 공간 대화의 첨부 파일과 출력물입니다. 일반 채팅 업로드는 이미지 및 파일에 표시됩니다.';
 
   @override
   String get storageSpaceManageSkills => '스킬 관리';
 
   @override
-  String get storageSessionFilesCleanOrphans => '연결된 대화가 없는 대화 파일 정리';
+  String get storageSessionFilesCleanOrphans => '빈 폴더 및 고아 폴더 정리';
 
   @override
   String storageSessionFilesCleanOrphansHint(String size) {
-    return '더 이상 대화가 없는 세션 폴더를 삭제합니다. 확보 가능: $size.';
+    return '빈 대화 폴더와 대화 또는 남은 참조가 없는 폴더를 제거합니다. 고아 폴더가 $size를 차지합니다.';
   }
 
   @override
@@ -14536,9 +14545,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get compressTaskAbandon => '포기';
 
   @override
-  String get browserAgentTimedOut => '작업 시간 초과, AI 일시 중지됨';
-
-  @override
   String get compressCancelledSnack => '취소되었습니다. 컨텍스트는 변경되지 않았습니다.';
 
   @override
@@ -15055,7 +15061,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get browserErrActionTimeout =>
-      '작업 시간 초과, 결과 미확인. 페이지를 확인한 후 AI가 계속하도록 허용하세요.';
+      '작업 시간이 초과되었습니다. 결과를 확인할 수 없습니다. 어시스턴트가 계속하기 전에 페이지를 확인할 수 있습니다.';
 
   @override
   String get toolPermissionRequestApprovalDesc =>
@@ -16317,4 +16323,66 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get responseRetryWithoutImages => '이미지 없이 재시도(원본 유지)';
+
+  @override
+  String get browserOperationTimeout => '작업 시간 초과';
+
+  @override
+  String get browserOperationTimeoutDescription =>
+      '브라우저 명령의 최대 대기 시간입니다. 시간 초과 후 어시스턴트가 페이지 상태를 확인할 수 있습니다.';
+
+  @override
+  String browserOperationTimeoutSeconds(int seconds) {
+    return '$seconds초';
+  }
+
+  @override
+  String get browserErrObservationRequired =>
+      '계속하기 전에 페이지를 확인하세요. 이전 작업이 확인되지 않았습니다.';
+
+  @override
+  String get storageAttachmentRetention => '첨부 파일 자동 정리';
+
+  @override
+  String get storageAttachmentRetentionDays => '정리 전 일수';
+
+  @override
+  String get storageAttachmentRetentionImmediately => '즉시 정리';
+
+  @override
+  String get storageAttachmentRetentionHint =>
+      '메시지나 대화를 삭제하면 더 이상 사용되지 않는 이미지와 파일을 자동으로 정리합니다.';
+
+  @override
+  String get storageAttachmentUnused => '사용 안 함';
+
+  @override
+  String storageAttachmentPending(String date) {
+    return '정리 대기 중 · $date';
+  }
+
+  @override
+  String storageAttachmentConversations(String names) {
+    return '대화: $names';
+  }
+
+  @override
+  String get storageAttachmentCleanUnused => '미사용 항목 정리';
+
+  @override
+  String get storageAttachmentProtectedHint => '사용 중인 파일은 유지됩니다.';
+
+  @override
+  String storageAttachmentDeleteConfirm(int count) {
+    return '사용하지 않는 파일 $count개를 지금 삭제하시겠습니까? 아직 사용 중인 파일은 유지됩니다.';
+  }
+
+  @override
+  String get storageAttachmentRetentionDelayed => '나중에 정리';
+
+  @override
+  String get storageAttachmentRetentionInvalidDays => '1–3650일 사이로 입력하세요.';
+
+  @override
+  String get storageAttachmentDetailsTitle => '파일 정보';
 }

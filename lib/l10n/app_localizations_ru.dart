@@ -2152,6 +2152,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get backupProgressErrorCopied => 'Ошибка скопирована';
 
   @override
+  String get backupProgressSkippedTitle =>
+      'Резервная копия создана с пропущенными элементами';
+
+  @override
+  String backupProgressSkippedMessage(int count) {
+    return 'Пропущено нечитаемых файлов или каталогов: $count. Они не включены в эту резервную копию.';
+  }
+
+  @override
   String get backupProgressPreparing => 'Подготовка';
 
   @override
@@ -7667,7 +7676,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String logViewerRequestsCount(int count) {
-    return '$count запросов';
+    return 'Загружено запросов: $count';
   }
 
   @override
@@ -11591,18 +11600,18 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get storageSpaceCategorySessionFilesHint =>
-      'Вложения и результаты по каждому чату.';
+      'Вложения и результаты сеансов рабочей области. Обычные загрузки чата перечислены в разделах «Изображения» и «Файлы».';
 
   @override
   String get storageSpaceManageSkills => 'Управление навыками';
 
   @override
   String get storageSessionFilesCleanOrphans =>
-      'Очистить файлы чатов без чатов';
+      'Очистить пустые и осиротевшие папки';
 
   @override
   String storageSessionFilesCleanOrphansHint(String size) {
-    return 'Удаляет папки сеансов, у которых больше нет чата. Можно освободить: $size.';
+    return 'Удалить пустые папки чатов и папки без чатов или оставшихся ссылок. Осиротевшие файлы занимают $size.';
   }
 
   @override
@@ -15243,9 +15252,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get compressTaskAbandon => 'Отменить';
 
   @override
-  String get browserAgentTimedOut => 'Время операции истекло; ИИ приостановлен';
-
-  @override
   String get compressCancelledSnack => 'Отменено. Контекст не изменён.';
 
   @override
@@ -15806,7 +15812,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get browserErrActionTimeout =>
-      'Время операции истекло; результат неизвестен. Проверьте страницу, прежде чем разрешить ИИ продолжить.';
+      'Время операции истекло; результат неизвестен. Ассистент может проверить страницу перед продолжением.';
 
   @override
   String get toolPermissionRequestApprovalDesc =>
@@ -17115,4 +17121,68 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get responseRetryWithoutImages =>
       'Повторить без изображений (сохранить оригиналы)';
+
+  @override
+  String get browserOperationTimeout => 'Тайм-аут операции';
+
+  @override
+  String get browserOperationTimeoutDescription =>
+      'Максимальное время ожидания команды браузера. После тайм-аута ассистент может проверить состояние страницы.';
+
+  @override
+  String browserOperationTimeoutSeconds(int seconds) {
+    return '$seconds с';
+  }
+
+  @override
+  String get browserErrObservationRequired =>
+      'Проверьте страницу перед продолжением: результат предыдущей операции не подтверждён.';
+
+  @override
+  String get storageAttachmentRetention => 'Автоочистка вложений';
+
+  @override
+  String get storageAttachmentRetentionDays => 'Дней до очистки';
+
+  @override
+  String get storageAttachmentRetentionImmediately => 'Очистить сразу';
+
+  @override
+  String get storageAttachmentRetentionHint =>
+      'После удаления сообщений или чатов автоматически удаляйте неиспользуемые изображения и файлы.';
+
+  @override
+  String get storageAttachmentUnused => 'Не используется';
+
+  @override
+  String storageAttachmentPending(String date) {
+    return 'Ожидает очистки · $date';
+  }
+
+  @override
+  String storageAttachmentConversations(String names) {
+    return 'Чаты: $names';
+  }
+
+  @override
+  String get storageAttachmentCleanUnused => 'Очистить неиспользуемые';
+
+  @override
+  String get storageAttachmentProtectedHint =>
+      'Файлы, которые ещё используются, будут сохранены.';
+
+  @override
+  String storageAttachmentDeleteConfirm(int count) {
+    return 'Удалить сейчас неиспользуемых файлов: $count? Файлы, которые всё ещё используются, будут сохранены.';
+  }
+
+  @override
+  String get storageAttachmentRetentionDelayed => 'Очистить позже';
+
+  @override
+  String get storageAttachmentRetentionInvalidDays =>
+      'Введите от 1 до 3650 дней.';
+
+  @override
+  String get storageAttachmentDetailsTitle => 'Информация о файле';
 }

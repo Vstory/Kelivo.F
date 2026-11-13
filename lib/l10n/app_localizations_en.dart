@@ -2117,6 +2117,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupProgressErrorCopied => 'Error copied';
 
   @override
+  String get backupProgressSkippedTitle =>
+      'Backup completed with skipped items';
+
+  @override
+  String backupProgressSkippedMessage(int count) {
+    return 'Unreadable files or directories skipped: $count. They are not included in this backup.';
+  }
+
+  @override
   String get backupProgressPreparing => 'Preparing';
 
   @override
@@ -7557,7 +7566,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String logViewerRequestsCount(int count) {
-    return '$count requests';
+    return '$count loaded requests';
   }
 
   @override
@@ -11427,18 +11436,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storageSpaceCategorySessionFilesHint =>
-      'Per-conversation attachments and outputs.';
+      'Workspace conversation attachments and outputs. Ordinary chat uploads are listed in Images and Files.';
 
   @override
   String get storageSpaceManageSkills => 'Manage skills';
 
   @override
   String get storageSessionFilesCleanOrphans =>
-      'Clean orphaned conversation files';
+      'Clean empty and orphaned folders';
 
   @override
   String storageSessionFilesCleanOrphansHint(String size) {
-    return 'Deletes session folders that no longer have a conversation. Reclaimable: $size.';
+    return 'Remove empty conversation folders and folders with no conversation or remaining references. Orphaned files occupy $size.';
   }
 
   @override
@@ -14997,9 +15006,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get compressTaskAbandon => 'Dismiss';
 
   @override
-  String get browserAgentTimedOut => 'Operation timed out; AI paused';
-
-  @override
   String get compressCancelledSnack => 'Cancelled. The context is unchanged.';
 
   @override
@@ -15536,7 +15542,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get browserErrActionTimeout =>
-      'Operation timed out; outcome unknown. Check the page before allowing AI to continue.';
+      'Operation timed out; outcome unknown. AI can inspect the page before continuing.';
 
   @override
   String get toolPermissionRequestApprovalDesc =>
@@ -16833,4 +16839,67 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get responseRetryWithoutImages =>
       'Retry without images (keep originals)';
+
+  @override
+  String get browserOperationTimeout => 'Operation timeout';
+
+  @override
+  String get browserOperationTimeoutDescription =>
+      'Maximum wait for a browser command. The assistant can check the page after a timeout.';
+
+  @override
+  String browserOperationTimeoutSeconds(int seconds) {
+    return '$seconds seconds';
+  }
+
+  @override
+  String get browserErrObservationRequired =>
+      'Inspect the page before continuing; the previous operation is unconfirmed.';
+
+  @override
+  String get storageAttachmentRetention => 'Auto-clean attachments';
+
+  @override
+  String get storageAttachmentRetentionDays => 'Days before cleanup';
+
+  @override
+  String get storageAttachmentRetentionImmediately => 'Clean immediately';
+
+  @override
+  String get storageAttachmentRetentionHint =>
+      'After you delete messages or chats, automatically remove images and files that are no longer used.';
+
+  @override
+  String get storageAttachmentUnused => 'Unused';
+
+  @override
+  String storageAttachmentPending(String date) {
+    return 'Waiting for cleanup · $date';
+  }
+
+  @override
+  String storageAttachmentConversations(String names) {
+    return 'Chats: $names';
+  }
+
+  @override
+  String get storageAttachmentCleanUnused => 'Clean unused';
+
+  @override
+  String get storageAttachmentProtectedHint =>
+      'Files still in use will be kept.';
+
+  @override
+  String storageAttachmentDeleteConfirm(int count) {
+    return 'Delete $count unused files now? Files that are still in use will be kept.';
+  }
+
+  @override
+  String get storageAttachmentRetentionDelayed => 'Clean later';
+
+  @override
+  String get storageAttachmentRetentionInvalidDays => 'Enter 1–3650 days.';
+
+  @override
+  String get storageAttachmentDetailsTitle => 'File info';
 }

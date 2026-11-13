@@ -2129,6 +2129,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get backupProgressErrorCopied => 'Hata kopyalandı';
 
   @override
+  String get backupProgressSkippedTitle =>
+      'Yedekleme atlanan öğelerle tamamlandı';
+
+  @override
+  String backupProgressSkippedMessage(int count) {
+    return 'Okunamayan dosya veya dizinler atlandı: $count. Bu yedeğe dahil edilmediler.';
+  }
+
+  @override
   String get backupProgressPreparing => 'Hazırlanıyor';
 
   @override
@@ -7618,7 +7627,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String logViewerRequestsCount(int count) {
-    return '$count istek';
+    return '$count yüklenen istek';
   }
 
   @override
@@ -11498,18 +11507,18 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get storageSpaceCategorySessionFilesHint =>
-      'Sohbet başına ekler ve çıktılar.';
+      'Çalışma alanı sohbet ekleri ve çıktıları. Sıradan sohbet yüklemeleri Görseller ve Dosyalar bölümünde listelenir.';
 
   @override
   String get storageSpaceManageSkills => 'Becerileri yönet';
 
   @override
   String get storageSessionFilesCleanOrphans =>
-      'Sohbeti olmayan dosyaları temizle';
+      'Boş ve sahipsiz klasörleri temizle';
 
   @override
   String storageSessionFilesCleanOrphansHint(String size) {
-    return 'Artık bir sohbete bağlı olmayan oturum klasörlerini siler. Geri kazanılabilir: $size.';
+    return 'Boş sohbet klasörlerini ve hiçbir sohbeti veya kalan referansı olmayan klasörleri kaldır. Sahipsiz dosyalar $size yer kaplıyor.';
   }
 
   @override
@@ -15087,10 +15096,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get compressTaskAbandon => 'Vazgeç';
 
   @override
-  String get browserAgentTimedOut =>
-      'İşlem zaman aşımına uğradı; AI duraklatıldı';
-
-  @override
   String get compressCancelledSnack => 'İptal edildi. Bağlam değişmedi.';
 
   @override
@@ -15630,7 +15635,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get browserErrActionTimeout =>
-      'İşlem zaman aşımına uğradı; sonuç bilinmiyor. AI\'nın devam etmesine izin vermeden önce sayfayı kontrol edin.';
+      'İşlem zaman aşımına uğradı; sonuç bilinmiyor. Asistan devam etmeden önce sayfayı inceleyebilir.';
 
   @override
   String get toolPermissionRequestApprovalDesc =>
@@ -16930,4 +16935,67 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get responseRetryWithoutImages =>
       'Görseller olmadan yeniden dene (orijinalleri koru)';
+
+  @override
+  String get browserOperationTimeout => 'İşlem zaman aşımı';
+
+  @override
+  String get browserOperationTimeoutDescription =>
+      'Bir tarayıcı komutu için en uzun bekleme süresi. Zaman aşımından sonra asistan sayfa durumunu kontrol edebilir.';
+
+  @override
+  String browserOperationTimeoutSeconds(int seconds) {
+    return '$seconds saniye';
+  }
+
+  @override
+  String get browserErrObservationRequired =>
+      'Devam etmeden önce sayfayı inceleyin; önceki işlem doğrulanmadı.';
+
+  @override
+  String get storageAttachmentRetention => 'Ekleri otomatik temizle';
+
+  @override
+  String get storageAttachmentRetentionDays => 'Temizlemeden önceki gün sayısı';
+
+  @override
+  String get storageAttachmentRetentionImmediately => 'Hemen temizle';
+
+  @override
+  String get storageAttachmentRetentionHint =>
+      'Mesajları veya sohbetleri sildikten sonra artık kullanılmayan görselleri ve dosyaları otomatik olarak kaldır.';
+
+  @override
+  String get storageAttachmentUnused => 'Kullanılmıyor';
+
+  @override
+  String storageAttachmentPending(String date) {
+    return 'Temizlenmeyi bekliyor · $date';
+  }
+
+  @override
+  String storageAttachmentConversations(String names) {
+    return 'Sohbetler: $names';
+  }
+
+  @override
+  String get storageAttachmentCleanUnused => 'Kullanılmayanları temizle';
+
+  @override
+  String get storageAttachmentProtectedHint =>
+      'Hâlâ kullanımda olan dosyalar korunacak.';
+
+  @override
+  String storageAttachmentDeleteConfirm(int count) {
+    return '$count kullanılmayan dosya şimdi silinsin mi? Hâlâ kullanımda olan dosyalar korunacak.';
+  }
+
+  @override
+  String get storageAttachmentRetentionDelayed => 'Daha sonra temizle';
+
+  @override
+  String get storageAttachmentRetentionInvalidDays => '1–3650 gün girin.';
+
+  @override
+  String get storageAttachmentDetailsTitle => 'Dosya bilgisi';
 }
