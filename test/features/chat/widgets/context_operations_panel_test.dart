@@ -23,6 +23,7 @@ import 'package:Kelivo/core/providers/instruction_injection_provider.dart';
 import 'package:Kelivo/core/providers/mcp_provider.dart';
 import 'package:Kelivo/core/providers/quick_phrase_provider.dart';
 import 'package:Kelivo/core/services/chat/chat_service.dart';
+import 'package:Kelivo/core/models/carried_original.dart';
 import 'package:Kelivo/core/services/chat/context_compression_service.dart';
 import 'package:Kelivo/features/chat/widgets/context_operations_panel.dart';
 import 'package:Kelivo/features/chat/widgets/context_operation_actions.dart';
@@ -31,6 +32,7 @@ import 'package:Kelivo/features/home/widgets/chat_input_bar.dart';
 import 'package:Kelivo/l10n/app_localizations.dart';
 import 'package:Kelivo/l10n/app_localizations_en.dart';
 import 'package:Kelivo/shared/widgets/ios_tactile.dart';
+import 'package:Kelivo/shared/widgets/snackbar.dart';
 import 'package:Kelivo/theme/theme_factory.dart';
 import '../../../support/business_test_harness.dart';
 
@@ -53,6 +55,10 @@ void check(String name, WidgetTesterCallback body) {
     try {
       await body(tester);
     } finally {
+      // Actions reached via runAsync can leave a real-time toast timer.
+      // Finish its exit animation while this test still owns the navigator.
+      AppSnackBarManager().dismissAll();
+      await tester.pumpAndSettle();
       await tester.pumpWidget(const SizedBox.shrink());
       debugDefaultTargetPlatformOverride = null;
     }
@@ -556,6 +562,76 @@ void main() {
     });
   });
 
+  check('detail actions use the latest copy after editing without reopening', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      chat.contextCompression.estimateCandidate =
+          (_, _, {bool? fixedContextStart}) async =>
+              (usedTokens: 100, contextWindow: 20000);
+      await start(
+        (_, _) async => 'summary',
+        options: const CompressContextOptions(
+          mode: CompressContextLimitMode.keepRecent,
+          keepUserMessages: 2,
+          carry: CarrySetting(mode: CarryMode.count, count: 1),
+        ),
+      );
+      await until(
+        () =>
+            chat.contextCompression.taskFor(id)!.phase ==
+            CompressionPhase.completed,
+      );
+    });
+    final original = chat.contextOperationsFor(id).single;
+    late BuildContext page;
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: settings,
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) {
+              page = context;
+              return const Scaffold();
+            },
+          ),
+        ),
+      ),
+    );
+    final closed = showContextOperationDetails(
+      page,
+      chat: chat,
+      conversationId: id,
+      operation: original,
+    );
+    await tester.pump();
+    final detail = find.byType(ContextOperationContent);
+    await pumpUntil(
+      tester,
+      () =>
+          detail.evaluate().isNotEmpty &&
+          tester.widget<ContextOperationContent>(detail).onSaveCarried != null,
+    );
+    final actions = tester.widget<ContextOperationContent>(detail);
+    final list = original.carried!;
+    expect(
+      await tester.runAsync(
+        () => actions.onSaveCarried!(
+          list.withItems([
+            list.items.single.copyWith(editedText: 'fixed copy'),
+          ]),
+        ),
+      ),
+      true,
+    );
+    expect(await tester.runAsync(() => actions.onUndo!()), true);
+    expect(chat.contextOperationsFor(id).single.revoked, true);
+    Navigator.of(tester.element(detail)).pop();
+    await tester.pumpAndSettle();
+    await closed;
+  });
   check('operation details paint and close while budgets are pending', (
     tester,
   ) async {

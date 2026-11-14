@@ -11671,48 +11671,6 @@ abstract class AppLocalizations {
   /// **'Next Image'**
   String get imageViewerPageNextButton;
 
-  /// Label of the button that zooms the image in.
-  ///
-  /// In en, this message translates to:
-  /// **'Zoom In'**
-  String get imageViewerPageZoomInButton;
-
-  /// Label of the button that zooms the image out.
-  ///
-  /// In en, this message translates to:
-  /// **'Zoom Out'**
-  String get imageViewerPageZoomOutButton;
-
-  /// Label of the button that resets the image zoom to its default level.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset Zoom'**
-  String get imageViewerPageResetZoomButton;
-
-  /// Label of the button that mirrors the image left-to-right.
-  ///
-  /// In en, this message translates to:
-  /// **'Flip Horizontal'**
-  String get imageViewerPageFlipHorizontalButton;
-
-  /// Label of the button that mirrors the image top-to-bottom.
-  ///
-  /// In en, this message translates to:
-  /// **'Flip Vertical'**
-  String get imageViewerPageFlipVerticalButton;
-
-  /// Label of the button that rotates the image counterclockwise.
-  ///
-  /// In en, this message translates to:
-  /// **'Rotate Left'**
-  String get imageViewerPageRotateLeftButton;
-
-  /// Label of the button that rotates the image clockwise.
-  ///
-  /// In en, this message translates to:
-  /// **'Rotate Right'**
-  String get imageViewerPageRotateRightButton;
-
   /// Compact position indicator in the image viewer showing current image number and total, e.g. 2/5.
   ///
   /// In en, this message translates to:
@@ -29717,6 +29675,378 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'File info'**
   String get storageAttachmentDetailsTitle;
+
+  /// Compression options panel: Also send your earlier messages as written Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Also send your earlier messages as written'**
+  String get compressionCarryTitle;
+
+  /// Compression options panel: From the part that becomes a summary, your own messages are sent to the model as you wrote them, not just as the summary retells them. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'From the part that becomes a summary, your own messages are sent to the model as you wrote them, not just as the summary retells them.'**
+  String get compressionCarryHint;
+
+  /// Compression options panel: Send the latest Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the latest'**
+  String get compressionCarryCountLabel;
+
+  /// Compression options panel: messages Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'messages'**
+  String get compressionCarryUnit;
+
+  /// Compression options panel: As many as fit Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'As many as fit'**
+  String get compressionCarryAll;
+
+  /// Compression options panel: No set number. Starts from the newest and goes back until it’s nearly full; if the oldest one is too long, only its start and end are sent. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'No set number. Starts from the newest and goes back until it’s nearly full; if the oldest one is too long, only its start and end are sent.'**
+  String get compressionCarryAllHint;
+
+  /// Compression options panel: Also bring back messages from earlier summaries Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Also bring back messages from earlier summaries'**
+  String get compressionCarryEarlier;
+
+  /// Compression options panel: Your messages from parts compressed earlier can be included too. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Your messages from parts compressed earlier can be included too.'**
+  String get compressionCarryEarlierHint;
+
+  /// Compression options panel: Will send {count} · about {tokens} tokens Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Will send {count} · about {tokens} tokens'**
+  String compressionCarryPreview(int count, String tokens);
+
+  /// Compression options panel: The part being summarized has no messages from you. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'The part being summarized has no messages from you.'**
+  String get compressionCarryNone;
+
+  /// Compression options panel: {count} older messages don’t fit and won’t be sent this time. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} older messages don’t fit and won’t be sent this time.'**
+  String compressionCarryNotFit(int count);
+
+  /// Compression options panel: {count} more Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} more'**
+  String compressionCarryMoreRows(int count);
+
+  /// Compression options panel: These messages would likely be more than the current model can take. Send fewer, or switch to a model with a larger context. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'These messages would likely be more than the current model can take. Send fewer, or switch to a model with a larger context.'**
+  String get compressionCarryOverBudget;
+
+  /// Compression options panel: Change to {count} Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Change to {count}'**
+  String compressionCarryFitAction(int count);
+
+  /// Compression options panel: Too long; only the start and end are sent Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Too long; only the start and end are sent'**
+  String get compressionCarryTruncated;
+
+  /// Compression options panel: Automatic compression will do the same. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic compression will do the same.'**
+  String get compressionCarryAutoToo;
+
+  /// Compression options panel: Images and files aren’t carried to the new chat; only the text is. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Images and files aren’t carried to the new chat; only the text is.'**
+  String get compressionCarryNewChatText;
+
+  /// Compression options panel: This service keeps your earlier messages on its own when compressing. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'This service keeps your earlier messages on its own when compressing.'**
+  String get compressionCarryServerKeeps;
+
+  /// Context operation details and carried message editor: Sent as written Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent as written'**
+  String get contextDetailCarried;
+
+  /// Context operation details and carried message editor: {count} of your earlier messages Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of your earlier messages'**
+  String contextDetailCarriedCount(int count);
+
+  /// Context operation details and carried message editor: Kept by the service Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept by the service'**
+  String get contextDetailServerKept;
+
+  /// Context operation details and carried message editor: This only changes the text sent to the model. The original message in the chat stays the same. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'This only changes the text sent to the model. The original message in the chat stays the same.'**
+  String get contextCarriedEditHint;
+
+  /// Context operation details and carried message editor: This can’t be empty. To stop sending it, choose “Stop sending”. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'This can’t be empty. To stop sending it, choose “Stop sending”.'**
+  String get contextCarriedEmpty;
+
+  /// Context operation details and carried message editor: Stop sending Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop sending'**
+  String get contextCarriedRemove;
+
+  /// Context operation details and carried message editor: This won’t be sent to the model anymore. The original message in the chat isn’t affected. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'This won’t be sent to the model anymore. The original message in the chat isn’t affected.'**
+  String get contextCarriedRemoveConfirm;
+
+  /// Context operation details and carried message editor: The original was deleted; only this text remains Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'The original was deleted; only this text remains'**
+  String get contextCarriedSourceDeleted;
+
+  /// Compression options panel: Include the reply too Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Include the reply too'**
+  String get compressionCarryReply;
+
+  /// Compression options panel: +about {tokens} Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'+about {tokens}'**
+  String compressionCarryReplyTokens(String tokens);
+
+  /// Compression options panel: The reply is already in the kept turns Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'The reply is already in the kept turns'**
+  String get compressionCarryReplyInKept;
+
+  /// Context operation details and carried message editor: The reply Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'The reply'**
+  String get contextCarriedReplyLabel;
+
+  /// Context operation details and carried message editor: Don’t send the reply Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  ///
+  /// In en, this message translates to:
+  /// **'Don’t send the reply'**
+  String get contextCarriedRemoveReply;
+
+  /// In the full-screen draft image editor: Cancel control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get imageEditorCancel;
+
+  /// In the full-screen draft image editor: finish editing and return to the composer without sending.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get imageEditorDone;
+
+  /// In the full-screen draft image editor: Undo control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get imageEditorUndo;
+
+  /// In the full-screen draft image editor: Redo control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Redo'**
+  String get imageEditorRedo;
+
+  /// In the full-screen draft image editor: Crop control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop'**
+  String get imageEditorToolCrop;
+
+  /// In the full-screen draft image editor: Draw control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw'**
+  String get imageEditorToolDraw;
+
+  /// In the full-screen draft image editor: Text control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get imageEditorToolText;
+
+  /// In the full-screen draft image editor: Mosaic control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Mosaic'**
+  String get imageEditorToolMosaic;
+
+  /// In the full-screen draft image editor: Pen control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Pen'**
+  String get imageEditorPen;
+
+  /// In the full-screen draft image editor: Arrow control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrow'**
+  String get imageEditorArrow;
+
+  /// In the full-screen draft image editor: Eraser control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Eraser'**
+  String get imageEditorEraser;
+
+  /// In the full-screen draft image editor: Free control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get imageEditorAspectFree;
+
+  /// In the full-screen draft image editor: Original control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get imageEditorAspectOriginal;
+
+  /// In the full-screen draft image editor: Rotate left control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate left'**
+  String get imageEditorRotate;
+
+  /// In the full-screen draft image editor: Flip control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip'**
+  String get imageEditorFlip;
+
+  /// In the full-screen draft image editor: Plain control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain'**
+  String get imageEditorTextPlain;
+
+  /// In the full-screen draft image editor: Outline control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Outline'**
+  String get imageEditorTextOutline;
+
+  /// In the full-screen draft image editor: Fill control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill'**
+  String get imageEditorTextFill;
+
+  /// In the full-screen draft image editor: Align control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Align'**
+  String get imageEditorAlign;
+
+  /// In the full-screen draft image editor: Brush control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Brush'**
+  String get imageEditorMosaicBrush;
+
+  /// In the full-screen draft image editor: Box control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Box'**
+  String get imageEditorMosaicRect;
+
+  /// In the full-screen draft image editor: Discard changes? control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get imageEditorDiscardTitle;
+
+  /// In the full-screen draft image editor: Keep editing control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get imageEditorKeepEditing;
+
+  /// In the full-screen draft image editor: Discard control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get imageEditorDiscard;
+
+  /// In the full-screen draft image editor: Couldn't process image control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t process image'**
+  String get imageEditorProcessFailed;
+
+  /// In the full-screen draft image editor: Retry control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get imageEditorRetry;
+
+  /// In the full-screen draft image editor: Remove control or status for editing draft image pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get imageEditorRemove;
+
+  /// In the full-screen draft image editor: revert the current image to its original imported pixels; this operation is undoable.
+  ///
+  /// In en, this message translates to:
+  /// **'Revert'**
+  String get imageEditorRestore;
+
+  /// In the full-screen draft image editor: accessible label of a color swatch; color is its six-digit hexadecimal RGB value.
+  ///
+  /// In en, this message translates to:
+  /// **'Color {color}'**
+  String imageEditorColor(String color);
+
+  /// Button in draft image preview that opens the image editor; absent for sent images.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get imageViewerPageEditButton;
+
+  /// Accessible label and tooltip of the draft image size chip that opens per-image compression quality controls.
+  ///
+  /// In en, this message translates to:
+  /// **'Image size'**
+  String get imageViewerPageFileSize;
 }
 
 class _AppLocalizationsDelegate

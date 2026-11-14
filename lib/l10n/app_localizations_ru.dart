@@ -6511,27 +6511,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get imageViewerPageNextButton => 'Следующее изображение';
 
   @override
-  String get imageViewerPageZoomInButton => 'Увеличить';
-
-  @override
-  String get imageViewerPageZoomOutButton => 'Уменьшить';
-
-  @override
-  String get imageViewerPageResetZoomButton => 'Сбросить масштаб';
-
-  @override
-  String get imageViewerPageFlipHorizontalButton => 'Отразить по горизонтали';
-
-  @override
-  String get imageViewerPageFlipVerticalButton => 'Отразить по вертикали';
-
-  @override
-  String get imageViewerPageRotateLeftButton => 'Повернуть влево';
-
-  @override
-  String get imageViewerPageRotateRightButton => 'Повернуть вправо';
-
-  @override
   String imageViewerPageCounter(int index, int total) {
     return '$index/$total';
   }
@@ -17185,4 +17164,219 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get storageAttachmentDetailsTitle => 'Информация о файле';
+
+  @override
+  String get compressionCarryTitle =>
+      'Также отправлять ваши прежние сообщения как есть';
+
+  @override
+  String get compressionCarryHint =>
+      'Из той части, которая становится сводкой, ваши собственные сообщения отправляются модели в том виде, как вы их написали, а не только в пересказе сводки.';
+
+  @override
+  String get compressionCarryCountLabel => 'Отправлять последние';
+
+  @override
+  String get compressionCarryUnit => 'сообщений';
+
+  @override
+  String get compressionCarryAll => 'Сколько поместится';
+
+  @override
+  String get compressionCarryAllHint =>
+      'Без фиксированного числа. Начинается с самых новых и идёт назад, пока не заполнится почти всё; если самое старое слишком длинное, отправляются только его начало и конец.';
+
+  @override
+  String get compressionCarryEarlier =>
+      'Также возвращать сообщения из прежних сводок';
+
+  @override
+  String get compressionCarryEarlierHint =>
+      'Ваши сообщения из частей, сжатых ранее, тоже можно включить.';
+
+  @override
+  String compressionCarryPreview(int count, String tokens) {
+    return 'Будет отправлено $count · около $tokens токенов';
+  }
+
+  @override
+  String get compressionCarryNone =>
+      'В части, которая сворачивается в сводку, нет ваших сообщений.';
+
+  @override
+  String compressionCarryNotFit(int count) {
+    return '$count более старых сообщений не помещаются и не будут отправлены в этот раз.';
+  }
+
+  @override
+  String compressionCarryMoreRows(int count) {
+    return 'ещё $count';
+  }
+
+  @override
+  String get compressionCarryOverBudget =>
+      'Эти сообщения, вероятно, превысят вместимость текущей модели. Отправьте меньше или переключитесь на модель с большим контекстом.';
+
+  @override
+  String compressionCarryFitAction(int count) {
+    return 'Изменить на $count';
+  }
+
+  @override
+  String get compressionCarryTruncated =>
+      'Слишком длинное; отправляются только начало и конец';
+
+  @override
+  String get compressionCarryAutoToo => 'Автоматическое сжатие сделает так же.';
+
+  @override
+  String get compressionCarryNewChatText =>
+      'Изображения и файлы не переносятся в новый чат; переносится только текст.';
+
+  @override
+  String get compressionCarryServerKeeps =>
+      'Этот сервис при сжатии сам сохраняет ваши прежние сообщения.';
+
+  @override
+  String get contextDetailCarried => 'Отправлено как есть';
+
+  @override
+  String contextDetailCarriedCount(int count) {
+    return '$count ваших прежних сообщений';
+  }
+
+  @override
+  String get contextDetailServerKept => 'Сохранено сервисом';
+
+  @override
+  String get contextCarriedEditHint =>
+      'Это меняет только текст, отправляемый модели. Исходное сообщение в чате остаётся прежним.';
+
+  @override
+  String get contextCarriedEmpty =>
+      'Это не может быть пустым. Чтобы перестать отправлять, выберите «Не отправлять».';
+
+  @override
+  String get contextCarriedRemove => 'Не отправлять';
+
+  @override
+  String get contextCarriedRemoveConfirm =>
+      'Это больше не будет отправляться модели. Исходное сообщение в чате не затрагивается.';
+
+  @override
+  String get contextCarriedSourceDeleted =>
+      'Исходное сообщение удалено; остался только этот текст';
+
+  @override
+  String get compressionCarryReply => 'Также включить ответ';
+
+  @override
+  String compressionCarryReplyTokens(String tokens) {
+    return '+около $tokens';
+  }
+
+  @override
+  String get compressionCarryReplyInKept =>
+      'Ответ уже есть в сохранённых репликах';
+
+  @override
+  String get contextCarriedReplyLabel => 'Ответ';
+
+  @override
+  String get contextCarriedRemoveReply => 'Не отправлять ответ';
+
+  @override
+  String get imageEditorCancel => 'Отмена';
+
+  @override
+  String get imageEditorDone => 'Готово';
+
+  @override
+  String get imageEditorUndo => 'Отменить';
+
+  @override
+  String get imageEditorRedo => 'Повторить';
+
+  @override
+  String get imageEditorToolCrop => 'Обрезать';
+
+  @override
+  String get imageEditorToolDraw => 'Рисовать';
+
+  @override
+  String get imageEditorToolText => 'Текст';
+
+  @override
+  String get imageEditorToolMosaic => 'Мозаика';
+
+  @override
+  String get imageEditorPen => 'Перо';
+
+  @override
+  String get imageEditorArrow => 'Стрелка';
+
+  @override
+  String get imageEditorEraser => 'Ластик';
+
+  @override
+  String get imageEditorAspectFree => 'Свободно';
+
+  @override
+  String get imageEditorAspectOriginal => 'Оригинал';
+
+  @override
+  String get imageEditorRotate => 'Повернуть влево';
+
+  @override
+  String get imageEditorFlip => 'Отразить';
+
+  @override
+  String get imageEditorTextPlain => 'Обычный';
+
+  @override
+  String get imageEditorTextOutline => 'Обводка';
+
+  @override
+  String get imageEditorTextFill => 'Заливка';
+
+  @override
+  String get imageEditorAlign => 'Выравнивание';
+
+  @override
+  String get imageEditorMosaicBrush => 'Кисть';
+
+  @override
+  String get imageEditorMosaicRect => 'Рамка';
+
+  @override
+  String get imageEditorDiscardTitle => 'Отменить изменения?';
+
+  @override
+  String get imageEditorKeepEditing => 'Продолжить редактирование';
+
+  @override
+  String get imageEditorDiscard => 'Отменить изменения';
+
+  @override
+  String get imageEditorProcessFailed => 'Не удалось обработать изображение';
+
+  @override
+  String get imageEditorRetry => 'Повторить';
+
+  @override
+  String get imageEditorRemove => 'Удалить';
+
+  @override
+  String get imageEditorRestore => 'Восстановить';
+
+  @override
+  String imageEditorColor(String color) {
+    return 'Цвет $color';
+  }
+
+  @override
+  String get imageViewerPageEditButton => 'Редактировать';
+
+  @override
+  String get imageViewerPageFileSize => 'Размер изображения';
 }

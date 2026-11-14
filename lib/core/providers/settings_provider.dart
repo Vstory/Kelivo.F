@@ -1,3 +1,5 @@
+import '../models/image_upload_quality.dart';
+export '../models/image_upload_quality.dart';
 import '../models/attachment_retention.dart';
 import '../models/native_compaction.dart';
 import '../../l10n/app_language.dart';
@@ -75,8 +77,6 @@ enum DesktopMessageNavButtonsMode {
 
 // Mobile: message navigation buttons visibility mode
 enum MobileMessageNavButtonsMode { always, scroll, never }
-
-enum ImageUploadQuality { original, high, balanced, saver, custom }
 
 class SettingsProvider extends ChangeNotifier {
   static const String _providersOrderKey = 'providers_order_v1';
@@ -1229,7 +1229,6 @@ class SettingsProvider extends ChangeNotifier {
         (localPreferences.getBool(LinuxWindowService.hideTitleBarKey) ?? false);
 
     _desktopAutostartHidden = await DesktopStartupService.readHidden();
-    await refreshDesktopStartup(notify: false);
 
     // Desktop: tray settings (default enabled on desktop platforms)
     final trayPref = prefs.getBool(_displayDesktopShowTrayKey);
@@ -5367,37 +5366,47 @@ Requirements:
     await _preferences.setBool(_sendMarkdownImageLinksAsImagesKey, value);
   }
 
-  ImageCompressConfig resolveImageCompressConfig() {
-    return switch (_imageUploadQuality) {
+  ImageCompressConfig resolveImageCompressConfig() => configFor(
+    _imageUploadQuality,
+    custom: _imageCompressCustomQuality,
+    includeTransparent: _imageCompressTransparentEnabled,
+  );
+
+  static ImageCompressConfig configFor(
+    ImageUploadQuality quality, {
+    int custom = 85,
+    bool includeTransparent = false,
+  }) {
+    return switch (quality) {
       ImageUploadQuality.original => ImageCompressConfig(
         enabled: false,
         quality: 100,
         maxLongEdge: 1568,
-        includeTransparent: _imageCompressTransparentEnabled,
+        includeTransparent: includeTransparent,
       ),
       ImageUploadQuality.high => ImageCompressConfig(
         enabled: true,
         quality: 90,
         maxLongEdge: 2048,
-        includeTransparent: _imageCompressTransparentEnabled,
+        includeTransparent: includeTransparent,
       ),
       ImageUploadQuality.balanced => ImageCompressConfig(
         enabled: true,
         quality: 85,
         maxLongEdge: 1568,
-        includeTransparent: _imageCompressTransparentEnabled,
+        includeTransparent: includeTransparent,
       ),
       ImageUploadQuality.saver => ImageCompressConfig(
         enabled: true,
         quality: 70,
         maxLongEdge: 1024,
-        includeTransparent: _imageCompressTransparentEnabled,
+        includeTransparent: includeTransparent,
       ),
       ImageUploadQuality.custom => ImageCompressConfig(
         enabled: true,
-        quality: _imageCompressCustomQuality,
+        quality: custom.clamp(10, 100),
         maxLongEdge: 1568,
-        includeTransparent: _imageCompressTransparentEnabled,
+        includeTransparent: includeTransparent,
       ),
     };
   }
@@ -5499,7 +5508,7 @@ Requirements:
   bool _desktopAutostartHidden = false;
   bool get desktopAutostartHidden => _desktopAutostartHidden;
 
-  Future<void> refreshDesktopStartup({bool notify = true}) async {
+  Future<void> refreshDesktopStartup() async {
     if (!DesktopStartupService.isDesktop || _desktopAutostartBusy) return;
     final revision = ++_desktopStartupRevision;
     try {
@@ -5512,7 +5521,7 @@ Requirements:
       if (revision != _desktopStartupRevision) return;
       _desktopAutostartFailed = true;
     }
-    if (notify) notifyListeners();
+    notifyListeners();
   }
 
   Future<void> setDesktopAutostartEnabled(bool enabled) async {

@@ -6470,27 +6470,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get imageViewerPageNextButton => 'Sonraki Görsel';
 
   @override
-  String get imageViewerPageZoomInButton => 'Yakınlaştır';
-
-  @override
-  String get imageViewerPageZoomOutButton => 'Uzaklaştır';
-
-  @override
-  String get imageViewerPageResetZoomButton => 'Yakınlaştırmayı Sıfırla';
-
-  @override
-  String get imageViewerPageFlipHorizontalButton => 'Yatay Çevir';
-
-  @override
-  String get imageViewerPageFlipVerticalButton => 'Dikey Çevir';
-
-  @override
-  String get imageViewerPageRotateLeftButton => 'Sola Döndür';
-
-  @override
-  String get imageViewerPageRotateRightButton => 'Sağa Döndür';
-
-  @override
   String imageViewerPageCounter(int index, int total) {
     return '$index/$total';
   }
@@ -16998,4 +16977,218 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get storageAttachmentDetailsTitle => 'Dosya bilgisi';
+
+  @override
+  String get compressionCarryTitle =>
+      'Önceki mesajlarınızı da yazdığınız gibi gönder';
+
+  @override
+  String get compressionCarryHint =>
+      'Özete dönüşen kısımdaki kendi mesajlarınız, özetin aktardığı şekliyle değil, yazdığınız gibi modele gönderilir.';
+
+  @override
+  String get compressionCarryCountLabel => 'En son şunları gönder:';
+
+  @override
+  String get compressionCarryUnit => 'mesaj';
+
+  @override
+  String get compressionCarryAll => 'Sığabildiği kadar';
+
+  @override
+  String get compressionCarryAllHint =>
+      'Sabit sayı yok. En yeniden başlayıp neredeyse dolana kadar geriye gider; en eski mesaj çok uzunsa yalnızca başı ve sonu gönderilir.';
+
+  @override
+  String get compressionCarryEarlier =>
+      'Daha önceki özetlerdeki mesajları da geri getir';
+
+  @override
+  String get compressionCarryEarlierHint =>
+      'Daha önce sıkıştırılan kısımlardaki mesajlarınız da dahil edilebilir.';
+
+  @override
+  String compressionCarryPreview(int count, String tokens) {
+    return '$count mesaj gönderilecek · yaklaşık $tokens token';
+  }
+
+  @override
+  String get compressionCarryNone => 'Özetlenen kısımda size ait mesaj yok.';
+
+  @override
+  String compressionCarryNotFit(int count) {
+    return '$count eski mesaj sığmıyor ve bu sefer gönderilmeyecek.';
+  }
+
+  @override
+  String compressionCarryMoreRows(int count) {
+    return '$count tane daha';
+  }
+
+  @override
+  String get compressionCarryOverBudget =>
+      'Bu mesajlar büyük ihtimalle mevcut modelin kapasitesini aşar. Daha az gönderin veya daha büyük bağlamı olan bir modele geçin.';
+
+  @override
+  String compressionCarryFitAction(int count) {
+    return '$count olarak değiştir';
+  }
+
+  @override
+  String get compressionCarryTruncated =>
+      'Çok uzun; yalnızca başı ve sonu gönderilir';
+
+  @override
+  String get compressionCarryAutoToo =>
+      'Otomatik sıkıştırma da aynısını yapar.';
+
+  @override
+  String get compressionCarryNewChatText =>
+      'Görseller ve dosyalar yeni sohbete taşınmaz; yalnızca metin taşınır.';
+
+  @override
+  String get compressionCarryServerKeeps =>
+      'Bu hizmet, sıkıştırırken önceki mesajlarınızı kendisi saklar.';
+
+  @override
+  String get contextDetailCarried => 'Yazdığınız gibi gönderildi';
+
+  @override
+  String contextDetailCarriedCount(int count) {
+    return 'Önceki $count mesajınız';
+  }
+
+  @override
+  String get contextDetailServerKept => 'Hizmet tarafından saklandı';
+
+  @override
+  String get contextCarriedEditHint =>
+      'Bu yalnızca modele gönderilen metni değiştirir. Sohbetteki orijinal mesaj aynı kalır.';
+
+  @override
+  String get contextCarriedEmpty =>
+      'Bu boş olamaz. Göndermeyi durdurmak için “Göndermeyi durdur”u seçin.';
+
+  @override
+  String get contextCarriedRemove => 'Göndermeyi durdur';
+
+  @override
+  String get contextCarriedRemoveConfirm =>
+      'Bu artık modele gönderilmeyecek. Sohbetteki orijinal mesaj etkilenmez.';
+
+  @override
+  String get contextCarriedSourceDeleted =>
+      'Orijinal silindi; yalnızca bu metin kaldı';
+
+  @override
+  String get compressionCarryReply => 'Yanıtı da dahil et';
+
+  @override
+  String compressionCarryReplyTokens(String tokens) {
+    return '+yaklaşık $tokens';
+  }
+
+  @override
+  String get compressionCarryReplyInKept => 'Yanıt zaten saklanan turlarda';
+
+  @override
+  String get contextCarriedReplyLabel => 'Yanıt';
+
+  @override
+  String get contextCarriedRemoveReply => 'Yanıtı gönderme';
+
+  @override
+  String get imageEditorCancel => 'İptal';
+
+  @override
+  String get imageEditorDone => 'Bitti';
+
+  @override
+  String get imageEditorUndo => 'Geri al';
+
+  @override
+  String get imageEditorRedo => 'Yinele';
+
+  @override
+  String get imageEditorToolCrop => 'Kırp';
+
+  @override
+  String get imageEditorToolDraw => 'Çiz';
+
+  @override
+  String get imageEditorToolText => 'Metin';
+
+  @override
+  String get imageEditorToolMosaic => 'Mozaik';
+
+  @override
+  String get imageEditorPen => 'Kalem';
+
+  @override
+  String get imageEditorArrow => 'Ok';
+
+  @override
+  String get imageEditorEraser => 'Silgi';
+
+  @override
+  String get imageEditorAspectFree => 'Serbest';
+
+  @override
+  String get imageEditorAspectOriginal => 'Orijinal';
+
+  @override
+  String get imageEditorRotate => 'Sola döndür';
+
+  @override
+  String get imageEditorFlip => 'Çevir';
+
+  @override
+  String get imageEditorTextPlain => 'Düz';
+
+  @override
+  String get imageEditorTextOutline => 'Dış çizgi';
+
+  @override
+  String get imageEditorTextFill => 'Dolgu';
+
+  @override
+  String get imageEditorAlign => 'Hizala';
+
+  @override
+  String get imageEditorMosaicBrush => 'Fırça';
+
+  @override
+  String get imageEditorMosaicRect => 'Kutu';
+
+  @override
+  String get imageEditorDiscardTitle => 'Değişiklikler atılsın mı?';
+
+  @override
+  String get imageEditorKeepEditing => 'Düzenlemeye devam et';
+
+  @override
+  String get imageEditorDiscard => 'At';
+
+  @override
+  String get imageEditorProcessFailed => 'Görsel işlenemedi';
+
+  @override
+  String get imageEditorRetry => 'Yeniden dene';
+
+  @override
+  String get imageEditorRemove => 'Kaldır';
+
+  @override
+  String get imageEditorRestore => 'Geri yükle';
+
+  @override
+  String imageEditorColor(String color) {
+    return 'Renk $color';
+  }
+
+  @override
+  String get imageViewerPageEditButton => 'Düzenle';
+
+  @override
+  String get imageViewerPageFileSize => 'Görsel boyutu';
 }

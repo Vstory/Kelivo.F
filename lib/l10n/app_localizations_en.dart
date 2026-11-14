@@ -6415,27 +6415,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageViewerPageNextButton => 'Next Image';
 
   @override
-  String get imageViewerPageZoomInButton => 'Zoom In';
-
-  @override
-  String get imageViewerPageZoomOutButton => 'Zoom Out';
-
-  @override
-  String get imageViewerPageResetZoomButton => 'Reset Zoom';
-
-  @override
-  String get imageViewerPageFlipHorizontalButton => 'Flip Horizontal';
-
-  @override
-  String get imageViewerPageFlipVerticalButton => 'Flip Vertical';
-
-  @override
-  String get imageViewerPageRotateLeftButton => 'Rotate Left';
-
-  @override
-  String get imageViewerPageRotateRightButton => 'Rotate Right';
-
-  @override
   String imageViewerPageCounter(int index, int total) {
     return '$index/$total';
   }
@@ -16902,4 +16881,220 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storageAttachmentDetailsTitle => 'File info';
+
+  @override
+  String get compressionCarryTitle =>
+      'Also send your earlier messages as written';
+
+  @override
+  String get compressionCarryHint =>
+      'From the part that becomes a summary, your own messages are sent to the model as you wrote them, not just as the summary retells them.';
+
+  @override
+  String get compressionCarryCountLabel => 'Send the latest';
+
+  @override
+  String get compressionCarryUnit => 'messages';
+
+  @override
+  String get compressionCarryAll => 'As many as fit';
+
+  @override
+  String get compressionCarryAllHint =>
+      'No set number. Starts from the newest and goes back until it’s nearly full; if the oldest one is too long, only its start and end are sent.';
+
+  @override
+  String get compressionCarryEarlier =>
+      'Also bring back messages from earlier summaries';
+
+  @override
+  String get compressionCarryEarlierHint =>
+      'Your messages from parts compressed earlier can be included too.';
+
+  @override
+  String compressionCarryPreview(int count, String tokens) {
+    return 'Will send $count · about $tokens tokens';
+  }
+
+  @override
+  String get compressionCarryNone =>
+      'The part being summarized has no messages from you.';
+
+  @override
+  String compressionCarryNotFit(int count) {
+    return '$count older messages don’t fit and won’t be sent this time.';
+  }
+
+  @override
+  String compressionCarryMoreRows(int count) {
+    return '$count more';
+  }
+
+  @override
+  String get compressionCarryOverBudget =>
+      'These messages would likely be more than the current model can take. Send fewer, or switch to a model with a larger context.';
+
+  @override
+  String compressionCarryFitAction(int count) {
+    return 'Change to $count';
+  }
+
+  @override
+  String get compressionCarryTruncated =>
+      'Too long; only the start and end are sent';
+
+  @override
+  String get compressionCarryAutoToo =>
+      'Automatic compression will do the same.';
+
+  @override
+  String get compressionCarryNewChatText =>
+      'Images and files aren’t carried to the new chat; only the text is.';
+
+  @override
+  String get compressionCarryServerKeeps =>
+      'This service keeps your earlier messages on its own when compressing.';
+
+  @override
+  String get contextDetailCarried => 'Sent as written';
+
+  @override
+  String contextDetailCarriedCount(int count) {
+    return '$count of your earlier messages';
+  }
+
+  @override
+  String get contextDetailServerKept => 'Kept by the service';
+
+  @override
+  String get contextCarriedEditHint =>
+      'This only changes the text sent to the model. The original message in the chat stays the same.';
+
+  @override
+  String get contextCarriedEmpty =>
+      'This can’t be empty. To stop sending it, choose “Stop sending”.';
+
+  @override
+  String get contextCarriedRemove => 'Stop sending';
+
+  @override
+  String get contextCarriedRemoveConfirm =>
+      'This won’t be sent to the model anymore. The original message in the chat isn’t affected.';
+
+  @override
+  String get contextCarriedSourceDeleted =>
+      'The original was deleted; only this text remains';
+
+  @override
+  String get compressionCarryReply => 'Include the reply too';
+
+  @override
+  String compressionCarryReplyTokens(String tokens) {
+    return '+about $tokens';
+  }
+
+  @override
+  String get compressionCarryReplyInKept =>
+      'The reply is already in the kept turns';
+
+  @override
+  String get contextCarriedReplyLabel => 'The reply';
+
+  @override
+  String get contextCarriedRemoveReply => 'Don’t send the reply';
+
+  @override
+  String get imageEditorCancel => 'Cancel';
+
+  @override
+  String get imageEditorDone => 'Done';
+
+  @override
+  String get imageEditorUndo => 'Undo';
+
+  @override
+  String get imageEditorRedo => 'Redo';
+
+  @override
+  String get imageEditorToolCrop => 'Crop';
+
+  @override
+  String get imageEditorToolDraw => 'Draw';
+
+  @override
+  String get imageEditorToolText => 'Text';
+
+  @override
+  String get imageEditorToolMosaic => 'Mosaic';
+
+  @override
+  String get imageEditorPen => 'Pen';
+
+  @override
+  String get imageEditorArrow => 'Arrow';
+
+  @override
+  String get imageEditorEraser => 'Eraser';
+
+  @override
+  String get imageEditorAspectFree => 'Free';
+
+  @override
+  String get imageEditorAspectOriginal => 'Original';
+
+  @override
+  String get imageEditorRotate => 'Rotate left';
+
+  @override
+  String get imageEditorFlip => 'Flip';
+
+  @override
+  String get imageEditorTextPlain => 'Plain';
+
+  @override
+  String get imageEditorTextOutline => 'Outline';
+
+  @override
+  String get imageEditorTextFill => 'Fill';
+
+  @override
+  String get imageEditorAlign => 'Align';
+
+  @override
+  String get imageEditorMosaicBrush => 'Brush';
+
+  @override
+  String get imageEditorMosaicRect => 'Box';
+
+  @override
+  String get imageEditorDiscardTitle => 'Discard changes?';
+
+  @override
+  String get imageEditorKeepEditing => 'Keep editing';
+
+  @override
+  String get imageEditorDiscard => 'Discard';
+
+  @override
+  String get imageEditorProcessFailed => 'Couldn\'t process image';
+
+  @override
+  String get imageEditorRetry => 'Retry';
+
+  @override
+  String get imageEditorRemove => 'Remove';
+
+  @override
+  String get imageEditorRestore => 'Revert';
+
+  @override
+  String imageEditorColor(String color) {
+    return 'Color $color';
+  }
+
+  @override
+  String get imageViewerPageEditButton => 'Edit';
+
+  @override
+  String get imageViewerPageFileSize => 'Image size';
 }
