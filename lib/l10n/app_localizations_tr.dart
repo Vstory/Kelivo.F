@@ -790,6 +790,20 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu sürümü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.';
 
   @override
+  String get homePageDeleteOtherVersions => 'Diğer Sürümleri Sil';
+
+  @override
+  String homePageDeleteOtherVersionsConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count diğer sürüm silinecek.',
+      one: '$count diğer sürüm silinecek.',
+    );
+    return 'Mesajın bu sürümü korunsun mu? $_temp0 Bu işlem geri alınamaz.';
+  }
+
+  @override
   String get homePageDeleteAllVersions => 'Tüm Sürümleri Sil';
 
   @override
@@ -5979,6 +5993,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Düşük gecikmeli akışlı transkripsiyon';
 
   @override
+  String get asrServicesDeepSeekSubtitle =>
+      'Kayıtları yazıya döker ve dili otomatik olarak algılar';
+
+  @override
   String get asrServicesGroqSubtitle => 'Whisper segmentli transkripsiyon';
 
   @override
@@ -6246,6 +6264,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get ttsServicesFieldVoiceLabel => 'Ses';
+
+  @override
+  String ttsServicesDeepSeekVoice(String voiceId) {
+    String _temp0 = intl.Intl.selectLogic(voiceId, {
+      'stella': 'Stella (kadın)',
+      'tide': 'Tide (erkek)',
+      'other': '$voiceId',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get ttsServicesFieldVoiceIdLabel => 'Ses Kimliği';
@@ -8535,7 +8563,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String legacyMemoryModeCacheWarning(String token) {
-    return 'Varsayılan şablon $token aracılığıyla geçerli saati ekler, bu da önbellek isabet oranını etkiler. İhtiyacınız yoksa kaldırın.';
+    return 'Şablon hâlâ $token içeriyorsa, enjekte edilirken çıkarılır ve artık geçerli zamanla doldurulmaz. Modelin geçerli zamanı bilmesi gerekiyorsa, asistan ayarlarında \"Geçerli saati ekle\" seçeneğini açın.';
   }
 
   @override

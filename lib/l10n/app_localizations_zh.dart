@@ -756,6 +756,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homePageDeleteMessageConfirm => '确定要删除当前版本吗？此操作不可撤销。';
 
   @override
+  String get homePageDeleteOtherVersions => '删除其他版本';
+
+  @override
+  String homePageDeleteOtherVersionsConfirm(int count) {
+    return '保留当前版本，删除这条消息的其他 $count 个版本？此操作不可撤销。';
+  }
+
+  @override
   String get homePageDeleteAllVersions => '删除全部版本';
 
   @override
@@ -5684,6 +5692,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get asrServicesOpenAiSubtitle => '低延迟流式转写';
 
   @override
+  String get asrServicesDeepSeekSubtitle => '转写录音并自动识别语言';
+
+  @override
   String get asrServicesGroqSubtitle => 'Whisper 分段云端转写';
 
   @override
@@ -5940,6 +5951,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get ttsServicesFieldVoiceLabel => '音色';
+
+  @override
+  String ttsServicesDeepSeekVoice(String voiceId) {
+    String _temp0 = intl.Intl.selectLogic(voiceId, {
+      'stella': '海星（女声）',
+      'tide': '暗潮（男声）',
+      'other': '$voiceId',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get ttsServicesFieldVoiceIdLabel => '音色 ID';
@@ -8117,7 +8138,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String legacyMemoryModeCacheWarning(String token) {
-    return '默认模板会注入当前时间 $token，影响缓存命中率，如不需要可删除';
+    return '模板里若还留着 $token，注入时会被去掉，不会再填入当前时间。需要让模型知道当前时间时，请在助手设置里打开「追加当前时间」。';
   }
 
   @override
@@ -17146,6 +17167,14 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get homePageDeleteMessageConfirm => '确定要删除当前版本吗？此操作不可撤销。';
 
   @override
+  String get homePageDeleteOtherVersions => '删除其他版本';
+
+  @override
+  String homePageDeleteOtherVersionsConfirm(int count) {
+    return '保留当前版本，删除这条消息的其他 $count 个版本？此操作不可撤销。';
+  }
+
+  @override
   String get homePageDeleteAllVersions => '删除全部版本';
 
   @override
@@ -22074,6 +22103,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get asrServicesOpenAiSubtitle => '低延迟流式转写';
 
   @override
+  String get asrServicesDeepSeekSubtitle => '转写录音并自动识别语言';
+
+  @override
   String get asrServicesGroqSubtitle => 'Whisper 分段云端转写';
 
   @override
@@ -22330,6 +22362,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get ttsServicesFieldVoiceLabel => '音色';
+
+  @override
+  String ttsServicesDeepSeekVoice(String voiceId) {
+    String _temp0 = intl.Intl.selectLogic(voiceId, {
+      'stella': '海星（女声）',
+      'tide': '暗潮（男声）',
+      'other': '$voiceId',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get ttsServicesFieldVoiceIdLabel => '音色 ID';
@@ -24507,7 +24549,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String legacyMemoryModeCacheWarning(String token) {
-    return '默认模板会注入当前时间 $token，影响缓存命中率，如不需要可删除';
+    return '模板里若还留着 $token，注入时会被去掉，不会再填入当前时间。需要让模型知道当前时间时，请在助手设置里打开「追加当前时间」。';
   }
 
   @override
@@ -33536,6 +33578,19 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get homePageDeleteMessageConfirm => '確定要刪除目前版本嗎？此操作不可撤銷。';
 
   @override
+  String get homePageDeleteOtherVersions => '刪除其他版本';
+
+  @override
+  String homePageDeleteOtherVersionsConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '將刪除其他 $count 個版本。',
+    );
+    return '保留這則訊息的目前版本？$_temp0此操作無法復原。';
+  }
+
+  @override
   String get homePageDeleteAllVersions => '刪除全部版本';
 
   @override
@@ -38463,6 +38518,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get asrServicesOpenAiSubtitle => '低延遲串流轉寫';
 
   @override
+  String get asrServicesDeepSeekSubtitle => '轉寫錄音並自動辨識語言';
+
+  @override
   String get asrServicesGroqSubtitle => 'Whisper 分段雲端轉寫';
 
   @override
@@ -38719,6 +38777,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get ttsServicesFieldVoiceLabel => '音色';
+
+  @override
+  String ttsServicesDeepSeekVoice(String voiceId) {
+    String _temp0 = intl.Intl.selectLogic(voiceId, {
+      'stella': '海星（女聲）',
+      'tide': '暗潮（男聲）',
+      'other': '$voiceId',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get ttsServicesFieldVoiceIdLabel => '音色 ID';
@@ -40898,7 +40966,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String legacyMemoryModeCacheWarning(String token) {
-    return '預設模板會注入目前時間 $token，影響快取命中率，如不需要可刪除';
+    return '模板裡若還留著 $token，注入時會被去掉，不會再填入目前時間。需要讓模型知道目前時間時，請在助手設定裡打開「追加目前時間」。';
   }
 
   @override

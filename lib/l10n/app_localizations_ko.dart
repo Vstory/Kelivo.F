@@ -770,6 +770,19 @@ class AppLocalizationsKo extends AppLocalizations {
       '현재 버전을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.';
 
   @override
+  String get homePageDeleteOtherVersions => '다른 버전 삭제';
+
+  @override
+  String homePageDeleteOtherVersionsConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count개의 다른 버전이 삭제됩니다.',
+    );
+    return '이 버전의 메시지를 유지하시겠습니까? $_temp0 이 작업은 되돌릴 수 없습니다.';
+  }
+
+  @override
   String get homePageDeleteAllVersions => '모든 버전 삭제';
 
   @override
@@ -5771,6 +5784,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get asrServicesOpenAiSubtitle => '저지연 스트리밍 전사';
 
   @override
+  String get asrServicesDeepSeekSubtitle => '녹음을 전사하고 언어를 자동으로 감지합니다';
+
+  @override
   String get asrServicesGroqSubtitle => 'Whisper 분할 클라우드 전사';
 
   @override
@@ -6027,6 +6043,16 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get ttsServicesFieldVoiceLabel => '음성';
+
+  @override
+  String ttsServicesDeepSeekVoice(String voiceId) {
+    String _temp0 = intl.Intl.selectLogic(voiceId, {
+      'stella': 'Stella (여성)',
+      'tide': 'Tide (남성)',
+      'other': '$voiceId',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get ttsServicesFieldVoiceIdLabel => '음성 ID';
@@ -8240,7 +8266,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String legacyMemoryModeCacheWarning(String token) {
-    return '기본 템플릿은 $token을(를) 통해 현재 시간을 주입하며, 이는 캐시 적중률에 영향을 줍니다. 필요하지 않으면 삭제하세요.';
+    return '템플릿에 $token이(가) 남아 있으면 주입 시 제거되며 더 이상 현재 시간으로 채워지지 않습니다. 모델이 현재 시간을 알아야 한다면 어시스턴트 설정에서 \"현재 시간 추가\"를 켜세요.';
   }
 
   @override

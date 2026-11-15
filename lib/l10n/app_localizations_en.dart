@@ -786,6 +786,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Are you sure you want to delete this version? This cannot be undone.';
 
   @override
+  String get homePageDeleteOtherVersions => 'Delete Other Versions';
+
+  @override
+  String homePageDeleteOtherVersionsConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count other versions will be deleted.',
+      one: '$count other version will be deleted.',
+    );
+    return 'Keep this version of the message? $_temp0 This cannot be undone.';
+  }
+
+  @override
   String get homePageDeleteAllVersions => 'Delete All Versions';
 
   @override
@@ -5929,6 +5943,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get asrServicesOpenAiSubtitle => 'Low-latency streaming transcription';
 
   @override
+  String get asrServicesDeepSeekSubtitle =>
+      'Transcribes recordings and detects the language automatically';
+
+  @override
   String get asrServicesGroqSubtitle => 'Whisper segmented transcription';
 
   @override
@@ -6193,6 +6211,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ttsServicesFieldVoiceLabel => 'Voice';
+
+  @override
+  String ttsServicesDeepSeekVoice(String voiceId) {
+    String _temp0 = intl.Intl.selectLogic(voiceId, {
+      'stella': 'Stella (female)',
+      'tide': 'Tide (male)',
+      'other': '$voiceId',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get ttsServicesFieldVoiceIdLabel => 'Voice ID';
@@ -8471,7 +8499,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String legacyMemoryModeCacheWarning(String token) {
-    return 'The default template injects the current time via $token, which affects cache hit rate. Remove it if you do not need it.';
+    return 'If a template still contains $token, it is stripped on inject and is no longer filled with the current time. If the model needs the current time, turn on \"Append current time\" in assistant settings.';
   }
 
   @override

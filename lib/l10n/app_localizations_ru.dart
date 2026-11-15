@@ -803,6 +803,22 @@ class AppLocalizationsRu extends AppLocalizations {
       'Вы уверены, что хотите удалить эту версию? Это действие нельзя отменить.';
 
   @override
+  String get homePageDeleteOtherVersions => 'Удалить другие версии';
+
+  @override
+  String homePageDeleteOtherVersionsConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Будет удалено $count других версии.',
+      many: 'Будет удалено $count других версий.',
+      few: 'Будут удалены $count другие версии.',
+      one: 'Будет удалена $count другая версия.',
+    );
+    return 'Оставить эту версию сообщения? $_temp0 Это действие нельзя отменить.';
+  }
+
+  @override
   String get homePageDeleteAllVersions => 'Удалить все версии';
 
   @override
@@ -6012,6 +6028,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Потоковая транскрипция с низкой задержкой';
 
   @override
+  String get asrServicesDeepSeekSubtitle =>
+      'Транскрибирует записи и автоматически определяет язык';
+
+  @override
   String get asrServicesGroqSubtitle => 'Сегментированная транскрипция Whisper';
 
   @override
@@ -6284,6 +6304,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get ttsServicesFieldVoiceLabel => 'Голос';
+
+  @override
+  String ttsServicesDeepSeekVoice(String voiceId) {
+    String _temp0 = intl.Intl.selectLogic(voiceId, {
+      'stella': 'Stella (женский)',
+      'tide': 'Tide (мужской)',
+      'other': '$voiceId',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get ttsServicesFieldVoiceIdLabel => 'ID голоса';
@@ -8592,7 +8622,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String legacyMemoryModeCacheWarning(String token) {
-    return 'Шаблон по умолчанию внедряет текущее время через $token, что влияет на долю попаданий в кэш. Удалите его, если он не нужен.';
+    return 'Если шаблон всё ещё содержит $token, он удаляется при внедрении и больше не заполняется текущим временем. Если модели нужно знать текущее время, включите «Добавлять текущее время» в настройках ассистента.';
   }
 
   @override

@@ -1516,6 +1516,18 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to delete this version? This cannot be undone.'**
   String get homePageDeleteMessageConfirm;
 
+  /// Action in a chat message's More menu and its confirmation dialog title. Deletes the other versions of this message while keeping the version on screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Other Versions'**
+  String get homePageDeleteOtherVersions;
+
+  /// Confirmation dialog body for deleting the other versions of one chat message. The version on screen is kept. Count is the number of other versions being permanently deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this version of the message? {count, plural, one{{count} other version will be deleted.} other{{count} other versions will be deleted.}} This cannot be undone.'**
+  String homePageDeleteOtherVersionsConfirm(int count);
+
   /// Dialog title and option label for deleting all versions of a message.
   ///
   /// In en, this message translates to:
@@ -10777,6 +10789,12 @@ abstract class AppLocalizations {
   /// **'Low-latency streaming transcription'**
   String get asrServicesOpenAiSubtitle;
 
+  /// Subtitle in the speech recognition provider list for DeepSeek. It transcribes recorded audio segments and determines the spoken language from the audio.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcribes recordings and detects the language automatically'**
+  String get asrServicesDeepSeekSubtitle;
+
   /// Subtitle describing the Groq ASR service as Whisper-based segmented cloud transcription.
   ///
   /// In en, this message translates to:
@@ -11274,6 +11292,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Voice'**
   String get ttsServicesFieldVoiceLabel;
+
+  /// Name and gender of the selected DeepSeek voice in the mobile and desktop TTS service editor. The voiceId is the API identifier. Preserve the select keys stella and tide and display any other identifier as supplied.
+  ///
+  /// In en, this message translates to:
+  /// **'{voiceId, select, stella{Stella (female)} tide{Tide (male)} other{{voiceId}}}'**
+  String ttsServicesDeepSeekVoice(String voiceId);
 
   /// Label for the voice ID field, used for providers like MiniMax, xAI and ElevenLabs.
   ///
@@ -15331,10 +15355,10 @@ abstract class AppLocalizations {
   /// **'Global setting for all assistants'**
   String get legacyMemoryModeSubtitle;
 
-  /// Info banner warning that the default legacy template injects the current time via the given token placeholder, which hurts cache hit rate.
+  /// Banner in the legacy memory rule editor. {token} is the literal placeholder removed when sending the template. Directs users who want the model to see the current time to the assistant's Append current time setting.
   ///
   /// In en, this message translates to:
-  /// **'The default template injects the current time via {token}, which affects cache hit rate. Remove it if you do not need it.'**
+  /// **'If a template still contains {token}, it is stripped on inject and is no longer filled with the current time. If the model needs the current time, turn on \"Append current time\" in assistant settings.'**
   String legacyMemoryModeCacheWarning(String token);
 
   /// Label for a memory content field in the memory UI; no caller supplied, evidently names the content input.

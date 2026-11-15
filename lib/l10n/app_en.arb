@@ -365,6 +365,19 @@
   "userProviderDefaultUserName": "User",
   "homePageDeleteMessage": "Delete This Version",
   "homePageDeleteMessageConfirm": "Are you sure you want to delete this version? This cannot be undone.",
+  "homePageDeleteOtherVersions": "Delete Other Versions",
+  "@homePageDeleteOtherVersions": {
+    "description": "Action in a chat message's More menu and its confirmation dialog title. Deletes the other versions of this message while keeping the version on screen."
+  },
+  "homePageDeleteOtherVersionsConfirm": "Keep this version of the message? {count, plural, one{{count} other version will be deleted.} other{{count} other versions will be deleted.}} This cannot be undone.",
+  "@homePageDeleteOtherVersionsConfirm": {
+    "description": "Confirmation dialog body for deleting the other versions of one chat message. The version on screen is kept. Count is the number of other versions being permanently deleted.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "homePageDeleteAllVersions": "Delete All Versions",
   "homePageDeleteAllVersionsConfirm": "Are you sure you want to delete all versions of this message? This cannot be undone.",
   "homePageCancel": "Cancel",
@@ -2764,6 +2777,7 @@
   "asrServicesLocalSubtitle": "Runs offline on this device after download",
   "asrServicesOpenAiTitle": "OpenAI Realtime",
   "asrServicesOpenAiSubtitle": "Low-latency streaming transcription",
+  "asrServicesDeepSeekSubtitle": "Transcribes recordings and detects the language automatically",
   "asrServicesGroqSubtitle": "Whisper segmented transcription",
   "asrServicesMistralSubtitle": "Voxtral segmented transcription",
   "asrServicesElevenLabsSubtitle": "Scribe segmented transcription",
@@ -2871,6 +2885,7 @@
   "ttsServicesFieldBaseUrlLabel": "API Base URL",
   "ttsServicesFieldModelLabel": "Model",
   "ttsServicesFieldVoiceLabel": "Voice",
+  "ttsServicesDeepSeekVoice": "{voiceId, select, stella{Stella (female)} tide{Tide (male)} other{{voiceId}}}",
   "ttsServicesFieldVoiceIdLabel": "Voice ID",
   "ttsServicesFieldEmotionLabel": "Emotion",
   "ttsServicesFieldSpeedLabel": "Speed",
@@ -3924,14 +3939,14 @@
   },
   "legacyMemoryModeTitle": "Use legacy memory",
   "legacyMemoryModeSubtitle": "Global setting for all assistants",
-  "legacyMemoryModeCacheWarning": "The default template injects the current time via {token}, which affects cache hit rate. Remove it if you do not need it.",
+  "legacyMemoryModeCacheWarning": "If a template still contains {token}, it is stripped on inject and is no longer filled with the current time. If the model needs the current time, turn on \"Append current time\" in assistant settings.",
   "@legacyMemoryModeCacheWarning": {
     "placeholders": {
       "token": {
         "type": "String"
       }
     },
-    "description": "Info banner warning that the default legacy template injects the current time via the given token placeholder, which hurts cache hit rate."
+    "description": "Banner in the legacy memory rule editor. {token} is the literal placeholder removed when sending the template. Directs users who want the model to see the current time to the assistant's Append current time setting."
   },
   "memoryUiContentLabel": "Content",
   "memoryUiValueLabel": "Value",
@@ -13367,6 +13382,9 @@
   "@asrServicesOpenAiSubtitle": {
     "description": "Subtitle describing the OpenAI Realtime ASR service as low-latency streaming transcription."
   },
+  "@asrServicesDeepSeekSubtitle": {
+    "description": "Subtitle in the speech recognition provider list for DeepSeek. It transcribes recorded audio segments and determines the spoken language from the audio."
+  },
   "@asrServicesGroqSubtitle": {
     "description": "Subtitle describing the Groq ASR service as Whisper-based segmented cloud transcription."
   },
@@ -13606,6 +13624,14 @@
   },
   "@ttsServicesFieldVoiceLabel": {
     "description": "Label for the voice field, used for providers like OpenAI, Gemini, Azure, Qwen and xAI."
+  },
+  "@ttsServicesDeepSeekVoice": {
+    "description": "Name and gender of the selected DeepSeek voice in the mobile and desktop TTS service editor. The voiceId is the API identifier. Preserve the select keys stella and tide and display any other identifier as supplied.",
+    "placeholders": {
+      "voiceId": {
+        "type": "String"
+      }
+    }
   },
   "@ttsServicesFieldVoiceIdLabel": {
     "description": "Label for the voice ID field, used for providers like MiniMax, xAI and ElevenLabs."
