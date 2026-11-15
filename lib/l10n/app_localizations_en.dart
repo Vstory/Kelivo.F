@@ -4977,12 +4977,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get miniMapScrollToBottomTooltip => 'Scroll to bottom';
 
   @override
-  String miniMapSearchMatchCount(int count) {
-    return '$count';
+  String get conversationFindHint => 'Find';
+
+  @override
+  String get conversationFindPrevious => 'Previous match';
+
+  @override
+  String get conversationFindNext => 'Next match';
+
+  @override
+  String get conversationFindOptions => 'Find options';
+
+  @override
+  String conversationFindMatchPosition(int current, int total) {
+    return '$current/$total';
   }
 
   @override
-  String get miniMapSearchNoResults => 'No matching messages';
+  String get conversationFindCaseSensitive => 'Match case';
+
+  @override
+  String get conversationFindWholeWord => 'Whole word';
+
+  @override
+  String get conversationFindWholeWordTooltip =>
+      'Matches whole words for scripts with word boundaries (e.g. English). Queries that contain Chinese, Japanese, or Korean characters still use substring matching.';
+
+  @override
+  String get conversationFindIncludeThinking => 'Include thinking';
+
+  @override
+  String get conversationFindOpenTooltip => 'Find in conversation';
 
   @override
   String get searchServicesPageApiKeyRequiredStatus => 'API Key Required';
@@ -13586,7 +13611,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupEncryptionPasswordHint =>
-      'Keep this password safe. If you lose it, the backup cannot be restored. It is kept in memory until you exit the app.';
+      'Keep this password safe. You will need it to restore backups on another device.';
 
   @override
   String get backupEncryptionPassword => 'Password';
@@ -17131,4 +17156,157 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get compressionCarryInvalidCount => 'Enter a number from 1 to 10,000.';
+
+  @override
+  String get backupRunningInBackground =>
+      'Backup will continue in the background';
+
+  @override
+  String backupBackgroundFailed(String error) {
+    return 'Background backup failed: $error';
+  }
+
+  @override
+  String get backupAutoEnableTitle => 'Back up automatically when due';
+
+  @override
+  String get backupAutoEnableHint =>
+      'When the scheduled time arrives, Kelivo backs up while the app is in the foreground. If the app is closed or killed, the backup does not keep running and is not resumed; the next time you open the app, a single full backup runs if it is still due.';
+
+  @override
+  String get backupAutoDestinationTitle => 'Automatic backup destination';
+
+  @override
+  String get backupAutoDestinationWebDav => 'WebDAV';
+
+  @override
+  String get backupAutoDestinationS3 => 'S3';
+
+  @override
+  String get backupAutoDestinationLocal => 'Local folder';
+
+  @override
+  String get backupAutoNeedRemoteHint => 'Set up WebDAV or S3 first.';
+
+  @override
+  String get backupAutoNeedDestinationHint =>
+      'Set up WebDAV or S3, or choose a local folder first.';
+
+  @override
+  String get backupAutoNeedFolderHint => 'Choose a backup folder first.';
+
+  @override
+  String get backupAutoLocalFolderChoose => 'Choose folder…';
+
+  @override
+  String get backupAutoLocalFolderChange => 'Change folder';
+
+  @override
+  String get backupAutoLocalFolderInvalid =>
+      'Choose a folder outside the app\'s own data directory.';
+
+  @override
+  String get backupAutoLocalRetentionTitle => 'Keep at most';
+
+  @override
+  String backupAutoLocalRetentionCount(int count) {
+    return '$count backups';
+  }
+
+  @override
+  String get backupAutoLocalRetentionUnlimited => 'No limit';
+
+  @override
+  String get backupAutoLocalNow => 'Back up to this folder now';
+
+  @override
+  String get backupAutoLocalDirUnavailable =>
+      'Can\'t write to the chosen folder. Check that it is still available, or choose another one. Kelivo won\'t change the saved location on its own.';
+
+  @override
+  String get backupAutoLocalDirPermission =>
+      'You don\'t have permission to write to the chosen folder. Please choose the folder again. Kelivo won\'t change the saved location on its own.';
+
+  @override
+  String get backupAutoLocalDirFull =>
+      'There isn\'t enough disk space, so the backup didn\'t finish. Your earlier backups are still there.';
+
+  @override
+  String get backupAutoLocalBookmarkLost =>
+      'Kelivo can\'t access the chosen folder. Please choose it again. The saved location won\'t be changed automatically.';
+
+  @override
+  String get backupAutoNextTitle => 'Next automatic backup';
+
+  @override
+  String get backupAutoRememberPasswordTitle =>
+      'Remember the password on this device?';
+
+  @override
+  String get backupAutoRememberPasswordMessage =>
+      'Remember the password on this device so automatic backups can run. It stays on this device and is never uploaded.';
+
+  @override
+  String get backupAutoRememberPasswordConfirm => 'Remember';
+
+  @override
+  String get backupAutoRememberPasswordDecline => 'Not now';
+
+  @override
+  String get backupAutoRememberDeclined =>
+      'Automatic backup was not turned on. You\'ll still get a reminder when it\'s due.';
+
+  @override
+  String get backupAutoKeychainUnavailable =>
+      'Kelivo can’t access the system keychain for the backup password. You can still back up manually.';
+
+  @override
+  String get backupAutoSucceeded => 'Automatic backup finished';
+
+  @override
+  String backupAutoFailed(String error) {
+    return 'Automatic backup failed: $error';
+  }
+
+  @override
+  String get backupAutoFailedPassword =>
+      'Automatic backup failed: the password is incorrect.';
+
+  @override
+  String get backupReminderSidebarSubtitleAutoFailed =>
+      'The automatic backup didn\'t finish. Check the network or back up manually.';
+
+  @override
+  String get backupEncryptionOnHintRemembered =>
+      'Backups are encrypted. The password is saved on this device.';
+
+  @override
+  String get backupRememberPasswordOnDevice =>
+      'Remember password on this device';
+
+  @override
+  String get backupForgetDisablesAutomaticHint =>
+      'Turning this off also turns off automatic backups.';
+
+  @override
+  String get backupManualPasswordHint =>
+      'Enter the password you set for encrypted backups.';
+
+  @override
+  String get backupManualPasswordNotSaved =>
+      'The password couldn’t be saved on this device. This backup will continue.';
+
+  @override
+  String get backupEncryptionChangePassword => 'Change backup password';
+
+  @override
+  String get backupMacKeychainNeedsUnlock =>
+      'macOS couldn’t unlock the login keychain. Open Keychain Access, unlock “login”, then try again in Kelivo.';
+
+  @override
+  String get backupMacOpenKeychainAccess => 'Open Keychain Access';
+
+  @override
+  String get backupMacKeychainAccessDenied =>
+      'macOS denied access to the backup password. If a system prompt appears, allow Kelivo to access it. You can also check the default keychain and the password item’s permissions in Keychain Access.';
 }

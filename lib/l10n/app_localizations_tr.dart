@@ -5006,12 +5006,37 @@ class AppLocalizationsTr extends AppLocalizations {
   String get miniMapScrollToBottomTooltip => 'En alta kaydır';
 
   @override
-  String miniMapSearchMatchCount(int count) {
-    return '$count';
+  String get conversationFindHint => 'Bul';
+
+  @override
+  String get conversationFindPrevious => 'Önceki eşleşme';
+
+  @override
+  String get conversationFindNext => 'Sonraki eşleşme';
+
+  @override
+  String get conversationFindOptions => 'Bulma seçenekleri';
+
+  @override
+  String conversationFindMatchPosition(int current, int total) {
+    return '$current/$total';
   }
 
   @override
-  String get miniMapSearchNoResults => 'Eşleşen mesaj yok';
+  String get conversationFindCaseSensitive => 'Büyük/küçük harf eşleştir';
+
+  @override
+  String get conversationFindWholeWord => 'Tam kelime';
+
+  @override
+  String get conversationFindWholeWordTooltip =>
+      'Kelime sınırları olan yazı sistemlerinde (ör. İngilizce) tam kelimeleri eşleştirir. Çince, Japonca veya Korece karakter içeren sorgular yine alt dize eşleştirmesi kullanır.';
+
+  @override
+  String get conversationFindIncludeThinking => 'Akıl yürütmeyi dahil et';
+
+  @override
+  String get conversationFindOpenTooltip => 'Sohbette bul';
 
   @override
   String get searchServicesPageApiKeyRequiredStatus => 'API Anahtarı Gerekli';
@@ -13666,7 +13691,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get backupEncryptionPasswordHint =>
-      'Bu parolayı güvenli tutun. Kaybederseniz yedek geri yüklenemez. Uygulamadan çıkana kadar yalnızca bellekte tutulur.';
+      'Bu parolayı güvenli bir yerde saklayın. Yedekleri başka bir cihazda geri yüklemek için bu parolaya ihtiyacınız olacak.';
 
   @override
   String get backupEncryptionPassword => 'Parola';
@@ -17226,4 +17251,155 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get compressionCarryInvalidCount =>
       '1 ile 10.000 arasında bir sayı girin.';
+
+  @override
+  String get backupRunningInBackground => 'Yedekleme arka planda devam edecek';
+
+  @override
+  String backupBackgroundFailed(String error) {
+    return 'Arka plan yedeklemesi başarısız oldu: $error';
+  }
+
+  @override
+  String get backupAutoEnableTitle => 'Zamanı geldiğinde otomatik yedekle';
+
+  @override
+  String get backupAutoEnableHint =>
+      'Planlanan saat geldiğinde Kelivo, uygulama ön plandayken yedekleme yapar. Uygulama kapatılır veya sonlandırılırsa yedekleme devam etmez ve kaldığı yerden sürdürülmez; uygulamayı bir sonraki açışınızda süre hâlâ dolmuşsa tek bir tam yedekleme çalışır.';
+
+  @override
+  String get backupAutoDestinationTitle => 'Otomatik yedekleme hedefi';
+
+  @override
+  String get backupAutoDestinationWebDav => 'WebDAV';
+
+  @override
+  String get backupAutoDestinationS3 => 'S3';
+
+  @override
+  String get backupAutoDestinationLocal => 'Yerel klasör';
+
+  @override
+  String get backupAutoNeedRemoteHint => 'Önce WebDAV veya S3 ayarlayın.';
+
+  @override
+  String get backupAutoNeedDestinationHint =>
+      'Önce WebDAV veya S3 ayarlayın ya da bir yerel klasör seçin.';
+
+  @override
+  String get backupAutoNeedFolderHint => 'Önce bir yedekleme klasörü seçin.';
+
+  @override
+  String get backupAutoLocalFolderChoose => 'Klasör seç…';
+
+  @override
+  String get backupAutoLocalFolderChange => 'Klasörü değiştir';
+
+  @override
+  String get backupAutoLocalFolderInvalid =>
+      'Uygulamanın kendi veri dizini dışında bir klasör seçin.';
+
+  @override
+  String get backupAutoLocalRetentionTitle => 'En fazla sakla';
+
+  @override
+  String backupAutoLocalRetentionCount(int count) {
+    return '$count yedek';
+  }
+
+  @override
+  String get backupAutoLocalRetentionUnlimited => 'Sınır yok';
+
+  @override
+  String get backupAutoLocalNow => 'Şimdi bu klasöre yedekle';
+
+  @override
+  String get backupAutoLocalDirUnavailable =>
+      'Seçilen klasöre yazılamıyor. Hâlâ kullanılabilir olduğunu kontrol edin veya başka bir klasör seçin. Kelivo kayıtlı konumu kendi başına değiştirmez.';
+
+  @override
+  String get backupAutoLocalDirPermission =>
+      'Seçilen klasöre yazma izniniz yok. Lütfen klasörü yeniden seçin. Kelivo kayıtlı konumu kendi başına değiştirmez.';
+
+  @override
+  String get backupAutoLocalDirFull =>
+      'Yeterli disk alanı yok, bu yüzden yedekleme tamamlanmadı. Önceki yedekleriniz hâlâ duruyor.';
+
+  @override
+  String get backupAutoLocalBookmarkLost =>
+      'Kelivo seçilen klasöre erişemiyor. Lütfen yeniden seçin. Kayıtlı konum otomatik olarak değiştirilmez.';
+
+  @override
+  String get backupAutoNextTitle => 'Sonraki otomatik yedekleme';
+
+  @override
+  String get backupAutoRememberPasswordTitle =>
+      'Parola bu cihazda hatırlansın mı?';
+
+  @override
+  String get backupAutoRememberPasswordMessage =>
+      'Otomatik yedeklemelerin çalışabilmesi için parolayı bu cihazda hatırla. Parola bu cihazda kalır ve hiçbir zaman yüklenmez.';
+
+  @override
+  String get backupAutoRememberPasswordConfirm => 'Hatırla';
+
+  @override
+  String get backupAutoRememberPasswordDecline => 'Şimdi değil';
+
+  @override
+  String get backupAutoRememberDeclined =>
+      'Otomatik yedekleme açılmadı. Zamanı geldiğinde yine hatırlatma alacaksınız.';
+
+  @override
+  String get backupAutoKeychainUnavailable =>
+      'Kelivo, yedekleme parolası için sistem anahtarlığına erişemiyor. Yine de manuel olarak yedekleme yapabilirsiniz.';
+
+  @override
+  String get backupAutoSucceeded => 'Otomatik yedekleme tamamlandı';
+
+  @override
+  String backupAutoFailed(String error) {
+    return 'Otomatik yedekleme başarısız oldu: $error';
+  }
+
+  @override
+  String get backupAutoFailedPassword =>
+      'Otomatik yedekleme başarısız oldu: parola yanlış.';
+
+  @override
+  String get backupReminderSidebarSubtitleAutoFailed =>
+      'Otomatik yedekleme tamamlanmadı. Ağı kontrol edin veya elle yedekleyin.';
+
+  @override
+  String get backupEncryptionOnHintRemembered =>
+      'Yedekler şifrelenir. Parola bu cihazda kayıtlı.';
+
+  @override
+  String get backupRememberPasswordOnDevice => 'Parolayı bu cihazda hatırla';
+
+  @override
+  String get backupForgetDisablesAutomaticHint =>
+      'Bunu kapatmak otomatik yedeklemeyi de kapatır.';
+
+  @override
+  String get backupManualPasswordHint =>
+      'Şifreli yedekler için belirlediğiniz parolayı girin.';
+
+  @override
+  String get backupManualPasswordNotSaved =>
+      'Parola bu cihazda kaydedilemedi. Bu yedekleme devam edecek.';
+
+  @override
+  String get backupEncryptionChangePassword => 'Yedek parolasını değiştir';
+
+  @override
+  String get backupMacKeychainNeedsUnlock =>
+      'macOS oturum açma anahtarlığının kilidini açamadı. Anahtar Zinciri Erişimi\'ni açın, “oturum açma” anahtarlığının kilidini açın ve ardından Kelivo\'da tekrar deneyin.';
+
+  @override
+  String get backupMacOpenKeychainAccess => 'Anahtar Zinciri Erişimi\'ni aç';
+
+  @override
+  String get backupMacKeychainAccessDenied =>
+      'macOS yedek parolasına erişimi reddetti. Bir sistem istemi görünürse Kelivo\'nun erişmesine izin verin. Ayrıca Anahtar Zinciri Erişimi\'nde varsayılan anahtar zincirini ve parola öğesinin izinlerini kontrol edebilirsiniz.';
 }

@@ -9109,17 +9109,65 @@ abstract class AppLocalizations {
   /// **'Scroll to bottom'**
   String get miniMapScrollToBottomTooltip;
 
-  /// Label showing how many messages match the minimap search; {count} is the match number.
+  /// Placeholder in the search field of the current conversation’s find bar.
   ///
   /// In en, this message translates to:
-  /// **'{count}'**
-  String miniMapSearchMatchCount(int count);
+  /// **'Find'**
+  String get conversationFindHint;
 
-  /// Empty-state text in the minimap search showing no messages matched the query.
+  /// Tooltip for the find bar button that selects the previous occurrence in the current conversation.
   ///
   /// In en, this message translates to:
-  /// **'No matching messages'**
-  String get miniMapSearchNoResults;
+  /// **'Previous match'**
+  String get conversationFindPrevious;
+
+  /// Tooltip for the find bar button that selects the next occurrence in the current conversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Next match'**
+  String get conversationFindNext;
+
+  /// Tooltip for the find bar button that opens the search options menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Find options'**
+  String get conversationFindOptions;
+
+  /// Match counter in the conversation find bar. current is the one-based occurrence index and total is the number of occurrences. Both are zero for no matches.
+  ///
+  /// In en, this message translates to:
+  /// **'{current}/{total}'**
+  String conversationFindMatchPosition(int current, int total);
+
+  /// Toggle in the conversation find menu requiring the query to match uppercase and lowercase letters exactly.
+  ///
+  /// In en, this message translates to:
+  /// **'Match case'**
+  String get conversationFindCaseSensitive;
+
+  /// Toggle in the conversation find menu limiting matches to whole words.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole word'**
+  String get conversationFindWholeWord;
+
+  /// Tooltip beside the whole-word search option explaining word boundaries and how CJK queries behave.
+  ///
+  /// In en, this message translates to:
+  /// **'Matches whole words for scripts with word boundaries (e.g. English). Queries that contain Chinese, Japanese, or Korean characters still use substring matching.'**
+  String get conversationFindWholeWordTooltip;
+
+  /// Toggle in the conversation find menu to also search the assistant’s reasoning steps.
+  ///
+  /// In en, this message translates to:
+  /// **'Include thinking'**
+  String get conversationFindIncludeThinking;
+
+  /// Tooltip for the message map button that opens the find bar in the current conversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Find in conversation'**
+  String get conversationFindOpenTooltip;
 
   /// Status label indicating a search service still needs an API key to be configured.
   ///
@@ -24168,10 +24216,10 @@ abstract class AppLocalizations {
   /// **'Backups are encrypted. Enter the password again after restarting the app.'**
   String get backupEncryptionOnHint;
 
-  /// Warning to keep the password safe since a lost password makes the backup unrestorable, kept only in memory.
+  /// Hint when setting an encryption password. A password remembered on this device is still needed to restore an encrypted backup on another device.
   ///
   /// In en, this message translates to:
-  /// **'Keep this password safe. If you lose it, the backup cannot be restored. It is kept in memory until you exit the app.'**
+  /// **'Keep this password safe. You will need it to restore backups on another device.'**
   String get backupEncryptionPasswordHint;
 
   /// Field label for the backup encryption password input.
@@ -30083,6 +30131,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter a number from 1 to 10,000.'**
   String get compressionCarryInvalidCount;
+
+  /// Shown in external backup settings or completion notifications. Backup will continue in the background
+  ///
+  /// In en, this message translates to:
+  /// **'Backup will continue in the background'**
+  String get backupRunningInBackground;
+
+  /// Shown in external backup settings or completion notifications. Background backup failed: {error} The error is the localized reason for the failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Background backup failed: {error}'**
+  String backupBackgroundFailed(String error);
+
+  /// Shown in external backup settings or completion notifications. Back up automatically when due
+  ///
+  /// In en, this message translates to:
+  /// **'Back up automatically when due'**
+  String get backupAutoEnableTitle;
+
+  /// Shown in external backup settings or completion notifications. When the scheduled time arrives, Kelivo backs up while the app is in the foreground. If the app is closed or killed, the backup does not keep running and is not resumed; the next time you open the app, a single full backup runs if it is still due.
+  ///
+  /// In en, this message translates to:
+  /// **'When the scheduled time arrives, Kelivo backs up while the app is in the foreground. If the app is closed or killed, the backup does not keep running and is not resumed; the next time you open the app, a single full backup runs if it is still due.'**
+  String get backupAutoEnableHint;
+
+  /// Shown in external backup settings or completion notifications. Automatic backup destination
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup destination'**
+  String get backupAutoDestinationTitle;
+
+  /// Shown in external backup settings or completion notifications. WebDAV
+  ///
+  /// In en, this message translates to:
+  /// **'WebDAV'**
+  String get backupAutoDestinationWebDav;
+
+  /// Shown in external backup settings or completion notifications. S3
+  ///
+  /// In en, this message translates to:
+  /// **'S3'**
+  String get backupAutoDestinationS3;
+
+  /// Desktop automatic backup folder settings or write result. Local folder
+  ///
+  /// In en, this message translates to:
+  /// **'Local folder'**
+  String get backupAutoDestinationLocal;
+
+  /// Shown in external backup settings or completion notifications. Set up WebDAV or S3 first.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up WebDAV or S3 first.'**
+  String get backupAutoNeedRemoteHint;
+
+  /// Shown in external backup settings or completion notifications. Set up WebDAV or S3, or choose a local folder first.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up WebDAV or S3, or choose a local folder first.'**
+  String get backupAutoNeedDestinationHint;
+
+  /// Desktop automatic backup folder settings or write result. Choose a backup folder first.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a backup folder first.'**
+  String get backupAutoNeedFolderHint;
+
+  /// Desktop automatic backup folder settings or write result. Choose folder…
+  ///
+  /// In en, this message translates to:
+  /// **'Choose folder…'**
+  String get backupAutoLocalFolderChoose;
+
+  /// Desktop automatic backup folder settings or write result. Change folder
+  ///
+  /// In en, this message translates to:
+  /// **'Change folder'**
+  String get backupAutoLocalFolderChange;
+
+  /// Desktop automatic backup folder settings or write result. Choose a folder outside the app's own data directory.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a folder outside the app\'s own data directory.'**
+  String get backupAutoLocalFolderInvalid;
+
+  /// Desktop automatic backup folder settings or write result. Keep at most
+  ///
+  /// In en, this message translates to:
+  /// **'Keep at most'**
+  String get backupAutoLocalRetentionTitle;
+
+  /// Desktop automatic backup folder settings or write result. {count} backups The count is the positive number of backups to keep.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} backups'**
+  String backupAutoLocalRetentionCount(int count);
+
+  /// Desktop automatic backup folder settings or write result. No limit
+  ///
+  /// In en, this message translates to:
+  /// **'No limit'**
+  String get backupAutoLocalRetentionUnlimited;
+
+  /// Desktop automatic backup folder settings or write result. Back up to this folder now
+  ///
+  /// In en, this message translates to:
+  /// **'Back up to this folder now'**
+  String get backupAutoLocalNow;
+
+  /// Desktop automatic backup folder settings or write result. Can't write to the chosen folder. Check that it is still available, or choose another one. Kelivo won't change the saved location on its own.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t write to the chosen folder. Check that it is still available, or choose another one. Kelivo won\'t change the saved location on its own.'**
+  String get backupAutoLocalDirUnavailable;
+
+  /// Desktop automatic backup folder settings or write result. You don't have permission to write to the chosen folder. Please choose the folder again. Kelivo won't change the saved location on its own.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to write to the chosen folder. Please choose the folder again. Kelivo won\'t change the saved location on its own.'**
+  String get backupAutoLocalDirPermission;
+
+  /// Desktop automatic backup folder settings or write result. There isn't enough disk space, so the backup didn't finish. Your earlier backups are still there.
+  ///
+  /// In en, this message translates to:
+  /// **'There isn\'t enough disk space, so the backup didn\'t finish. Your earlier backups are still there.'**
+  String get backupAutoLocalDirFull;
+
+  /// Desktop automatic backup folder settings or write result. Kelivo can't access the chosen folder. Please choose it again. The saved location won't be changed automatically.
+  ///
+  /// In en, this message translates to:
+  /// **'Kelivo can\'t access the chosen folder. Please choose it again. The saved location won\'t be changed automatically.'**
+  String get backupAutoLocalBookmarkLost;
+
+  /// Shown in external backup settings or completion notifications. Next automatic backup
+  ///
+  /// In en, this message translates to:
+  /// **'Next automatic backup'**
+  String get backupAutoNextTitle;
+
+  /// Device-only password consent dialog when enabling encrypted automatic backups. Remember the password on this device?
+  ///
+  /// In en, this message translates to:
+  /// **'Remember the password on this device?'**
+  String get backupAutoRememberPasswordTitle;
+
+  /// Device-only password consent dialog when enabling encrypted automatic backups. Remember the password on this device so automatic backups can run. It stays on this device and is never uploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember the password on this device so automatic backups can run. It stays on this device and is never uploaded.'**
+  String get backupAutoRememberPasswordMessage;
+
+  /// Device-only password consent dialog when enabling encrypted automatic backups. Remember
+  ///
+  /// In en, this message translates to:
+  /// **'Remember'**
+  String get backupAutoRememberPasswordConfirm;
+
+  /// Device-only password consent dialog when enabling encrypted automatic backups. Not now
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get backupAutoRememberPasswordDecline;
+
+  /// Device-only password consent dialog when enabling encrypted automatic backups. Automatic backup was not turned on. You'll still get a reminder when it's due.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup was not turned on. You\'ll still get a reminder when it\'s due.'**
+  String get backupAutoRememberDeclined;
+
+  /// Backup settings or automatic backup failure when access to the device credential store is unavailable. Manual backups can still prompt for the password.
+  ///
+  /// In en, this message translates to:
+  /// **'Kelivo can’t access the system keychain for the backup password. You can still back up manually.'**
+  String get backupAutoKeychainUnavailable;
+
+  /// Shown in external backup settings or completion notifications. Automatic backup finished
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup finished'**
+  String get backupAutoSucceeded;
+
+  /// Shown in external backup settings or completion notifications. Automatic backup failed: {error} The error is the localized reason for the failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup failed: {error}'**
+  String backupAutoFailed(String error);
+
+  /// Shown in external backup settings or completion notifications. Automatic backup failed: the password is incorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup failed: the password is incorrect.'**
+  String get backupAutoFailedPassword;
+
+  /// Sidebar reminder after a due automatic external backup fails.
+  ///
+  /// In en, this message translates to:
+  /// **'The automatic backup didn\'t finish. Check the network or back up manually.'**
+  String get backupReminderSidebarSubtitleAutoFailed;
+
+  /// Subtitle for backup encryption when the device remembers the password for manual or automatic backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups are encrypted. The password is saved on this device.'**
+  String get backupEncryptionOnHintRemembered;
+
+  /// Backup encryption settings switch and optional password dialog checkbox. Saves the backup encryption password on this device for future backups, including manual backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember password on this device'**
+  String get backupRememberPasswordOnDevice;
+
+  /// Subtitle of the remember-password switch when encrypted automatic backups are on, explaining what forgetting the password will do.
+  ///
+  /// In en, this message translates to:
+  /// **'Turning this off also turns off automatic backups.'**
+  String get backupForgetDisablesAutomaticHint;
+
+  /// Hint when entering the current encryption password to make a backup or save it on this device.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the password you set for encrypted backups.'**
+  String get backupManualPasswordHint;
+
+  /// Notice when the user chose to remember the password during a manual backup but secure storage failed. The current backup still uses the password they entered.
+  ///
+  /// In en, this message translates to:
+  /// **'The password couldn’t be saved on this device. This backup will continue.'**
+  String get backupManualPasswordNotSaved;
+
+  /// Action in backup encryption settings to choose a new password for future external backups while keeping encryption enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Change backup password'**
+  String get backupEncryptionChangePassword;
+
+  /// Shown after macOS denies authorization for the local backup password. Keychain Access is the name of the macOS utility. The user should unlock their login keychain there and retry.
+  ///
+  /// In en, this message translates to:
+  /// **'macOS couldn’t unlock the login keychain. Open Keychain Access, unlock “login”, then try again in Kelivo.'**
+  String get backupMacKeychainNeedsUnlock;
+
+  /// Button on a backup-password authorization error that opens Apple’s Keychain Access app on macOS so the user can unlock their default keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Keychain Access'**
+  String get backupMacOpenKeychainAccess;
+
+  /// Backup password error when macOS denied access even though the default keychain was reported unlocked. Covers access denied by item permissions or an unusable login keychain without assuming that the user cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'macOS denied access to the backup password. If a system prompt appears, allow Kelivo to access it. You can also check the default keychain and the password item’s permissions in Keychain Access.'**
+  String get backupMacKeychainAccessDenied;
 }
 
 class _AppLocalizationsDelegate

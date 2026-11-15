@@ -4866,12 +4866,37 @@ class AppLocalizationsKo extends AppLocalizations {
   String get miniMapScrollToBottomTooltip => '맨 아래로 스크롤';
 
   @override
-  String miniMapSearchMatchCount(int count) {
-    return '$count';
+  String get conversationFindHint => '찾기';
+
+  @override
+  String get conversationFindPrevious => '이전 일치 항목';
+
+  @override
+  String get conversationFindNext => '다음 일치 항목';
+
+  @override
+  String get conversationFindOptions => '찾기 옵션';
+
+  @override
+  String conversationFindMatchPosition(int current, int total) {
+    return '$current/$total';
   }
 
   @override
-  String get miniMapSearchNoResults => '일치하는 메시지 없음';
+  String get conversationFindCaseSensitive => '대/소문자 구분';
+
+  @override
+  String get conversationFindWholeWord => '단어 단위';
+
+  @override
+  String get conversationFindWholeWordTooltip =>
+      '단어 경계가 있는 문자 체계(예: 영어)에서는 단어 단위로 일치합니다. 중국어, 일본어, 한국어 문자가 포함된 검색어는 여전히 부분 문자열로 일치합니다.';
+
+  @override
+  String get conversationFindIncludeThinking => '사고 과정 포함';
+
+  @override
+  String get conversationFindOpenTooltip => '대화에서 찾기';
 
   @override
   String get searchServicesPageApiKeyRequiredStatus => 'API Key 필요';
@@ -13175,7 +13200,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get backupEncryptionPasswordHint =>
-      '이 비밀번호를 안전하게 보관하세요. 분실하면 백업을 복원할 수 없습니다. 비밀번호는 앱을 종료할 때까지 메모리에만 보관됩니다.';
+      '이 비밀번호를 안전하게 보관하세요. 다른 기기에서 백업을 복원할 때 필요합니다.';
 
   @override
   String get backupEncryptionPassword => '비밀번호';
@@ -16605,4 +16630,150 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get compressionCarryInvalidCount => '1에서 10,000 사이의 숫자를 입력하세요.';
+
+  @override
+  String get backupRunningInBackground => '백그라운드에서 백업이 계속됩니다';
+
+  @override
+  String backupBackgroundFailed(String error) {
+    return '백그라운드 백업 실패: $error';
+  }
+
+  @override
+  String get backupAutoEnableTitle => '예정 시각에 자동으로 백업';
+
+  @override
+  String get backupAutoEnableHint =>
+      '예정된 시각이 되면 앱이 포그라운드에 있을 때 Kelivo가 백업합니다. 앱이 닫히거나 종료되면 백업이 계속 실행되지 않으며 이어서 진행되지도 않습니다. 앱을 다시 열었을 때 아직 예정 시각이 지났다면 전체 백업을 한 번만 실행합니다.';
+
+  @override
+  String get backupAutoDestinationTitle => '자동 백업 위치';
+
+  @override
+  String get backupAutoDestinationWebDav => 'WebDAV';
+
+  @override
+  String get backupAutoDestinationS3 => 'S3';
+
+  @override
+  String get backupAutoDestinationLocal => '로컬 폴더';
+
+  @override
+  String get backupAutoNeedRemoteHint => '먼저 WebDAV 또는 S3를 설정하세요.';
+
+  @override
+  String get backupAutoNeedDestinationHint =>
+      '먼저 WebDAV 또는 S3를 설정하거나 로컬 폴더를 선택하세요.';
+
+  @override
+  String get backupAutoNeedFolderHint => '먼저 백업 폴더를 선택하세요.';
+
+  @override
+  String get backupAutoLocalFolderChoose => '폴더 선택…';
+
+  @override
+  String get backupAutoLocalFolderChange => '폴더 변경';
+
+  @override
+  String get backupAutoLocalFolderInvalid => '앱 자체 데이터 디렉터리 밖의 폴더를 선택하세요.';
+
+  @override
+  String get backupAutoLocalRetentionTitle => '최대 보관';
+
+  @override
+  String backupAutoLocalRetentionCount(int count) {
+    return '백업 $count개';
+  }
+
+  @override
+  String get backupAutoLocalRetentionUnlimited => '제한 없음';
+
+  @override
+  String get backupAutoLocalNow => '지금 이 폴더에 백업';
+
+  @override
+  String get backupAutoLocalDirUnavailable =>
+      '선택한 폴더에 쓸 수 없습니다. 폴더가 여전히 사용 가능한지 확인하거나 다른 폴더를 선택하세요. Kelivo는 저장된 위치를 임의로 변경하지 않습니다.';
+
+  @override
+  String get backupAutoLocalDirPermission =>
+      '선택한 폴더에 쓸 권한이 없습니다. 폴더를 다시 선택하세요. Kelivo는 저장된 위치를 임의로 변경하지 않습니다.';
+
+  @override
+  String get backupAutoLocalDirFull =>
+      '디스크 공간이 부족하여 백업이 완료되지 않았습니다. 이전 백업은 그대로 남아 있습니다.';
+
+  @override
+  String get backupAutoLocalBookmarkLost =>
+      'Kelivo가 선택한 폴더에 접근할 수 없습니다. 폴더를 다시 선택하세요. 저장된 위치는 자동으로 변경되지 않습니다.';
+
+  @override
+  String get backupAutoNextTitle => '다음 자동 백업';
+
+  @override
+  String get backupAutoRememberPasswordTitle => '이 기기에 비밀번호를 기억할까요?';
+
+  @override
+  String get backupAutoRememberPasswordMessage =>
+      '자동 백업이 실행될 수 있도록 이 기기에 비밀번호를 기억합니다. 비밀번호는 이 기기에만 저장되며 업로드되지 않습니다.';
+
+  @override
+  String get backupAutoRememberPasswordConfirm => '기억';
+
+  @override
+  String get backupAutoRememberPasswordDecline => '나중에';
+
+  @override
+  String get backupAutoRememberDeclined =>
+      '자동 백업이 켜지지 않았습니다. 예정 시각이 되면 계속 알려드립니다.';
+
+  @override
+  String get backupAutoKeychainUnavailable =>
+      'Kelivo가 백업 비밀번호를 위해 시스템 키체인에 접근할 수 없습니다. 수동으로 백업할 수는 있습니다.';
+
+  @override
+  String get backupAutoSucceeded => '자동 백업 완료';
+
+  @override
+  String backupAutoFailed(String error) {
+    return '자동 백업 실패: $error';
+  }
+
+  @override
+  String get backupAutoFailedPassword => '자동 백업 실패: 비밀번호가 올바르지 않습니다.';
+
+  @override
+  String get backupReminderSidebarSubtitleAutoFailed =>
+      '자동 백업이 완료되지 않았습니다. 네트워크를 확인하거나 수동으로 백업하세요.';
+
+  @override
+  String get backupEncryptionOnHintRemembered =>
+      '백업이 암호화됩니다. 비밀번호는 이 기기에 저장되어 있습니다.';
+
+  @override
+  String get backupRememberPasswordOnDevice => '이 기기에 비밀번호 저장';
+
+  @override
+  String get backupForgetDisablesAutomaticHint => '이 기능을 끄면 자동 백업도 꺼집니다.';
+
+  @override
+  String get backupManualPasswordHint => '암호화된 백업에 설정한 비밀번호를 입력하세요.';
+
+  @override
+  String get backupManualPasswordNotSaved =>
+      '이 기기에 비밀번호를 저장하지 못했습니다. 이번 백업은 계속 진행됩니다.';
+
+  @override
+  String get backupEncryptionChangePassword => '백업 비밀번호 변경';
+
+  @override
+  String get backupMacKeychainNeedsUnlock =>
+      'macOS에서 로그인 키체인을 잠금 해제하지 못했습니다. 키체인 접근을 열어 \'로그인\'을 잠금 해제한 후 Kelivo에서 다시 시도하세요.';
+
+  @override
+  String get backupMacOpenKeychainAccess => '키체인 접근 열기';
+
+  @override
+  String get backupMacKeychainAccessDenied =>
+      'macOS에서 백업 비밀번호 접근이 거부되었습니다. 시스템 프롬프트가 나타나면 Kelivo의 접근을 허용해 주세요. 키체인 접근에서 기본 키체인과 비밀번호 항목의 권한을 확인할 수도 있습니다.';
 }
