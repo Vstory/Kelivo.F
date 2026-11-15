@@ -467,38 +467,50 @@ jobs:
                 "repos/${REPO}/releases/assets/${id}" -f label="" >/dev/null 2>&1 || true
             done
 
-      # 发布页积到几百张后 Releases 页翻不动，构建完顺手把超出的清掉。
-      # ⚠️ 判据必须是 CI 的 tag 命名：图床页 upstream-issue-attachments / issue-attachments(-<issue号>)
-      #    与 CI 页混在同一个列表里，且 upstream-issue-attachments 本身就是 prerelease=true ——
-      #    按 prerelease 或「列表前 N 条之外全删」都会把上游 issue 正文引用的截图连页删掉。
-      # 放在发布之后：本次刚建的页永远落在保留窗口内，清理失败也只影响历史页。
+      # 发布页积到几百张后 Releases 页翻不动，构建完把超出的清掉，只留最近 KEEP_RELEASE_PAGES 张。
+      # ⚠️ 删除只认 release id：REST 没有 DELETE /releases/tags/{tag} 这个端点 ——
+      #    用了它只会 404，而紧接着那句 refs/tags 是真端点会成功，于是 tag 被删、页留下，
+      #    整页烂成 untagged 幽灵页（2026-11-15 首次上线就是这么翻车的）。
+      # 排序键取 tag 内嵌的构建时间 r<YYMMDD>.<HHMM>：created_at 只是「页什么时候建的」，
+      #    重跑 edit 旧页会把顺序带偏；升序后从最旧的开始删，最新那张永远在保留窗口里。
+      # 判据是 CI 的 tag 命名：图床页 upstream-issue-attachments / issue-attachments(-<issue号>)
+      #    与 CI 页混在同一列表，且 upstream-issue-attachments 本身就是 prerelease=true ——
+      #    按 prerelease 或「列表前 N 条之外全删」会连上游 issue 正文引用的截图一起删掉。
       - name: Prune old release pages
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: |
           set -uo pipefail
-          # 0 或空值会让 tail 从第 1 条切起，等于删光；宁可不清理也不能误删
+          # 0 / 空 / 非数字会让下面的窗口计算退化成「全删」；宁可不清理也不能误删
           case "${KEEP_RELEASE_PAGES:-}" in
-            ''|*[!0-9]*) echo "::error::KEEP_RELEASE_PAGES 不是正整数（${KEEP_RELEASE_PAGES:-空}），跳过清理"; exit 0 ;;
-            0) echo "::error::KEEP_RELEASE_PAGES 为 0，跳过清理"; exit 0 ;;
+            ''|*[!0-9]*|0) echo "::error::KEEP_RELEASE_PAGES 非法（${KEEP_RELEASE_PAGES:-空}），跳过清理"; exit 0 ;;
           esac
-          pruned=0
-          while IFS=$'\t' read -r created tag; do
+          pages=$(gh api --paginate "repos/${REPO}/releases?per_page=100" \
+                    --jq '.[] | [.id, .tag_name] | @tsv' \
+                  | awk -F'\t' 'match($2, /-r[0-9][0-9][0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9]\./) {
+                                   k = substr($2, RSTART + 2, 6) substr($2, RSTART + 9, 4)
+                                   print k "\t" $1 "\t" $2 }')
+          total=$(printf '%s\n' "$pages" | grep -c . || true)
+          stale=$(printf '%s\n' "$pages" | sort -t $'\t' -k1,1n | head -n -"${KEEP_RELEASE_PAGES}" || true)
+          if [ -z "${stale//[[:space:]]/}" ]; then
+            echo "发布页共 ${total} 张，未超过 ${KEEP_RELEASE_PAGES} 张，无需清理"
+            exit 0
+          fi
+          pruned=0; failed=0
+          while IFS=$'\t' read -r key id tag; do
             [ -n "${tag:-}" ] || continue
-            echo "::notice::清理过期发布页 ${tag}（建于 ${created}）"
-            gh api -X DELETE "repos/${REPO}/releases/tags/${tag}" || true
-            gh api -X DELETE "repos/${REPO}/git/refs/tags/${tag}" || true
-            pruned=$((pruned + 1))
-          done < <(
-            gh api --paginate "repos/${REPO}/releases?per_page=100" \
-              --jq '.[] | [.created_at, .tag_name] | @tsv' \
-            | awk -F'\t' -v re='^v[0-9]+\.[0-9]+\.[0-9]+-r[0-9]{6}\.[0-9]{4}\.[0-9a-f]+$' \
-                '$2 ~ re { print }' \
-            | sort -r \
-            | tail -n +$(( KEEP_RELEASE_PAGES + 1 ))
-          )
-          echo "发布页清理完成：删 ${pruned} 张，保留最近 ${KEEP_RELEASE_PAGES} 张"
+            if gh api -X DELETE "repos/${REPO}/releases/${id}" >/dev/null; then
+              pruned=$((pruned + 1))
+              echo "::notice::已清理过期页 ${tag}（构建于 ${key}）"
+              # 页删了 tag 通常还在；此前被误删过 ref 的页会 404，忽略
+              gh api -X DELETE "repos/${REPO}/git/refs/tags/${tag}" >/dev/null 2>&1 || true
+            else
+              failed=$((failed + 1))
+              echo "::warning::清理失败 ${tag}（id ${id}），下轮构建再试"
+            fi
+          done <<<"$stale"
+          echo "发布页清理完成：原有 ${total} 张，删 ${pruned} 张，失败 ${failed} 张，保留最近 ${KEEP_RELEASE_PAGES} 张"
 
       # artifact 名必须带 run_number：upload-artifact 拒绝同名 artifact，
       # 「同一 commit、同一分钟内重复触发」会让 ts 与短号都相同。
