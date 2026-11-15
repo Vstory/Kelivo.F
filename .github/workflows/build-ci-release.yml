@@ -83,7 +83,7 @@ jobs:
       # 取消会跳过后续所有 step，被 concurrency 干掉的那个 run 停在「页面已建、包没传完」
       # 时自己收不了尾 ⇒ 残页只能由后续 run 顺手清。判据同 Mishka.F：target_commitish
       # 命中一个「只跑过 cancelled、从未 success」的 head sha（同一提交重跑成功过的留着）。
-      # ⚠️ tag 还要再匹配 CI 的构建命名：issue-attachments-* 那几张图床页同样是 prerelease，
+      # ⚠️ tag 还要再匹配 CI 的构建命名：图床页 upstream-issue-attachments 同样是 prerelease，
       #    只筛 prerelease 会把上游 issue 里引用的截图连页删掉。
       - name: Sweep release pages of cancelled runs
         env:
@@ -103,13 +103,17 @@ jobs:
             exit 0
           fi
           gh api "repos/${REPO}/releases?per_page=100" \
-            --jq '.[] | select(.prerelease) | "\(.target_commitish)\t\(.tag_name)\t\(.assets|length)"' \
-          | while IFS=$'\t' read -r sha tag assets; do
+            --jq '.[] | select(.prerelease) | "\(.id)\t\(.tag_name)\t\(.assets|length)\t\(.target_commitish)"' \
+          | while IFS=$'\t' read -r id tag assets sha; do
               grep -qxF "$sha" <<<"$dead" || continue
               grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+-r[0-9]{6}\.[0-9]{4}\.[0-9a-f]+$' <<<"$tag" || continue
-              echo "::notice::清理被取消运行的产物页 ${tag}（资产 ${assets} 个）"
-              gh api -X DELETE "repos/${REPO}/releases/tags/${tag}" || true
-              gh api -X DELETE "repos/${REPO}/git/refs/tags/${tag}" || true
+              # 按 id 删：DELETE /releases/tags/{tag} 不存在，用它只会 404 后把 tag 删掉，页烂成幽灵页
+              if gh api -X DELETE "repos/${REPO}/releases/${id}" >/dev/null; then
+                echo "::notice::清理被取消运行的产物页 ${tag}（资产 ${assets} 个）"
+                gh api -X DELETE "repos/${REPO}/git/refs/tags/${tag}" >/dev/null 2>&1 || true
+              else
+                echo "::warning::清理失败 ${tag}（id ${id}）"
+              fi
             done
 
       # 指定 ref 构建时（如复现上游发版时代的代码），那棵树里没有 fork 的改写脚本，
@@ -473,9 +477,9 @@ jobs:
       #    整页烂成 untagged 幽灵页（2026-11-15 首次上线就是这么翻车的）。
       # 排序键取 tag 内嵌的构建时间 r<YYMMDD>.<HHMM>：created_at 只是「页什么时候建的」，
       #    重跑 edit 旧页会把顺序带偏；升序后从最旧的开始删，最新那张永远在保留窗口里。
-      # 判据是 CI 的 tag 命名：图床页 upstream-issue-attachments / issue-attachments(-<issue号>)
-      #    与 CI 页混在同一列表，且 upstream-issue-attachments 本身就是 prerelease=true ——
-      #    按 prerelease 或「列表前 N 条之外全删」会连上游 issue 正文引用的截图一起删掉。
+      # 判据是 CI 的 tag 命名：图床页 upstream-issue-attachments（全仓唯一图床页，上游 issue 正文
+      #    引用的截图都在这里）与 CI 页混在同一列表，且它本身就是 prerelease=true ——
+      #    按 prerelease 或「列表前 N 条之外全删」会连那些截图一起删掉。
       - name: Prune old release pages
         env:
           GH_TOKEN: ${{ github.token }}
