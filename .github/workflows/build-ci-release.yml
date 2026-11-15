@@ -63,6 +63,8 @@ env:
   JAVA_VERSION: '17'
   # push 触发时出 debug + release：debug 排障日志最全，release 验证正式构建形态
   PUSH_VARIANT: release
+  # 发布页只留最近这么多张，更早的连页带资产一起清。判据是 tag 命名，图床页不在清理范围
+  KEEP_RELEASE_PAGES: '30'
   # ═════════════════════════ PROJECT-CUSTOM-END ═════════════════════════
 
 jobs:
@@ -464,6 +466,39 @@ jobs:
               gh api -X PATCH -H "Accept: application/vnd.github+json" \
                 "repos/${REPO}/releases/assets/${id}" -f label="" >/dev/null 2>&1 || true
             done
+
+      # 发布页积到几百张后 Releases 页翻不动，构建完顺手把超出的清掉。
+      # ⚠️ 判据必须是 CI 的 tag 命名：图床页 upstream-issue-attachments / issue-attachments(-<issue号>)
+      #    与 CI 页混在同一个列表里，且 upstream-issue-attachments 本身就是 prerelease=true ——
+      #    按 prerelease 或「列表前 N 条之外全删」都会把上游 issue 正文引用的截图连页删掉。
+      # 放在发布之后：本次刚建的页永远落在保留窗口内，清理失败也只影响历史页。
+      - name: Prune old release pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -uo pipefail
+          # 0 或空值会让 tail 从第 1 条切起，等于删光；宁可不清理也不能误删
+          case "${KEEP_RELEASE_PAGES:-}" in
+            ''|*[!0-9]*) echo "::error::KEEP_RELEASE_PAGES 不是正整数（${KEEP_RELEASE_PAGES:-空}），跳过清理"; exit 0 ;;
+            0) echo "::error::KEEP_RELEASE_PAGES 为 0，跳过清理"; exit 0 ;;
+          esac
+          pruned=0
+          while IFS=$'\t' read -r created tag; do
+            [ -n "${tag:-}" ] || continue
+            echo "::notice::清理过期发布页 ${tag}（建于 ${created}）"
+            gh api -X DELETE "repos/${REPO}/releases/tags/${tag}" || true
+            gh api -X DELETE "repos/${REPO}/git/refs/tags/${tag}" || true
+            pruned=$((pruned + 1))
+          done < <(
+            gh api --paginate "repos/${REPO}/releases?per_page=100" \
+              --jq '.[] | [.created_at, .tag_name] | @tsv' \
+            | awk -F'\t' -v re='^v[0-9]+\.[0-9]+\.[0-9]+-r[0-9]{6}\.[0-9]{4}\.[0-9a-f]+$' \
+                '$2 ~ re { print }' \
+            | sort -r \
+            | tail -n +$(( KEEP_RELEASE_PAGES + 1 ))
+          )
+          echo "发布页清理完成：删 ${pruned} 张，保留最近 ${KEEP_RELEASE_PAGES} 张"
 
       # artifact 名必须带 run_number：upload-artifact 拒绝同名 artifact，
       # 「同一 commit、同一分钟内重复触发」会让 ts 与短号都相同。
