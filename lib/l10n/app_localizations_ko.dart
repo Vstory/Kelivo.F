@@ -140,6 +140,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get storageSpaceCopyErrorDetails => '오류 세부 정보 복사';
 
   @override
+  String get storageAttachmentChecking => '첨부 파일 사용량 확인 중…';
+
+  @override
+  String get storageAttachmentCheckFailed =>
+      '첨부 파일 사용량을 확인할 수 없습니다. 새로 고쳐 다시 시도하세요.';
+
+  @override
   String get storageSpaceCopyErrorFailed => '오류 세부 정보를 복사할 수 없습니다. 다시 시도해 주세요.';
 
   @override
@@ -11399,8 +11406,40 @@ class AppLocalizationsKo extends AppLocalizations {
   String get incomingShareMoveFailed => '대화를 전환하지 못했습니다. 초안은 유지되었습니다.';
 
   @override
+  String attachmentEncodingUnrecognized(String name) {
+    return '“$name”의 텍스트 인코딩을 인식할 수 없습니다. UTF-8로 저장한 후 다시 보내 주세요.';
+  }
+
+  @override
+  String get attachmentEncodingUnrecognizedShort => '인코딩 인식 불가';
+
+  @override
+  String attachmentNotText(String name) {
+    return '“$name”은(는) 텍스트 파일이 아니므로 여기에서 사용할 수 없습니다.';
+  }
+
+  @override
+  String get attachmentNotTextShort => '텍스트 파일 아님';
+
+  @override
+  String attachmentTruncatedNotice(int count) {
+    return '파일이 너무 커서 처음 $count자만 읽었습니다. 나머지가 필요하면 파일을 나눠서 다시 보내 주세요.';
+  }
+
+  @override
+  String get attachmentTruncatedCard => '앞부분만 전송됩니다';
+
+  @override
+  String attachmentDocumentTooLarge(String name) {
+    return '“$name” 파일이 너무 커서 일반 대화에서 읽을 수 없습니다.';
+  }
+
+  @override
+  String get attachmentDocumentTooLargeShort => '파일이 너무 큼';
+
+  @override
   String attachmentRequiresWorkspace(String name) {
-    return '「$name」은(는) 일반 대화에서 직접 읽을 수 없습니다. 작업 공간을 연결하고 파일 도구를 활성화하거나, 초안을 작업 공간이 있는 대화로 이동하세요.';
+    return '“$name”을(를) 사용하려면 작업 공간을 연결하고 파일 도구를 활성화하거나, 이 초안을 작업 공간이 있는 대화로 옮기세요. 이 파일은 일반 대화에서 직접 읽을 수 없습니다.';
   }
 
   @override
@@ -16458,8 +16497,20 @@ class AppLocalizationsKo extends AppLocalizations {
       '이전에 압축된 부분에 포함된 내 메시지도 함께 포함할 수 있습니다.';
 
   @override
-  String compressionCarryPreview(int count, String tokens) {
-    return '$count개 전송 · 약 $tokens 토큰';
+  String compressionCarryPreview(int count, int replyCount, String tokens) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '사용자 메시지 $count개',
+      one: '사용자 메시지 1개',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      replyCount,
+      locale: localeName,
+      other: '답변 $replyCount개',
+      one: '답변 1개',
+    );
+    return '$_temp0 · $_temp1 · 약 $tokens 토큰';
   }
 
   @override
@@ -16642,6 +16693,16 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get compressionCarryListTitle => '메시지 미리보기';
+
+  @override
+  String get compressionCarrySelectAllReplies => '모든 답변 선택';
+
+  @override
+  String get compressionCarryDeselectAllReplies => '모든 답변 선택 해제';
+
+  @override
+  String get compressionCarryPairNotFit =>
+      '이 메시지와 해당 답장이 남은 예산을 초과합니다. 둘 다 제외됩니다.';
 
   @override
   String compressionCarryImageCount(int count) {

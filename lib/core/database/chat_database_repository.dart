@@ -787,9 +787,13 @@ class ChatDatabaseRepository {
           'WHERE is_streaming != 0;',
           [DateTime.now().toUtc().microsecondsSinceEpoch],
         );
-        database.execute('DELETE FROM chat_storage_meta_rows WHERE key = ?;', [
-          ChatStorageMetaKeys.activeStreamingIds,
-        ]);
+        database.execute(
+          'DELETE FROM chat_storage_meta_rows WHERE key IN (?, ?);',
+          [
+            ChatStorageMetaKeys.activeStreamingIds,
+            GenUiDerivedSchema.searchBackfillKey,
+          ],
+        );
         database.execute(
           'INSERT OR REPLACE INTO chat_storage_meta_rows (key, value) '
           'VALUES (?, ?);',
@@ -2137,14 +2141,18 @@ class ChatDatabaseRepository {
   Future<int> getMessageCount(String conversationId) async {
     return _observer.measure(ChatDatabaseOperation.queryMessageCount, () async {
       await _timelineIndex.ensureConversation(conversationId);
-      final row = await _db
-          .customSelect(
-            'SELECT message_count FROM timeline_state WHERE conversation_id = ?',
-            variables: [Variable<String>(conversationId)],
-          )
-          .getSingleOrNull();
-      return row?.read<int>('message_count') ?? 0;
+      return _indexedMessageCount(conversationId);
     }, resultCount: (count) => count);
+  }
+
+  Future<int> _indexedMessageCount(String conversationId) async {
+    final row = await _db
+        .customSelect(
+          'SELECT message_count FROM timeline_state WHERE conversation_id = ?',
+          variables: [Variable<String>(conversationId)],
+        )
+        .getSingleOrNull();
+    return row?.read<int>('message_count') ?? 0;
   }
 
   Future<Map<String, int>> getMessageCountsByConversation() async {
@@ -2668,6 +2676,220 @@ class ChatDatabaseRepository {
     }, resultCount: (rows) => rows.length);
   }
 
+  Future<String> getConversationSummarySource(
+    String conversationId, {
+    required int start,
+    required int end,
+  }) async {
+    await _timelineIndex.ensureConversation(conversationId);
+    return _db.transaction(() async {
+      const maxChars = 2000;
+      final total = await _indexedMessageCount(conversationId);
+      final first = start.clamp(0, total);
+      final afterLast = end.clamp(0, total);
+      if (first >= afterLast) return '';
+      // The summary cursor counts all raw revisions. Locate its endpoints on
+      // the order index before filtering for user messages.
+      Future<int> orderAt(int index) async {
+        final fromEnd = total - 1 - index;
+        final descending = fromEnd < index;
+        final row = await _db
+            .customSelect(
+              'SELECT message_order FROM message_rows WHERE conversation_id = ? '
+              'ORDER BY message_order ${descending ? 'DESC' : 'ASC'} LIMIT 1 OFFSET ?',
+              variables: [
+                Variable<String>(conversationId),
+                Variable<int>(descending ? fromEnd : index),
+              ],
+            )
+            .getSingle();
+        return row.read<int>('message_order');
+      }
+
+      var cursor = await orderAt(first) - 1;
+      final lastOrder = await orderAt(afterLast - 1);
+      final content = StringBuffer();
+      while (cursor < lastOrder) {
+        final page = await _db
+            .customSelect(
+              "SELECT id, message_order FROM message_rows WHERE conversation_id = ? AND role = 'user' "
+              "AND message_order > ? AND message_order <= ? ORDER BY message_order LIMIT 20",
+              variables: [
+                Variable<String>(conversationId),
+                Variable<int>(cursor),
+                Variable<int>(lastOrder),
+              ],
+            )
+            .get();
+        if (page.isEmpty) break;
+        cursor = page.last.read<int>('message_order');
+        final ids = [for (final row in page) row.read<String>('id')];
+        final texts = await getMessageTexts(
+          ids,
+          trimmedPrefixLength: maxChars - content.length,
+        );
+        for (final message in texts) {
+          final text = message.text;
+          if (text.isEmpty) continue;
+          if (content.isNotEmpty) {
+            final space = maxChars - content.length;
+            if (space <= 2) {
+              return content.toString() + '\n\n'.substring(0, space);
+            }
+            content.write('\n\n');
+          }
+          final remaining = maxChars - content.length;
+          if (text.length >= remaining) {
+            content.write(text.substring(0, utf16SafeHeadEnd(text, remaining)));
+            return content.toString();
+          }
+          content.write(text);
+        }
+      }
+      return content.toString();
+    });
+  }
+
+  // ChatMessage.content joins just the text parts in ordinal order. Do that
+  // on SQLite's worker without materializing reasoning, tools or attachments.
+  Future<List<ChatMessageText>> getMessageTexts(
+    List<String> ids, {
+    int? trimmedPrefixLength,
+  }) async {
+    if (ids.isEmpty) return const [];
+    const body = '''(SELECT GROUP_CONCAT(payload, '') FROM (
+  SELECT p.payload FROM message_part_rows p WHERE p.revision_id = m.id AND p.kind = 'text'
+  ORDER BY p.ordinal
+))''';
+    final projection = trimmedPrefixLength == null
+        ? body
+        : 'kelivo_trimmed_prefix($body, ?2)';
+    final rows = await _db
+        .customSelect(
+          '''
+SELECT m.id, m.role, m.is_streaming, CASE WHEN m.role IN ('user', 'assistant') THEN $projection END AS body
+FROM json_each(?1) requested JOIN message_rows m ON m.id = requested.value
+ORDER BY requested.key
+''',
+          variables: [
+            Variable<String>(jsonEncode(ids)),
+            if (trimmedPrefixLength != null) Variable<int>(trimmedPrefixLength),
+          ],
+        )
+        .get();
+    return [
+      for (final row in rows)
+        (
+          id: row.read<String>('id'),
+          role: row.read<String>('role'),
+          isStreaming: row.read<bool>('is_streaming'),
+          text: row.readNullable<String>('body') ?? '',
+        ),
+    ];
+  }
+
+  /// Memory watermarks count raw revisions, including unselected versions.
+  /// Visit text parts newest first until the prompt is full. Bounds describe
+  /// the entire eligible window, including messages omitted from the prompt.
+  Future<({int startOrder, int endOrder, int length})?>
+  readMemoryOrganizeWindow(
+    String conversationId, {
+    required int watermark,
+    required int minAssistantTurns,
+    required int firstWindowLimit,
+    required int textPrefixLength,
+    required bool Function(String role, String text) addText,
+  }) async {
+    await _timelineIndex.ensureConversation(conversationId);
+    return _db.transaction(() async {
+      final streaming = await _db
+          .customSelect(
+            'SELECT 1 FROM message_rows INDEXED BY idx_message_rows_streaming '
+            'WHERE is_streaming = 1 AND conversation_id = ? LIMIT 1',
+            variables: [Variable<String>(conversationId)],
+          )
+          .getSingleOrNull();
+      if (streaming != null) return null;
+
+      const empty = (startOrder: -1, endOrder: -1, length: 0);
+      final total = await _indexedMessageCount(conversationId);
+      final pending = total - watermark - 1;
+      if (pending <= 0) return empty;
+      const groups = '''
+JOIN timeline_group_rows g ON g.conversation_id = ?1 AND g.group_id = COALESCE(m.group_id, m.id)
+LEFT JOIN timeline_selection_rows s ON s.conversation_id = g.conversation_id AND s.group_id = g.group_id''';
+      final selected =
+          '(g.version_count = 1 OR m.id = ${MessageTimelineIndex.selectedRevision('g')})';
+      // The maintained raw count lets SQLite walk just the unprocessed suffix.
+      // Number it before filtering versions and return only aggregate bounds.
+      final row = await _db
+          .customSelect(
+            '''
+WITH tail AS (
+  SELECT id, role, group_id, message_order
+  FROM message_rows WHERE conversation_id = ?1
+  ORDER BY message_order DESC LIMIT ?2
+), numbered AS (
+  SELECT tail.*, ?3 - ROW_NUMBER() OVER (ORDER BY message_order DESC) AS position
+  FROM tail
+), window AS (
+  SELECT m.position, m.message_order, COUNT(*) FILTER (WHERE m.role = 'assistant') OVER () AS turns
+  FROM numbered m $groups WHERE $selected ORDER BY m.message_order DESC LIMIT ?4
+)
+SELECT COUNT(*) AS length, MIN(position) AS start, MAX(position) AS end,
+       MIN(message_order) AS first_order, MAX(message_order) AS last_order
+FROM window WHERE turns >= ?5
+''',
+            variables: [
+              Variable<String>(conversationId),
+              Variable<int>(pending),
+              Variable<int>(total),
+              Variable<int>(watermark == -1 ? firstWindowLimit : -1),
+              Variable<int>(minAssistantTurns),
+            ],
+          )
+          .getSingle();
+      final length = row.read<int>('length');
+      if (length == 0) return empty;
+      final bounds = (
+        startOrder: row.read<int>('start'),
+        endOrder: row.read<int>('end'),
+        length: length,
+      );
+      final firstOrder = row.read<int>('first_order');
+      var lastOrder = row.read<int>('last_order');
+      while (lastOrder >= firstOrder) {
+        final page = await _db
+            .customSelect(
+              '''
+SELECT m.id, m.message_order FROM message_rows m $groups
+WHERE m.conversation_id = ?1 AND m.message_order BETWEEN ?2 AND ?3
+  AND m.role IN ('user','assistant') AND $selected
+ORDER BY m.message_order DESC LIMIT 20
+''',
+              variables: [
+                Variable<String>(conversationId),
+                Variable<int>(firstOrder),
+                Variable<int>(lastOrder),
+              ],
+            )
+            .get();
+        if (page.isEmpty) break;
+        lastOrder = page.last.read<int>('message_order') - 1;
+        final ids = [for (final item in page) item.read<String>('id')];
+        for (final message in await getMessageTexts(
+          ids,
+          trimmedPrefixLength: textPrefixLength,
+        )) {
+          if (!addText(message.role, message.text)) {
+            return bounds;
+          }
+        }
+      }
+      return bounds;
+    });
+  }
+
   /// Loads the selected linear message versions needed for model context.
   ///
   /// Raw selection, tail limiting and part hydration share a transaction.
@@ -3016,6 +3238,72 @@ class ChatDatabaseRepository {
     return {for (final row in rows) row.read(_db.messageRows.id)!};
   }
 
+  Future<List<QueryRow>> _readTimelineGroupPage(
+    String conversationId,
+    String condition,
+    List<Variable<Object>> values,
+    bool descending,
+    int size,
+  ) {
+    final direction = descending ? 'DESC' : 'ASC';
+    return _db
+        .customSelect(
+          'SELECT g.group_id,g.anchor_order,g.version_count,'
+          '${MessageTimelineIndex.selectedRevision('g')} AS revision_id '
+          'FROM timeline_group_rows g '
+          'LEFT JOIN timeline_selection_rows s ON s.conversation_id=g.conversation_id AND s.group_id=g.group_id '
+          'WHERE g.conversation_id = ? $condition '
+          'ORDER BY g.anchor_order $direction,g.group_id $direction LIMIT ?',
+          variables: [
+            Variable<String>(conversationId),
+            ...values,
+            Variable<int>(size),
+          ],
+          readsFrom: {_db.messageRows, _db.conversationRows},
+        )
+        .get();
+  }
+
+  /// Visit selected dialogue newest first in a single snapshot. The first
+  /// count fixes the logical cutoff; later pages seek from the prior anchor.
+  Future<void> readSelectedMessageTextTail(
+    String conversationId, {
+    required int start,
+    required int pageSize,
+    required bool Function(Iterable<ChatMessageText>) visit,
+  }) async {
+    if (pageSize <= 0) return;
+    await _timelineIndex.ensureConversation(conversationId);
+    await _db.transaction(() async {
+      final state = await _db
+          .customSelect(
+            'SELECT group_count FROM timeline_state WHERE conversation_id = ?',
+            variables: [Variable<String>(conversationId)],
+          )
+          .getSingleOrNull();
+      final total = state?.read<int>('group_count') ?? 0;
+      var remaining = total - start.clamp(0, total);
+      var cursor = <Variable<Object>>[];
+      while (remaining > 0) {
+        final page = await _readTimelineGroupPage(
+          conversationId,
+          cursor.isEmpty ? '' : 'AND (g.anchor_order,g.group_id)<(?,?)',
+          cursor,
+          true,
+          remaining.clamp(1, pageSize),
+        );
+        if (page.isEmpty) return;
+        final ids = [for (final row in page) row.read<String>('revision_id')];
+        if (!visit(await getMessageTexts(ids))) return;
+        remaining -= page.length;
+        cursor = [
+          Variable<int>(page.last.read<int>('anchor_order')),
+          Variable<String>(page.last.read<String>('group_id')),
+        ];
+      }
+    });
+  }
+
   Future<LinearMessageWindow> loadLinearMessageWindow({
     required String conversationId,
     String? beforeRevisionId,
@@ -3054,22 +3342,13 @@ class ChatDatabaseRepository {
         List<Variable<Object>> values,
         bool descending,
         int size,
-      ) => _db
-          .customSelect(
-            'SELECT g.group_id,g.anchor_order,g.version_count,'
-            '${MessageTimelineIndex.selectedRevision('g')} AS revision_id '
-            'FROM timeline_group_rows g '
-            'LEFT JOIN timeline_selection_rows s ON s.conversation_id=g.conversation_id AND s.group_id=g.group_id '
-            'WHERE g.conversation_id = ? $condition '
-            'ORDER BY g.anchor_order ${descending ? 'DESC' : 'ASC'},g.group_id ${descending ? 'DESC' : 'ASC'} LIMIT ?',
-            variables: [
-              Variable<String>(conversationId),
-              ...values,
-              Variable<int>(size),
-            ],
-            readsFrom: {_db.messageRows, _db.conversationRows},
-          )
-          .get();
+      ) => _readTimelineGroupPage(
+        conversationId,
+        condition,
+        values,
+        descending,
+        size,
+      );
       int index = 0;
       List<QueryRow> rows;
       if (cursors.isEmpty) {
@@ -3395,8 +3674,8 @@ class ChatDatabaseRepository {
     if (cleanTokens.isEmpty || limit <= 0) return const [];
     await _ensureMessageSearchFts();
     await _genUiSearch.ensure();
-    return _db.transaction(() async {
-      final useSubstringFallback = cleanTokens.any(_requiresCjkFallback);
+    final useSubstringFallback = cleanTokens.any(_requiresCjkFallback);
+    Future<List<ConversationSearchMatch>> read() => _db.transaction(() async {
       String escapeLike(String value) => value
           .replaceAll(r'\', r'\\')
           .replaceAll('%', r'\%')
@@ -3662,6 +3941,9 @@ class ChatDatabaseRepository {
       }
       return matches;
     });
+    return useSubstringFallback
+        ? read()
+        : _genUiSearch.retryOnFtsCorruption(read);
   }
 
   Future<Map<String, UiSearchText>> _searchTextForCandidates(
@@ -7016,7 +7298,7 @@ class ChatDatabaseRepository {
     });
   }
 
-  Future<void> updateStreamingCheckpoint(
+  Future<bool> updateStreamingCheckpoint(
     ChatMessage message,
     List<Map<String, dynamic>> toolEvents, {
     String? generationRunId,
@@ -7038,47 +7320,46 @@ class ChatDatabaseRepository {
     );
   }
 
-  Future<void> _updateStreamingCheckpoint(
+  Future<bool> _updateStreamingCheckpoint(
     ChatMessage message,
     List<Map<String, dynamic>> toolEvents, {
     String? generationRunId,
     int? checkpointSeq,
-  }) async {
-    await _writeTransaction(() async {
-      // Guard against a late flush resurrecting an already-finalized message.
-      // A streaming snapshot (is_streaming = true) that arrives after the
-      // terminal write has committed (row is_streaming = 0) must not overwrite
-      // the terminal content or flip is_streaming back on (which would also
-      // unindex it from search). Final writes carry is_streaming = false and
-      // are unaffected.
-      if (message.isStreaming) {
-        final existing =
-            await (_db.select(_db.messageRows)
-                  ..where((row) => row.id.equals(message.id))
-                  ..limit(1))
-                .getSingleOrNull();
-        if (existing != null && !existing.isStreaming) {
-          return;
-        }
+  }) => _writeTransaction(() async {
+    // Guard against a late flush resurrecting an already-finalized message.
+    // A streaming snapshot (is_streaming = true) that arrives after the
+    // terminal write has committed (row is_streaming = 0) must not overwrite
+    // the terminal content or flip is_streaming back on (which would also
+    // unindex it from search). Final writes carry is_streaming = false and
+    // are unaffected.
+    if (message.isStreaming) {
+      final existing =
+          await (_db.select(_db.messageRows)
+                ..where((row) => row.id.equals(message.id))
+                ..limit(1))
+              .getSingleOrNull();
+      if (existing != null && !existing.isStreaming) {
+        return false;
       }
-      // Keep message_rows (incl. is_streaming) ahead of parts rewrite so the
-      // FTS finalize trigger indexes the pre-rewrite text part correctly.
-      await _updateMessageRow(message);
-      await _replaceMessageParts(
-        message,
-        toolEvents: toolEvents,
-        streamingCheckpoint: true,
+    }
+    // Keep message_rows (incl. is_streaming) ahead of parts rewrite so the
+    // FTS finalize trigger indexes the pre-rewrite text part correctly.
+    await _updateMessageRow(message);
+    await _replaceMessageParts(
+      message,
+      toolEvents: toolEvents,
+      streamingCheckpoint: true,
+    );
+    if (generationRunId != null && checkpointSeq != null) {
+      await GenerationRunCommands(_db).checkpoint(
+        id: generationRunId,
+        targetRevisionId: message.id,
+        checkpointSeq: checkpointSeq,
+        updatedAt: DateTime.now().toUtc(),
       );
-      if (generationRunId != null && checkpointSeq != null) {
-        await GenerationRunCommands(_db).checkpoint(
-          id: generationRunId,
-          targetRevisionId: message.id,
-          checkpointSeq: checkpointSeq,
-          updatedAt: DateTime.now().toUtc(),
-        );
-      }
-    });
-  }
+    }
+    return true;
+  });
 
   final _checkpointParts = <String, ChatMessage>{};
   final _checkpointRoundPayloads = <String, Map<int, String>>{};
@@ -7809,14 +8090,15 @@ class ChatDatabaseRepository {
       }
       // Clearing is_streaming fires message_search_fts_finalize, which indexes
       // the checkpointed text parts left by the abandoned stream.
-      await (_db.update(
-        _db.messageRows,
-      )..where((row) => row.isStreaming.equals(true))).write(
-        MessageRowsCompanion(
-          isStreaming: const Value(false),
-          updatedAt: Value(DateTime.now().toUtc()),
-        ),
+      final recovered = await _db.customWriteReturning(
+        'UPDATE message_rows SET is_streaming = 0, updated_at = ? '
+        'WHERE is_streaming = 1 RETURNING id',
+        variables: [Variable<int>(now.microsecondsSinceEpoch)],
+        updates: {_db.messageRows},
+        updateKind: UpdateKind.update,
       );
+      // An in-place tool continuation can retain its original completed run.
+      await _sealGenUiSearch(recovered.map((row) => row.read<String>('id')));
       await clearActiveStreamingIds();
       return runs.length;
     });

@@ -146,6 +146,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get storageSpaceCopyErrorDetails => 'Hata ayrıntılarını kopyala';
 
   @override
+  String get storageAttachmentChecking => 'Ek kullanımı kontrol ediliyor…';
+
+  @override
+  String get storageAttachmentCheckFailed =>
+      'Ek kullanımı kontrol edilemedi. Yeniden denemek için yenileyin.';
+
+  @override
   String get storageSpaceCopyErrorFailed =>
       'Hata ayrıntıları kopyalanamadı. Lütfen tekrar deneyin.';
 
@@ -11816,8 +11823,40 @@ class AppLocalizationsTr extends AppLocalizations {
       'Sohbetler arasında geçiş yapılamadı. Taslağınız korundu.';
 
   @override
+  String attachmentEncodingUnrecognized(String name) {
+    return '“$name” dosyasının metin kodlaması tanınamadı. UTF-8 olarak kaydedip yeniden gönderin.';
+  }
+
+  @override
+  String get attachmentEncodingUnrecognizedShort => 'Kodlama tanınamadı';
+
+  @override
+  String attachmentNotText(String name) {
+    return '“$name” bir metin dosyası değil, bu yüzden burada kullanılamaz.';
+  }
+
+  @override
+  String get attachmentNotTextShort => 'Metin dosyası değil';
+
+  @override
+  String attachmentTruncatedNotice(int count) {
+    return 'Bu dosya çok büyük, bu yüzden yalnızca ilk $count karakter okundu. Kalanına ihtiyacınız varsa dosyayı bölüp yeniden gönderin.';
+  }
+
+  @override
+  String get attachmentTruncatedCard => 'Yalnızca başlangıç gönderilecek';
+
+  @override
+  String attachmentDocumentTooLarge(String name) {
+    return '“$name” normal bir sohbette okunamayacak kadar büyük.';
+  }
+
+  @override
+  String get attachmentDocumentTooLargeShort => 'Dosya çok büyük';
+
+  @override
   String attachmentRequiresWorkspace(String name) {
-    return '“$name” kullanmak için bir çalışma alanı bağlayıp dosya araçlarını etkinleştirin veya bu taslağı çalışma alanı olan bir sohbete taşıyın. Bu dosya normal bir sohbette doğrudan okunamaz.';
+    return '“$name” dosyasını kullanmak için bir çalışma alanı bağlayıp dosya araçlarını etkinleştirin veya bu taslağı çalışma alanı olan bir sohbete taşıyın. Bu dosya normal bir sohbette doğrudan okunamaz.';
   }
 
   @override
@@ -17076,8 +17115,20 @@ class AppLocalizationsTr extends AppLocalizations {
       'Daha önce sıkıştırılan kısımlardaki mesajlarınız da dahil edilebilir.';
 
   @override
-  String compressionCarryPreview(int count, String tokens) {
-    return '$count mesaj gönderilecek · yaklaşık $tokens token';
+  String compressionCarryPreview(int count, int replyCount, String tokens) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kullanıcı mesajı',
+      one: '1 kullanıcı mesajı',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      replyCount,
+      locale: localeName,
+      other: '$replyCount yanıt',
+      one: '1 yanıt',
+    );
+    return '$_temp0 · $_temp1 · yaklaşık $tokens token';
   }
 
   @override
@@ -17265,6 +17316,17 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get compressionCarryListTitle => 'Mesaj önizlemesi';
+
+  @override
+  String get compressionCarrySelectAllReplies => 'Tüm yanıtları seç';
+
+  @override
+  String get compressionCarryDeselectAllReplies =>
+      'Tüm yanıtların seçimini kaldır';
+
+  @override
+  String get compressionCarryPairNotFit =>
+      'Bu mesaj ve yanıtı kalan bütçeyi aşıyor. İkisi de dışarıda bırakılacak.';
 
   @override
   String compressionCarryImageCount(int count) {

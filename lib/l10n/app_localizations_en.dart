@@ -145,6 +145,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storageSpaceCopyErrorDetails => 'Copy error details';
 
   @override
+  String get storageAttachmentChecking => 'Checking attachment usage…';
+
+  @override
+  String get storageAttachmentCheckFailed =>
+      'Could not check attachment usage. Refresh to try again.';
+
+  @override
   String get storageSpaceCopyErrorFailed =>
       'Could not copy the error details. Please try again.';
 
@@ -11744,6 +11751,38 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not switch conversations. Your draft has been kept.';
 
   @override
+  String attachmentEncodingUnrecognized(String name) {
+    return 'Couldn’t recognize the text encoding of “$name”. Save it as UTF-8 and send it again.';
+  }
+
+  @override
+  String get attachmentEncodingUnrecognizedShort => 'Encoding unrecognized';
+
+  @override
+  String attachmentNotText(String name) {
+    return '“$name” isn’t a text file, so it can’t be used here.';
+  }
+
+  @override
+  String get attachmentNotTextShort => 'Not a text file';
+
+  @override
+  String attachmentTruncatedNotice(int count) {
+    return 'This file is too large, so only the first $count characters were read. Split it and send again if you need the rest.';
+  }
+
+  @override
+  String get attachmentTruncatedCard => 'Only the beginning will be sent';
+
+  @override
+  String attachmentDocumentTooLarge(String name) {
+    return '“$name” is too large to read in a regular chat.';
+  }
+
+  @override
+  String get attachmentDocumentTooLargeShort => 'File too large';
+
+  @override
   String attachmentRequiresWorkspace(String name) {
     return 'To use “$name”, bind a workspace and enable file tools, or move this draft to a conversation with a workspace. This file cannot be read directly in a regular chat.';
   }
@@ -16980,8 +17019,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your messages from parts compressed earlier can be included too.';
 
   @override
-  String compressionCarryPreview(int count, String tokens) {
-    return 'Will send $count · about $tokens tokens';
+  String compressionCarryPreview(int count, int replyCount, String tokens) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count user messages',
+      one: '1 user message',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      replyCount,
+      locale: localeName,
+      other: '$replyCount replies',
+      one: '1 reply',
+    );
+    return '$_temp0 · $_temp1 · about $tokens tokens';
   }
 
   @override
@@ -17171,6 +17222,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get compressionCarryListTitle => 'Message preview';
+
+  @override
+  String get compressionCarrySelectAllReplies => 'Select all replies';
+
+  @override
+  String get compressionCarryDeselectAllReplies => 'Deselect all replies';
+
+  @override
+  String get compressionCarryPairNotFit =>
+      'This message and its reply exceed the remaining budget. Both will be left out.';
 
   @override
   String compressionCarryImageCount(int count) {

@@ -352,6 +352,18 @@ abstract class AppLocalizations {
   /// **'Copy error details'**
   String get storageSpaceCopyErrorDetails;
 
+  /// Inline status on the Images and Files storage pages while files are visible and the app checks which attachments are safe to delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking attachment usage…'**
+  String get storageAttachmentChecking;
+
+  /// Inline error on the Images and Files storage pages when files can still be opened but their reference check failed and cleanup is unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check attachment usage. Refresh to try again.'**
+  String get storageAttachmentCheckFailed;
+
   /// Error notification on the Images and Files storage detail pages when the clipboard cannot accept the diagnostic text. The user can tap the copy button again.
   ///
   /// In en, this message translates to:
@@ -20949,7 +20961,55 @@ abstract class AppLocalizations {
   /// **'Could not switch conversations. Your draft has been kept.'**
   String get incomingShareMoveFailed;
 
-  /// Warning shown when an attachment named {name} needs a bound workspace with file tools; suggests binding one or moving the draft to a workspace conversation.
+  /// Detailed composer or generation error for an attachment whose text encoding cannot be recognized. {name} is the displayed file name.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t recognize the text encoding of “{name}”. Save it as UTF-8 and send it again.'**
+  String attachmentEncodingUnrecognized(String name);
+
+  /// Short error label on a composer attachment card when its text encoding cannot be recognized.
+  ///
+  /// In en, this message translates to:
+  /// **'Encoding unrecognized'**
+  String get attachmentEncodingUnrecognizedShort;
+
+  /// Detailed composer or generation error for a binary attachment. {name} is the displayed file name.
+  ///
+  /// In en, this message translates to:
+  /// **'“{name}” isn’t a text file, so it can’t be used here.'**
+  String attachmentNotText(String name);
+
+  /// Short error label on a composer attachment card for binary content.
+  ///
+  /// In en, this message translates to:
+  /// **'Not a text file'**
+  String get attachmentNotTextShort;
+
+  /// Shown on tapping a truncated composer attachment and after its text in the model prompt. {count} is the actual number of Unicode characters included.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is too large, so only the first {count} characters were read. Split it and send again if you need the rest.'**
+  String attachmentTruncatedNotice(int count);
+
+  /// Short warning on a composer attachment card when only the start of its text will be sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the beginning will be sent'**
+  String get attachmentTruncatedCard;
+
+  /// Detailed composer or generation error when a document exceeds the local extraction size limit. {name} is the displayed file name.
+  ///
+  /// In en, this message translates to:
+  /// **'“{name}” is too large to read in a regular chat.'**
+  String attachmentDocumentTooLarge(String name);
+
+  /// Short error label on a composer attachment card when a document exceeds the local extraction limit.
+  ///
+  /// In en, this message translates to:
+  /// **'File too large'**
+  String get attachmentDocumentTooLargeShort;
+
+  /// Warning in a conversation already bound to a workspace when an attachment cannot be read locally and the necessary file tools are unavailable. {name} is the displayed file name.
   ///
   /// In en, this message translates to:
   /// **'To use “{name}”, bind a workspace and enable file tools, or move this draft to a conversation with a workspace. This file cannot be read directly in a regular chat.'**
@@ -29820,11 +29880,11 @@ abstract class AppLocalizations {
   /// **'Your messages from parts compressed earlier can be included too.'**
   String get compressionCarryEarlierHint;
 
-  /// Compression options panel: Will send {count} · about {tokens} tokens Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
+  /// Summary below Message preview and More settings in manual context compression. Shows how many original user messages and associated assistant replies the current selection would carry, and their combined estimated input tokens. A reply already in retained history is not counted again.
   ///
   /// In en, this message translates to:
-  /// **'Will send {count} · about {tokens} tokens'**
-  String compressionCarryPreview(int count, String tokens);
+  /// **'{count, plural, =1{1 user message} other{{count} user messages}} · {replyCount, plural, =1{1 reply} other{{replyCount} replies}} · about {tokens} tokens'**
+  String compressionCarryPreview(int count, int replyCount, String tokens);
 
   /// Compression options panel: The part being summarized has no messages from you. Refers to original user messages additionally sent with a summary; replies are optional text-only copies.
   ///
@@ -30155,6 +30215,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message preview'**
   String get compressionCarryListTitle;
+
+  /// Action beside the Message preview heading in manual context compression. Includes the available assistant replies for all currently selected user messages, including collapsed rows. Individual replies can still be switched off.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all replies'**
+  String get compressionCarrySelectAllReplies;
+
+  /// Action beside the Message preview heading in manual context compression. Clears every assistant reply selection for this compression, including collapsed replies and those outside the token budget. The selected user messages stay checked.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect all replies'**
+  String get compressionCarryDeselectAllReplies;
+
+  /// Warning on the first user message whose selected assistant reply puts the pair over the remaining token budget in the fit-as-many-as-possible compression preview. This pair is omitted from the totals. The reply can still be switched off.
+  ///
+  /// In en, this message translates to:
+  /// **'This message and its reply exceed the remaining budget. Both will be left out.'**
+  String get compressionCarryPairNotFit;
 
   /// Preview title for a message containing only images. Count is the number of images.
   ///

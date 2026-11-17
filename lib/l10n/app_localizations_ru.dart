@@ -147,6 +147,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get storageSpaceCopyErrorDetails => 'Копировать сведения об ошибке';
 
   @override
+  String get storageAttachmentChecking => 'Проверка использования вложений…';
+
+  @override
+  String get storageAttachmentCheckFailed =>
+      'Не удалось проверить использование вложений. Обновите, чтобы повторить попытку.';
+
+  @override
   String get storageSpaceCopyErrorFailed =>
       'Не удалось скопировать сведения об ошибке. Попробуйте ещё раз.';
 
@@ -11912,8 +11919,40 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось переключить чат. Ваш черновик сохранён.';
 
   @override
+  String attachmentEncodingUnrecognized(String name) {
+    return 'Не удалось распознать кодировку текста в «$name». Сохраните файл в UTF-8 и отправьте снова.';
+  }
+
+  @override
+  String get attachmentEncodingUnrecognizedShort => 'Кодировка не распознана';
+
+  @override
+  String attachmentNotText(String name) {
+    return '«$name» — не текстовый файл, поэтому его нельзя использовать здесь.';
+  }
+
+  @override
+  String get attachmentNotTextShort => 'Не текстовый файл';
+
+  @override
+  String attachmentTruncatedNotice(int count) {
+    return 'Файл слишком большой, поэтому прочитаны только первые $count символов. Разделите его и отправьте снова, если нужна остальная часть.';
+  }
+
+  @override
+  String get attachmentTruncatedCard => 'Будет отправлено только начало';
+
+  @override
+  String attachmentDocumentTooLarge(String name) {
+    return '«$name» слишком большой для чтения в обычном чате.';
+  }
+
+  @override
+  String get attachmentDocumentTooLargeShort => 'Файл слишком большой';
+
+  @override
   String attachmentRequiresWorkspace(String name) {
-    return 'Чтобы использовать «$name», привяжите рабочую область и включите файловые инструменты или переместите этот черновик в чат с рабочей областью. Этот файл нельзя прочитать напрямую в обычном чате.';
+    return 'Чтобы использовать «$name», привяжите рабочую область и включите файловые инструменты или перенесите этот черновик в чат с рабочей областью. Этот файл нельзя прочитать напрямую в обычном чате.';
   }
 
   @override
@@ -17265,8 +17304,24 @@ class AppLocalizationsRu extends AppLocalizations {
       'Ваши сообщения из частей, сжатых ранее, тоже можно включить.';
 
   @override
-  String compressionCarryPreview(int count, String tokens) {
-    return 'Будет отправлено $count · около $tokens токенов';
+  String compressionCarryPreview(int count, int replyCount, String tokens) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сообщения пользователя',
+      many: '$count сообщений пользователя',
+      few: '$count сообщения пользователя',
+      one: '$count сообщение пользователя',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      replyCount,
+      locale: localeName,
+      other: '$replyCount ответа',
+      many: '$replyCount ответов',
+      few: '$replyCount ответа',
+      one: '$replyCount ответ',
+    );
+    return '$_temp0 · $_temp1 · около $tokens токенов';
   }
 
   @override
@@ -17455,6 +17510,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get compressionCarryListTitle => 'Предпросмотр сообщений';
+
+  @override
+  String get compressionCarrySelectAllReplies => 'Выбрать все ответы';
+
+  @override
+  String get compressionCarryDeselectAllReplies =>
+      'Снять выбор со всех ответов';
+
+  @override
+  String get compressionCarryPairNotFit =>
+      'Это сообщение и ответ на него превышают оставшийся бюджет. Оба будут пропущены.';
 
   @override
   String compressionCarryImageCount(int count) {

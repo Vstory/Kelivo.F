@@ -51,6 +51,14 @@
   "@storageSpaceCopyErrorDetails": {
     "description": "Button on the Images and Files storage detail pages that copies the load error and its stack trace to the clipboard."
   },
+  "storageAttachmentChecking": "Checking attachment usage…",
+  "@storageAttachmentChecking": {
+    "description": "Inline status on the Images and Files storage pages while files are visible and the app checks which attachments are safe to delete."
+  },
+  "storageAttachmentCheckFailed": "Could not check attachment usage. Refresh to try again.",
+  "@storageAttachmentCheckFailed": {
+    "description": "Inline error on the Images and Files storage pages when files can still be opened but their reference check failed and cleanup is unavailable."
+  },
   "storageSpaceCopyErrorFailed": "Could not copy the error details. Please try again.",
   "@storageSpaceCopyErrorFailed": {
     "description": "Error notification on the Images and Files storage detail pages when the clipboard cannot accept the diagnostic text. The user can tap the copy button again."
@@ -5716,6 +5724,58 @@
   "incomingShareNoConversations": "No matching conversations",
   "chatInputBarRemoveAttachment": "Remove attachment",
   "incomingShareMoveFailed": "Could not switch conversations. Your draft has been kept.",
+  "attachmentEncodingUnrecognized": "Couldn’t recognize the text encoding of “{name}”. Save it as UTF-8 and send it again.",
+  "@attachmentEncodingUnrecognized": {
+    "description": "Detailed composer or generation error for an attachment whose text encoding cannot be recognized. {name} is the displayed file name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentEncodingUnrecognizedShort": "Encoding unrecognized",
+  "@attachmentEncodingUnrecognizedShort": {
+    "description": "Short error label on a composer attachment card when its text encoding cannot be recognized."
+  },
+  "attachmentNotText": "“{name}” isn’t a text file, so it can’t be used here.",
+  "@attachmentNotText": {
+    "description": "Detailed composer or generation error for a binary attachment. {name} is the displayed file name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentNotTextShort": "Not a text file",
+  "@attachmentNotTextShort": {
+    "description": "Short error label on a composer attachment card for binary content."
+  },
+  "attachmentTruncatedNotice": "This file is too large, so only the first {count} characters were read. Split it and send again if you need the rest.",
+  "@attachmentTruncatedNotice": {
+    "description": "Shown on tapping a truncated composer attachment and after its text in the model prompt. {count} is the actual number of Unicode characters included.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attachmentTruncatedCard": "Only the beginning will be sent",
+  "@attachmentTruncatedCard": {
+    "description": "Short warning on a composer attachment card when only the start of its text will be sent."
+  },
+  "attachmentDocumentTooLarge": "“{name}” is too large to read in a regular chat.",
+  "@attachmentDocumentTooLarge": {
+    "description": "Detailed composer or generation error when a document exceeds the local extraction size limit. {name} is the displayed file name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentDocumentTooLargeShort": "File too large",
+  "@attachmentDocumentTooLargeShort": {
+    "description": "Short error label on a composer attachment card when a document exceeds the local extraction limit."
+  },
   "attachmentRequiresWorkspace": "To use “{name}”, bind a workspace and enable file tools, or move this draft to a conversation with a workspace. This file cannot be read directly in a regular chat.",
   "@attachmentRequiresWorkspace": {
     "placeholders": {
@@ -5723,7 +5783,7 @@
         "type": "String"
       }
     },
-    "description": "Warning shown when an attachment named {name} needs a bound workspace with file tools; suggests binding one or moving the draft to a workspace conversation."
+    "description": "Warning in a conversation already bound to a workspace when an attachment cannot be read locally and the necessary file tools are unavailable. {name} is the displayed file name."
   },
   "storageSessionFilesUnlinked": "Unlinked conversation",
   "workspaceExternalMount": "Mount external folder",
@@ -22078,13 +22138,17 @@
   "@compressionCarryEarlierHint": {
     "description": "Compression options panel: Your messages from parts compressed earlier can be included too. Refers to original user messages additionally sent with a summary; replies are optional text-only copies."
   },
-  "compressionCarryPreview": "Will send {count} · about {tokens} tokens",
+  "compressionCarryPreview": "{count, plural, =1{1 user message} other{{count} user messages}} · {replyCount, plural, =1{1 reply} other{{replyCount} replies}} · about {tokens} tokens",
   "@compressionCarryPreview": {
-    "description": "Compression options panel: Will send {count} · about {tokens} tokens Refers to original user messages additionally sent with a summary; replies are optional text-only copies.",
+    "description": "Summary below Message preview and More settings in manual context compression. Shows how many original user messages and associated assistant replies the current selection would carry, and their combined estimated input tokens. A reply already in retained history is not counted again.",
     "placeholders": {
       "count": {
         "type": "int",
-        "description": "Number of user messages"
+        "description": "Number of original user messages carried with the summary"
+      },
+      "replyCount": {
+        "type": "int",
+        "description": "Number of carried user messages that also carry their assistant reply"
       },
       "tokens": {
         "type": "String",
@@ -22346,6 +22410,18 @@
   "compressionCarryListTitle": "Message preview",
   "@compressionCarryListTitle": {
     "description": "Heading above the list of messages the user can select in the compression settings."
+  },
+  "compressionCarrySelectAllReplies": "Select all replies",
+  "@compressionCarrySelectAllReplies": {
+    "description": "Action beside the Message preview heading in manual context compression. Includes the available assistant replies for all currently selected user messages, including collapsed rows. Individual replies can still be switched off."
+  },
+  "compressionCarryDeselectAllReplies": "Deselect all replies",
+  "@compressionCarryDeselectAllReplies": {
+    "description": "Action beside the Message preview heading in manual context compression. Clears every assistant reply selection for this compression, including collapsed replies and those outside the token budget. The selected user messages stay checked."
+  },
+  "compressionCarryPairNotFit": "This message and its reply exceed the remaining budget. Both will be left out.",
+  "@compressionCarryPairNotFit": {
+    "description": "Warning on the first user message whose selected assistant reply puts the pair over the remaining token budget in the fit-as-many-as-possible compression preview. This pair is omitted from the totals. The reply can still be switched off."
   },
   "compressionCarryImageCount": "{count, plural, =1{1 image} other{{count} images}}",
   "@compressionCarryImageCount": {

@@ -134,6 +134,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storageSpaceCopyErrorDetails => '复制错误详情';
 
   @override
+  String get storageAttachmentChecking => '正在检查附件使用情况…';
+
+  @override
+  String get storageAttachmentCheckFailed => '无法检查附件使用情况，请刷新后重试。';
+
+  @override
   String get storageSpaceCopyErrorFailed => '无法复制错误详情，请重试。';
 
   @override
@@ -11221,6 +11227,38 @@ class AppLocalizationsZh extends AppLocalizations {
   String get incomingShareMoveFailed => '无法切换对话，草稿已保留。';
 
   @override
+  String attachmentEncodingUnrecognized(String name) {
+    return '「$name」无法识别这个文本的编码，可以另存为 UTF-8 后重发';
+  }
+
+  @override
+  String get attachmentEncodingUnrecognizedShort => '无法识别编码';
+
+  @override
+  String attachmentNotText(String name) {
+    return '「$name」这个文件不是文本，暂不支持';
+  }
+
+  @override
+  String get attachmentNotTextShort => '不是文本';
+
+  @override
+  String attachmentTruncatedNotice(int count) {
+    return '文件过大，只读取了前 $count 字，建议拆分后再发送';
+  }
+
+  @override
+  String get attachmentTruncatedCard => '将只发送开头';
+
+  @override
+  String attachmentDocumentTooLarge(String name) {
+    return '「$name」文件过大，无法在普通对话中读取';
+  }
+
+  @override
+  String get attachmentDocumentTooLargeShort => '文件过大';
+
+  @override
   String attachmentRequiresWorkspace(String name) {
     return '「$name」无法在普通对话中直接读取。请绑定工作区并启用文件工具，或将草稿移到已有工作区的对话。';
   }
@@ -16090,8 +16128,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get compressionCarryEarlierHint => '之前压缩过的部分里你发过的消息，也可以挑进来。';
 
   @override
-  String compressionCarryPreview(int count, String tokens) {
-    return '将带上 $count 条 · 约 $tokens tokens';
+  String compressionCarryPreview(int count, int replyCount, String tokens) {
+    return '$count 条用户原文 · $replyCount 条助手回复 · 约 $tokens tokens';
   }
 
   @override
@@ -16271,6 +16309,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get compressionCarryListTitle => '消息预览';
+
+  @override
+  String get compressionCarrySelectAllReplies => '全选助手回复';
+
+  @override
+  String get compressionCarryDeselectAllReplies => '全不选';
+
+  @override
+  String get compressionCarryPairNotFit => '剩余空间放不下这组原文和回复，本次会一起跳过。';
 
   @override
   String compressionCarryImageCount(int count) {
@@ -16558,6 +16605,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get storageSpaceCopyErrorDetails => '复制错误详情';
 
   @override
+  String get storageAttachmentChecking => '正在检查附件使用情况…';
+
+  @override
+  String get storageAttachmentCheckFailed => '无法检查附件使用情况，请刷新后重试。';
+
+  @override
   String get storageSpaceCopyErrorFailed => '无法复制错误详情，请重试。';
 
   @override
@@ -27645,6 +27698,38 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get incomingShareMoveFailed => '无法切换对话，草稿已保留。';
 
   @override
+  String attachmentEncodingUnrecognized(String name) {
+    return '「$name」无法识别这个文本的编码，可以另存为 UTF-8 后重发';
+  }
+
+  @override
+  String get attachmentEncodingUnrecognizedShort => '无法识别编码';
+
+  @override
+  String attachmentNotText(String name) {
+    return '「$name」这个文件不是文本，暂不支持';
+  }
+
+  @override
+  String get attachmentNotTextShort => '不是文本';
+
+  @override
+  String attachmentTruncatedNotice(int count) {
+    return '文件过大，只读取了前 $count 字，建议拆分后再发送';
+  }
+
+  @override
+  String get attachmentTruncatedCard => '将只发送开头';
+
+  @override
+  String attachmentDocumentTooLarge(String name) {
+    return '「$name」文件过大，无法在普通对话中读取';
+  }
+
+  @override
+  String get attachmentDocumentTooLargeShort => '文件过大';
+
+  @override
   String attachmentRequiresWorkspace(String name) {
     return '「$name」无法在普通对话中直接读取。请绑定工作区并启用文件工具，或将草稿移到已有工作区的对话。';
   }
@@ -32514,8 +32599,8 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get compressionCarryEarlierHint => '之前压缩过的部分里你发过的消息，也可以挑进来。';
 
   @override
-  String compressionCarryPreview(int count, String tokens) {
-    return '将带上 $count 条 · 约 $tokens tokens';
+  String compressionCarryPreview(int count, int replyCount, String tokens) {
+    return '$count 条用户原文 · $replyCount 条助手回复 · 约 $tokens tokens';
   }
 
   @override
@@ -32695,6 +32780,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get compressionCarryListTitle => '消息预览';
+
+  @override
+  String get compressionCarrySelectAllReplies => '全选助手回复';
+
+  @override
+  String get compressionCarryDeselectAllReplies => '全不选';
+
+  @override
+  String get compressionCarryPairNotFit => '剩余空间放不下这组原文和回复，本次会一起跳过。';
 
   @override
   String compressionCarryImageCount(int count) {
@@ -32980,6 +33074,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get storageSpaceCopyErrorDetails => '複製錯誤詳情';
+
+  @override
+  String get storageAttachmentChecking => '正在檢查附件使用情況…';
+
+  @override
+  String get storageAttachmentCheckFailed => '無法檢查附件使用情況，請重新整理後再試。';
 
   @override
   String get storageSpaceCopyErrorFailed => '無法複製錯誤詳情，請重試。';
@@ -44076,8 +44176,40 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get incomingShareMoveFailed => '無法切換對話，草稿已保留。';
 
   @override
+  String attachmentEncodingUnrecognized(String name) {
+    return '無法辨識「$name」的文字編碼。請另存為 UTF-8 後重新傳送。';
+  }
+
+  @override
+  String get attachmentEncodingUnrecognizedShort => '無法辨識編碼';
+
+  @override
+  String attachmentNotText(String name) {
+    return '「$name」不是文字檔，因此無法在此使用。';
+  }
+
+  @override
+  String get attachmentNotTextShort => '不是文字檔';
+
+  @override
+  String attachmentTruncatedNotice(int count) {
+    return '檔案過大，僅讀取了前 $count 個字元。如需其餘內容，請拆分後重新傳送。';
+  }
+
+  @override
+  String get attachmentTruncatedCard => '將只傳送開頭部分';
+
+  @override
+  String attachmentDocumentTooLarge(String name) {
+    return '「$name」檔案過大，無法在一般對話中讀取。';
+  }
+
+  @override
+  String get attachmentDocumentTooLargeShort => '檔案過大';
+
+  @override
   String attachmentRequiresWorkspace(String name) {
-    return '「$name」無法在一般對話中直接讀取。請綁定工作區並啟用檔案工具，或將草稿移到已有工作區的對話。';
+    return '若要使用「$name」，請綁定工作區並啟用檔案工具，或將此草稿移至已有工作區的對話。此檔案無法在一般對話中直接讀取。';
   }
 
   @override
@@ -48950,8 +49082,20 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get compressionCarryEarlierHint => '之前壓縮過的部分裡你發過的訊息，也可以挑進來。';
 
   @override
-  String compressionCarryPreview(int count, String tokens) {
-    return '將帶上 $count 則 · 約 $tokens tokens';
+  String compressionCarryPreview(int count, int replyCount, String tokens) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 則使用者訊息',
+      one: '1 則使用者訊息',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      replyCount,
+      locale: localeName,
+      other: '$replyCount 則回覆',
+      one: '1 則回覆',
+    );
+    return '$_temp0 · $_temp1 · 約 $tokens tokens';
   }
 
   @override
@@ -49131,6 +49275,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get compressionCarryListTitle => '訊息預覽';
+
+  @override
+  String get compressionCarrySelectAllReplies => '全選回覆';
+
+  @override
+  String get compressionCarryDeselectAllReplies => '取消選取所有回覆';
+
+  @override
+  String get compressionCarryPairNotFit => '剩餘空間放不下這組訊息和回覆，本次會一起略過。';
 
   @override
   String compressionCarryImageCount(int count) {
