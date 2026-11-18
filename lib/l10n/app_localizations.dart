@@ -3256,6 +3256,12 @@ abstract class AppLocalizations {
   /// **'Files and Images'**
   String get backupPageFilesLabel;
 
+  /// Error shown on the backup settings page when local storage cannot save WebDAV or S3 server settings or the shared backup and import content selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the backup settings. Please try again.'**
+  String get backupPageSettingsSaveFailed;
+
   /// Title of the backup scope selector tile listing which content categories to back up or import.
   ///
   /// In en, this message translates to:
@@ -4132,6 +4138,30 @@ abstract class AppLocalizations {
   /// **'Import from Other Apps'**
   String get backupPageImportFromOtherApps;
 
+  /// Subtitle of Import from Other Apps in Local Backup. List every supported app by its product name and explain that the official toolbox converts the file privately in the browser.
+  ///
+  /// In en, this message translates to:
+  /// **'Newer Chatbox and Cherry Studio 2.x backups, plus ChatGPT, Claude, DeepSeek, Gemini, Grok, Open WebUI, NextChat, and LobeChat. Converts locally in your browser into a Kelivo backup; the file is not uploaded.'**
+  String get backupPageImportFromOtherAppsSubtitle;
+
+  /// Action in the backup import failure dialog and notification. Opens the official Kelivo conversion toolbox in the system browser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Toolbox'**
+  String get backupPageOpenImportToolbox;
+
+  /// Notification when the system browser cannot open the import toolbox. Show its complete address {url} so the user can open it manually.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t open the browser. Open this URL yourself: {url}'**
+  String backupPageImportToolboxOpenFailed(String url);
+
+  /// Explanation above Merge in the local backup import mode dialog when the file is a toolbox chat import. The user can merge or cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'This file was converted by the official toolbox. It will be merged into your existing data and will not replace chats or assistants already on this device.'**
+  String get backupPageToolboxImportMergeOnlyHint;
+
   /// Status text indicating a feature or option is not yet supported.
   ///
   /// In en, this message translates to:
@@ -4294,11 +4324,17 @@ abstract class AppLocalizations {
   /// **'Import from Cherry Studio'**
   String get backupPageImportFromCherryStudio;
 
-  /// Error message shown when a Cherry Studio backup uses format version {version} that Kelivo cannot import; advises exporting from Cherry Studio v1 or waiting for v2 support.
+  /// Shown in the import progress dialog and notification for a Cherry Studio 2.x backup. {version} is the file format version. Refer to the official browser toolbox and the Import Backup File and Merge actions in the app.
   ///
   /// In en, this message translates to:
-  /// **'This backup uses Cherry Studio format version {version}, which Kelivo cannot import yet. Export from Cherry Studio v1 instead, or wait for a Kelivo update that supports Cherry Studio v2 backups.'**
+  /// **'This is a Cherry Studio 2.x backup (format version {version}) and can’t be imported in the app directly. Convert it with the official toolbox into a Kelivo backup, then use Import Backup File and choose Merge. Conversion happens in your browser; the file is not uploaded.'**
   String backupPageCherryStudioUnsupportedBackupVersion(String version);
+
+  /// Shown in the import progress dialog and notification for an unsupported Chatbox backup. {version} is the file format version. Refer to the official browser toolbox and the Import Backup File and Merge actions in the app.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a newer Chatbox backup (format version {version}) and can’t be imported in the app directly. Convert it with the official toolbox into a Kelivo backup, then use Import Backup File and choose Merge. Conversion happens in your browser; the file is not uploaded.'**
+  String backupPageChatboxUnsupportedBackupVersion(String version);
 
   /// Button label and task title for importing data from a Chatbox backup.
   ///
@@ -8172,6 +8208,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'1 hour'**
   String get providerDetailPageClaudePromptCachingTtl1h;
+
+  /// Providers settings row for the global default interval between automatic account balance queries.
+  ///
+  /// In en, this message translates to:
+  /// **'Default balance refresh interval'**
+  String get providerBalanceDefaultInterval;
+
+  /// Row in a provider account balance editor for overriding its periodic refresh interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance refresh interval'**
+  String get providerBalanceInterval;
+
+  /// Global and provider settings label. An account balance query becomes due after a final model reply.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh balance after each reply'**
+  String get providerBalanceRefreshOnReply;
+
+  /// Provider override option that inherits the global setting. The value is the currently effective interval or the localized on/off state.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow global setting ({value})'**
+  String providerBalanceFollowDefault(String value);
+
+  /// Option disabling the selected balance refresh trigger, either the periodic interval or refresh after replies.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get providerBalanceRefreshOff;
+
+  /// Provider override option that enables refreshing the account balance after replies.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get providerBalanceRefreshOn;
+
+  /// Account balance refresh interval displayed as a number of whole minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 minute} other{{count} minutes}}'**
+  String providerBalanceRefreshMinutes(int count);
+
+  /// Preset selection for querying the account balance every one hour.
+  ///
+  /// In en, this message translates to:
+  /// **'1 hour'**
+  String get providerBalanceRefreshHour;
+
+  /// Option that opens the dialog for entering a custom balance refresh interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom interval…'**
+  String get providerBalanceCustomInterval;
+
+  /// Numeric field label in the custom account balance refresh interval dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval in minutes'**
+  String get providerBalanceIntervalMinutes;
+
+  /// Action in the account balance badge context menu to query the provider immediately.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh balance now'**
+  String get providerBalanceRefreshNow;
+
+  /// Balance badge tooltip showing the date and time of the most recent successful query. Both placeholders are already localized.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated {date} at {time}'**
+  String providerBalanceLastUpdated(String date, String time);
 
   /// Title of the account balance page and a row label opening balance settings.
   ///
@@ -28668,17 +28776,29 @@ abstract class AppLocalizations {
   /// **'Maximum requests'**
   String get compressionRequests;
 
-  /// Compression option to include world books evaluated on the selected history and memory snapshots frozen in that history, rather than current live memory or retained messages.
+  /// Main switch in the text compression details for including background information in the summary request. It also controls the availability of the instruction injection option. No placeholders.
   ///
   /// In en, this message translates to:
-  /// **'Reference world books and historical memory'**
+  /// **'Use background references'**
   String get compressionReference;
 
-  /// Compression reference help: restrict dynamic reference sources to the selected historical range, and distinguish explanatory background from events or character knowledge. No placeholders.
+  /// Help below the background references switch in text compression settings. The assistant’s system prompt, world book entries matched to the selected history, and memory snapshots saved in that range help explain context. The chat history establishes events and character knowledge. No placeholders.
   ///
   /// In en, this message translates to:
-  /// **'World books are matched only against the history being compressed, using memory snapshots from that time. This is only to explain names and rules — it doesn’t mean those events happened, or that a character already knows them.'**
+  /// **'The summary can draw on the assistant’s system prompt, world book entries matched to this part of the chat, and memories saved at the time. The chat history establishes what happened and what each character knows.'**
   String get compressionReferenceHint;
+
+  /// Switch under background references in text compression settings. Enables sending the instruction cards selected for the chat as reference material to the model generating a summary. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Use instruction injections as references'**
+  String get compressionInstructionInjections;
+
+  /// Help below the instruction injection switch in text compression settings. Describes the selected chat instruction cards being sent as background material for the summary. No placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the instruction cards enabled for this chat to the summary model as background references.'**
+  String get compressionInstructionInjectionsHint;
 
   /// Switch label for replacing already-consumed tool results with references.
   ///

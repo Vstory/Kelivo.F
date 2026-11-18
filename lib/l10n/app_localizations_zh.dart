@@ -1648,6 +1648,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backupPageFilesLabel => '文件与图片';
 
   @override
+  String get backupPageSettingsSaveFailed => '备份设置保存失败，请重试。';
+
+  @override
   String get backupPageScopeTitle => '备份与导入内容';
 
   @override
@@ -2134,6 +2137,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backupPageImportFromOtherApps => '从其他APP导入';
 
   @override
+  String get backupPageImportFromOtherAppsSubtitle =>
+      '新版 Chatbox、Cherry Studio 2.x，以及 ChatGPT、Claude、DeepSeek、Gemini、Grok、Open WebUI、NextChat、LobeChat。在浏览器本地转换成 Kelivo 备份后再导入，文件不会上传。';
+
+  @override
+  String get backupPageOpenImportToolbox => '打开工具箱';
+
+  @override
+  String backupPageImportToolboxOpenFailed(String url) {
+    return '无法打开浏览器，请手动访问：$url';
+  }
+
+  @override
+  String get backupPageToolboxImportMergeOnlyHint =>
+      '这是官方工具箱转换的备份。导入会合并到现有数据，不会替换已有聊天和助手。';
+
+  @override
   String get backupPageNotSupportedYet => '暂不支持';
 
   @override
@@ -2219,7 +2238,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String backupPageCherryStudioUnsupportedBackupVersion(String version) {
-    return '此备份使用 Cherry Studio 格式版本 $version，Kelivo 目前尚无法导入。请改用 Cherry Studio v1 导出备份，或等待后续版本支持 Cherry Studio v2。';
+    return '这是 Cherry Studio 2.x 备份（格式版本 $version），App 里暂时不能直接导入。请到官方工具箱转换成 Kelivo 备份，再回到「备份文件导入」，并选择「合并」。转换在浏览器本地完成，文件不会上传。';
+  }
+
+  @override
+  String backupPageChatboxUnsupportedBackupVersion(String version) {
+    return '这是 Chatbox 新版备份（格式版本 $version），App 里暂时不能直接导入。请到官方工具箱转换成 Kelivo 备份，再回到「备份文件导入」，并选择「合并」。转换在浏览器本地完成，文件不会上传。';
   }
 
   @override
@@ -4300,6 +4324,48 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get providerDetailPageClaudePromptCachingTtl1h => '1 小时';
+
+  @override
+  String get providerBalanceDefaultInterval => '余额默认刷新间隔';
+
+  @override
+  String get providerBalanceInterval => '余额刷新间隔';
+
+  @override
+  String get providerBalanceRefreshOnReply => '模型每次回复后刷新余额';
+
+  @override
+  String providerBalanceFollowDefault(String value) {
+    return '跟随全局设置（当前：$value）';
+  }
+
+  @override
+  String get providerBalanceRefreshOff => '关闭';
+
+  @override
+  String get providerBalanceRefreshOn => '开启';
+
+  @override
+  String providerBalanceRefreshMinutes(int count) {
+    return '$count 分钟';
+  }
+
+  @override
+  String get providerBalanceRefreshHour => '1 小时';
+
+  @override
+  String get providerBalanceCustomInterval => '自定义间隔…';
+
+  @override
+  String get providerBalanceIntervalMinutes => '间隔分钟数';
+
+  @override
+  String get providerBalanceRefreshNow => '立即刷新余额';
+
+  @override
+  String providerBalanceLastUpdated(String date, String time) {
+    return '最后更新于 $date $time';
+  }
 
   @override
   String get providerDetailPageBalanceTitle => '账户余额';
@@ -15441,11 +15507,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get compressionRequests => '最多请求';
 
   @override
-  String get compressionReference => '参考世界书与历史记忆';
+  String get compressionReference => '使用背景参考资料';
 
   @override
   String get compressionReferenceHint =>
-      '只根据这次要压缩的历史来查找世界书，并使用当时保存的记忆。这些内容只帮模型理解人名和规则，不会当成已经发生的事，也不会当成角色已经知道的事。';
+      '摘要可参考助手的系统提示词、与这段历史匹配的世界书和当时保存的记忆。发生过的事和角色知道的事以聊天记录为准。';
+
+  @override
+  String get compressionInstructionInjections => '压缩时参考指令注入';
+
+  @override
+  String get compressionInstructionInjectionsHint => '将当前对话启用的指令卡作为参考资料发给摘要模型。';
 
   @override
   String get compressionToolReferences => '已读过的工具结果只保留引用';
@@ -18119,6 +18191,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get backupPageFilesLabel => '文件与图片';
 
   @override
+  String get backupPageSettingsSaveFailed => '备份设置保存失败，请重试。';
+
+  @override
   String get backupPageScopeTitle => '备份与导入内容';
 
   @override
@@ -18605,6 +18680,22 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get backupPageImportFromOtherApps => '从其他APP导入';
 
   @override
+  String get backupPageImportFromOtherAppsSubtitle =>
+      '新版 Chatbox、Cherry Studio 2.x，以及 ChatGPT、Claude、DeepSeek、Gemini、Grok、Open WebUI、NextChat、LobeChat。在浏览器本地转换成 Kelivo 备份后再导入，文件不会上传。';
+
+  @override
+  String get backupPageOpenImportToolbox => '打开工具箱';
+
+  @override
+  String backupPageImportToolboxOpenFailed(String url) {
+    return '无法打开浏览器，请手动访问：$url';
+  }
+
+  @override
+  String get backupPageToolboxImportMergeOnlyHint =>
+      '这是官方工具箱转换的备份。导入会合并到现有数据，不会替换已有聊天和助手。';
+
+  @override
   String get backupPageNotSupportedYet => '暂不支持';
 
   @override
@@ -18690,7 +18781,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String backupPageCherryStudioUnsupportedBackupVersion(String version) {
-    return '此备份使用 Cherry Studio 格式版本 $version，Kelivo 目前尚无法导入。请改用 Cherry Studio v1 导出备份，或等待后续版本支持 Cherry Studio v2。';
+    return '这是 Cherry Studio 2.x 备份（格式版本 $version），App 里暂时不能直接导入。请到官方工具箱转换成 Kelivo 备份，再回到「备份文件导入」，并选择「合并」。转换在浏览器本地完成，文件不会上传。';
+  }
+
+  @override
+  String backupPageChatboxUnsupportedBackupVersion(String version) {
+    return '这是 Chatbox 新版备份（格式版本 $version），App 里暂时不能直接导入。请到官方工具箱转换成 Kelivo 备份，再回到「备份文件导入」，并选择「合并」。转换在浏览器本地完成，文件不会上传。';
   }
 
   @override
@@ -20771,6 +20867,48 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get providerDetailPageClaudePromptCachingTtl1h => '1 小时';
+
+  @override
+  String get providerBalanceDefaultInterval => '余额默认刷新间隔';
+
+  @override
+  String get providerBalanceInterval => '余额刷新间隔';
+
+  @override
+  String get providerBalanceRefreshOnReply => '模型每次回复后刷新余额';
+
+  @override
+  String providerBalanceFollowDefault(String value) {
+    return '跟随全局设置（当前：$value）';
+  }
+
+  @override
+  String get providerBalanceRefreshOff => '关闭';
+
+  @override
+  String get providerBalanceRefreshOn => '开启';
+
+  @override
+  String providerBalanceRefreshMinutes(int count) {
+    return '$count 分钟';
+  }
+
+  @override
+  String get providerBalanceRefreshHour => '1 小时';
+
+  @override
+  String get providerBalanceCustomInterval => '自定义间隔…';
+
+  @override
+  String get providerBalanceIntervalMinutes => '间隔分钟数';
+
+  @override
+  String get providerBalanceRefreshNow => '立即刷新余额';
+
+  @override
+  String providerBalanceLastUpdated(String date, String time) {
+    return '最后更新于 $date $time';
+  }
 
   @override
   String get providerDetailPageBalanceTitle => '账户余额';
@@ -31912,11 +32050,17 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get compressionRequests => '最多请求';
 
   @override
-  String get compressionReference => '参考世界书与历史记忆';
+  String get compressionReference => '使用背景参考资料';
 
   @override
   String get compressionReferenceHint =>
-      '只根据这次要压缩的历史来查找世界书，并使用当时保存的记忆。这些内容只帮模型理解人名和规则，不会当成已经发生的事，也不会当成角色已经知道的事。';
+      '摘要可参考助手的系统提示词、与这段历史匹配的世界书和当时保存的记忆。发生过的事和角色知道的事以聊天记录为准。';
+
+  @override
+  String get compressionInstructionInjections => '压缩时参考指令注入';
+
+  @override
+  String get compressionInstructionInjectionsHint => '将当前对话启用的指令卡作为参考资料发给摘要模型。';
 
   @override
   String get compressionToolReferences => '已读过的工具结果只保留引用';
@@ -34595,6 +34739,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get backupPageFilesLabel => '檔案與圖片';
 
   @override
+  String get backupPageSettingsSaveFailed => '無法儲存備份設定，請再試一次。';
+
+  @override
   String get backupPageScopeTitle => '備份與匯入內容';
 
   @override
@@ -35082,6 +35229,22 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get backupPageImportFromOtherApps => '從其他APP匯入';
 
   @override
+  String get backupPageImportFromOtherAppsSubtitle =>
+      '新版 Chatbox、Cherry Studio 2.x，以及 ChatGPT、Claude、DeepSeek、Gemini、Grok、Open WebUI、NextChat、LobeChat。在瀏覽器本機轉換成 Kelivo 備份後再匯入，檔案不會上傳。';
+
+  @override
+  String get backupPageOpenImportToolbox => '開啟工具箱';
+
+  @override
+  String backupPageImportToolboxOpenFailed(String url) {
+    return '無法開啟瀏覽器，請手動前往：$url';
+  }
+
+  @override
+  String get backupPageToolboxImportMergeOnlyHint =>
+      '這是官方工具箱轉換的備份。匯入會合併到現有資料，不會取代已有聊天和助手。';
+
+  @override
   String get backupPageNotSupportedYet => '暫不支援';
 
   @override
@@ -35167,7 +35330,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String backupPageCherryStudioUnsupportedBackupVersion(String version) {
-    return '此備份使用 Cherry Studio 格式版本 $version，Kelivo 目前尚無法匯入。請改用 Cherry Studio v1 匯出備份，或等待後續版本支援 Cherry Studio v2。';
+    return '這是 Cherry Studio 2.x 備份（格式版本 $version），App 裡暫時無法直接匯入。請到官方工具箱轉換成 Kelivo 備份，再回到「備份檔案匯入」，並選擇「合併」。轉換在瀏覽器本機完成，檔案不會上傳。';
+  }
+
+  @override
+  String backupPageChatboxUnsupportedBackupVersion(String version) {
+    return '這是 Chatbox 新版備份（格式版本 $version），App 裡暫時無法直接匯入。請到官方工具箱轉換成 Kelivo 備份，再回到「備份檔案匯入」，並選擇「合併」。轉換在瀏覽器本機完成，檔案不會上傳。';
   }
 
   @override
@@ -37247,6 +37415,48 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get providerDetailPageClaudePromptCachingTtl1h => '1 小時';
+
+  @override
+  String get providerBalanceDefaultInterval => '餘額預設重新整理間隔';
+
+  @override
+  String get providerBalanceInterval => '餘額重新整理間隔';
+
+  @override
+  String get providerBalanceRefreshOnReply => '模型每次回覆後重新整理餘額';
+
+  @override
+  String providerBalanceFollowDefault(String value) {
+    return '跟隨全域設定（$value）';
+  }
+
+  @override
+  String get providerBalanceRefreshOff => '關閉';
+
+  @override
+  String get providerBalanceRefreshOn => '開啟';
+
+  @override
+  String providerBalanceRefreshMinutes(int count) {
+    return '$count 分鐘';
+  }
+
+  @override
+  String get providerBalanceRefreshHour => '1 小時';
+
+  @override
+  String get providerBalanceCustomInterval => '自訂間隔…';
+
+  @override
+  String get providerBalanceIntervalMinutes => '間隔分鐘數';
+
+  @override
+  String get providerBalanceRefreshNow => '立即重新整理餘額';
+
+  @override
+  String providerBalanceLastUpdated(String date, String time) {
+    return '最後更新於 $date $time';
+  }
 
   @override
   String get providerDetailPageBalanceTitle => '帳戶餘額';
@@ -48394,11 +48604,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get compressionRequests => '最多請求';
 
   @override
-  String get compressionReference => '參考世界書與歷史記憶';
+  String get compressionReference => '使用背景參考資料';
 
   @override
   String get compressionReferenceHint =>
-      '只根據這次要壓縮的歷史來查找世界書，並使用當時儲存的記憶。這些內容只幫模型理解人名和規則，不會當成已經發生的事，也不會當成角色已經知道的事。';
+      '摘要可參考助手的系統提示詞、與這段歷史相符的世界書條目，以及當時儲存的記憶。發生過的事和角色知道的事以聊天記錄為準。';
+
+  @override
+  String get compressionInstructionInjections => '使用指令注入作為參考';
+
+  @override
+  String get compressionInstructionInjectionsHint =>
+      '將目前對話啟用的指令卡作為參考資料傳送給摘要模型。';
 
   @override
   String get compressionToolReferences => '已讀過的工具結果只保留引用';

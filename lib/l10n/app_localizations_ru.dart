@@ -1754,6 +1754,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get backupPageFilesLabel => 'Файлы и изображения';
 
   @override
+  String get backupPageSettingsSaveFailed =>
+      'Не удалось сохранить настройки резервного копирования. Попробуйте ещё раз.';
+
+  @override
   String get backupPageScopeTitle => 'Содержимое резервной копии и импорта';
 
   @override
@@ -2267,6 +2271,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get backupPageImportFromOtherApps => 'Импорт из других приложений';
 
   @override
+  String get backupPageImportFromOtherAppsSubtitle =>
+      'Резервные копии новых версий Chatbox и Cherry Studio 2.x, а также ChatGPT, Claude, DeepSeek, Gemini, Grok, Open WebUI, NextChat и LobeChat. Файл конвертируется локально в браузере в резервную копию Kelivo и не загружается.';
+
+  @override
+  String get backupPageOpenImportToolbox => 'Открыть инструменты';
+
+  @override
+  String backupPageImportToolboxOpenFailed(String url) {
+    return 'Не удалось открыть браузер. Откройте этот адрес вручную: $url';
+  }
+
+  @override
+  String get backupPageToolboxImportMergeOnlyHint =>
+      'Этот файл конвертирован официальными инструментами. При импорте данные будут объединены с существующими, а чаты и ассистенты на этом устройстве не будут заменены.';
+
+  @override
   String get backupPageNotSupportedYet => 'Пока не поддерживается';
 
   @override
@@ -2352,7 +2372,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String backupPageCherryStudioUnsupportedBackupVersion(String version) {
-    return 'Эта резервная копия использует версию формата Cherry Studio $version, которую Kelivo пока не может импортировать. Экспортируйте резервную копию из Cherry Studio v1 или дождитесь обновления Kelivo с поддержкой резервных копий Cherry Studio v2.';
+    return 'Это резервная копия Cherry Studio 2.x (версия формата $version), её нельзя импортировать в приложение напрямую. Конвертируйте её официальными инструментами в резервную копию Kelivo, затем откройте «Импорт файла резервной копии» и выберите «Объединение». Конвертация выполняется локально в браузере, файл не загружается.';
+  }
+
+  @override
+  String backupPageChatboxUnsupportedBackupVersion(String version) {
+    return 'Это резервная копия новой версии Chatbox (версия формата $version), её нельзя импортировать в приложение напрямую. Конвертируйте её официальными инструментами в резервную копию Kelivo, затем откройте «Импорт файла резервной копии» и выберите «Объединение». Конвертация выполняется локально в браузере, файл не загружается.';
   }
 
   @override
@@ -4534,6 +4559,58 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get providerDetailPageClaudePromptCachingTtl1h => '1 час';
+
+  @override
+  String get providerBalanceDefaultInterval =>
+      'Интервал обновления баланса по умолчанию';
+
+  @override
+  String get providerBalanceInterval => 'Интервал обновления баланса';
+
+  @override
+  String get providerBalanceRefreshOnReply =>
+      'Обновлять баланс после каждого ответа';
+
+  @override
+  String providerBalanceFollowDefault(String value) {
+    return 'Как в глобальных настройках ($value)';
+  }
+
+  @override
+  String get providerBalanceRefreshOff => 'Выкл.';
+
+  @override
+  String get providerBalanceRefreshOn => 'Вкл.';
+
+  @override
+  String providerBalanceRefreshMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count минуты',
+      many: '$count минут',
+      few: '$count минуты',
+      one: '$count минута',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get providerBalanceRefreshHour => '1 час';
+
+  @override
+  String get providerBalanceCustomInterval => 'Свой интервал…';
+
+  @override
+  String get providerBalanceIntervalMinutes => 'Интервал в минутах';
+
+  @override
+  String get providerBalanceRefreshNow => 'Обновить баланс сейчас';
+
+  @override
+  String providerBalanceLastUpdated(String date, String time) {
+    return 'Последнее обновление: $date в $time';
+  }
 
   @override
   String get providerDetailPageBalanceTitle => 'Баланс аккаунта';
@@ -16569,12 +16646,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get compressionRequests => 'Максимум запросов';
 
   @override
-  String get compressionReference =>
-      'Учитывать книги мира и историческую память';
+  String get compressionReference => 'Использовать справочные материалы';
 
   @override
   String get compressionReferenceHint =>
-      'Мировые книги сопоставляются только с историей, которая сжимается, с использованием снимков памяти того времени. Это нужно только для объяснения имён и правил — это не означает, что те события произошли или что персонаж уже о них знает.';
+      'Сводка может опираться на системный промпт ассистента, записи мировой книги, совпавшие с этой частью чата, и сохранённые на тот момент воспоминания. История чата определяет, что произошло и что знает каждый персонаж.';
+
+  @override
+  String get compressionInstructionInjections =>
+      'Учитывать внедрённые инструкции при сжатии';
+
+  @override
+  String get compressionInstructionInjectionsHint =>
+      'Отправлять модели, которая составляет сводку, включённые для этого чата карточки инструкций как справочный материал.';
 
   @override
   String get compressionToolReferences =>

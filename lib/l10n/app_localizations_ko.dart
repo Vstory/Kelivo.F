@@ -1688,6 +1688,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get backupPageFilesLabel => '파일 및 이미지';
 
   @override
+  String get backupPageSettingsSaveFailed => '백업 설정을 저장하지 못했습니다. 다시 시도해 주세요.';
+
+  @override
   String get backupPageScopeTitle => '백업 및 가져오기 내용';
 
   @override
@@ -2183,6 +2186,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get backupPageImportFromOtherApps => '다른 앱에서 가져오기';
 
   @override
+  String get backupPageImportFromOtherAppsSubtitle =>
+      '최신 Chatbox 및 Cherry Studio 2.x 백업과 ChatGPT, Claude, DeepSeek, Gemini, Grok, Open WebUI, NextChat, LobeChat을 지원합니다. 브라우저에서 로컬로 Kelivo 백업으로 변환하며 파일은 업로드되지 않습니다.';
+
+  @override
+  String get backupPageOpenImportToolbox => '도구 상자 열기';
+
+  @override
+  String backupPageImportToolboxOpenFailed(String url) {
+    return '브라우저를 열 수 없습니다. 다음 URL을 직접 여세요: $url';
+  }
+
+  @override
+  String get backupPageToolboxImportMergeOnlyHint =>
+      '공식 도구 상자에서 변환된 파일입니다. 기존 데이터에 병합되며 이 기기에 이미 있는 채팅과 어시스턴트를 대체하지 않습니다.';
+
+  @override
   String get backupPageNotSupportedYet => '아직 지원되지 않음';
 
   @override
@@ -2268,7 +2287,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String backupPageCherryStudioUnsupportedBackupVersion(String version) {
-    return '이 백업은 Cherry Studio 형식 버전 $version을(를) 사용하며, Kelivo에서는 아직 가져올 수 없습니다. Cherry Studio v1에서 내보내거나 Cherry Studio v2 백업을 지원하는 Kelivo 업데이트를 기다리세요.';
+    return 'Cherry Studio 2.x 백업(형식 버전 $version)으로, 앱에서 직접 가져올 수 없습니다. 공식 도구 상자에서 Kelivo 백업으로 변환한 뒤 \'백업 파일 가져오기\'에서 \'병합\'을 선택하세요. 변환은 브라우저에서 로컬로 이루어지며 파일은 업로드되지 않습니다.';
+  }
+
+  @override
+  String backupPageChatboxUnsupportedBackupVersion(String version) {
+    return '최신 Chatbox 백업(형식 버전 $version)으로, 앱에서 직접 가져올 수 없습니다. 공식 도구 상자에서 Kelivo 백업으로 변환한 뒤 \'백업 파일 가져오기\'에서 \'병합\'을 선택하세요. 변환은 브라우저에서 로컬로 이루어지며 파일은 업로드되지 않습니다.';
   }
 
   @override
@@ -4371,6 +4395,54 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get providerDetailPageClaudePromptCachingTtl1h => '1시간';
+
+  @override
+  String get providerBalanceDefaultInterval => '기본 잔액 새로 고침 간격';
+
+  @override
+  String get providerBalanceInterval => '잔액 새로 고침 간격';
+
+  @override
+  String get providerBalanceRefreshOnReply => '모델이 답변할 때마다 잔액 새로 고침';
+
+  @override
+  String providerBalanceFollowDefault(String value) {
+    return '전역 설정 따르기($value)';
+  }
+
+  @override
+  String get providerBalanceRefreshOff => '끔';
+
+  @override
+  String get providerBalanceRefreshOn => '켬';
+
+  @override
+  String providerBalanceRefreshMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count분',
+      one: '1분',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get providerBalanceRefreshHour => '1시간';
+
+  @override
+  String get providerBalanceCustomInterval => '사용자 지정 간격…';
+
+  @override
+  String get providerBalanceIntervalMinutes => '간격(분)';
+
+  @override
+  String get providerBalanceRefreshNow => '지금 잔액 새로 고침';
+
+  @override
+  String providerBalanceLastUpdated(String date, String time) {
+    return '마지막 업데이트: $date $time';
+  }
 
   @override
   String get providerDetailPageBalanceTitle => '계정 잔액';
@@ -15788,11 +15860,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get compressionRequests => '최대 요청 수';
 
   @override
-  String get compressionReference => '세계관 책과 과거 기억 참조';
+  String get compressionReference => '배경 참조 사용';
 
   @override
   String get compressionReferenceHint =>
-      '이번에 압축할 기록만을 기준으로 세계관을 찾고, 당시 저장된 메모리를 사용합니다. 이 내용은 모델이 인물 이름과 규칙을 이해하도록 돕기 위한 것일 뿐, 해당 사건이 발생했다거나 캐릭터가 이미 알고 있다는 의미가 아닙니다.';
+      '요약은 어시스턴트의 시스템 프롬프트, 이 대화 구간과 일치하는 세계관 항목, 당시 저장된 메모리를 참고할 수 있습니다. 무슨 일이 있었고 각 캐릭터가 무엇을 아는지는 대화 기록을 기준으로 합니다.';
+
+  @override
+  String get compressionInstructionInjections => '지시 주입을 참고 자료로 사용';
+
+  @override
+  String get compressionInstructionInjectionsHint =>
+      '이 대화에서 활성화된 지시 카드를 배경 참조 자료로 요약 모델에 전송합니다.';
 
   @override
   String get compressionToolReferences => '이미 읽은 도구 결과는 참조만 유지';

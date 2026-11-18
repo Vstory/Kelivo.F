@@ -738,6 +738,10 @@
     "description": "Error shown when an iOS local backup destination is inside the app container. No file is copied and the backup is not counted as successful. Ask the user to choose a folder that survives deleting Kelivo."
   },
   "backupPageFilesLabel": "Files and Images",
+  "backupPageSettingsSaveFailed": "Could not save the backup settings. Please try again.",
+  "@backupPageSettingsSaveFailed": {
+    "description": "Error shown on the backup settings page when local storage cannot save WebDAV or S3 server settings or the shared backup and import content selection."
+  },
   "backupPageScopeTitle": "Backup and import content",
   "backupPageScopeSelectedCount": "{selected}/{total}",
   "@backupPageScopeSelectedCount": {
@@ -1030,6 +1034,27 @@
   "backupPageImportBackupFile": "Import Backup File",
   "backupPageImportBackupFileSubtitle": "Import a local backup file",
   "backupPageImportFromOtherApps": "Import from Other Apps",
+  "backupPageImportFromOtherAppsSubtitle": "Newer Chatbox and Cherry Studio 2.x backups, plus ChatGPT, Claude, DeepSeek, Gemini, Grok, Open WebUI, NextChat, and LobeChat. Converts locally in your browser into a Kelivo backup; the file is not uploaded.",
+  "@backupPageImportFromOtherAppsSubtitle": {
+    "description": "Subtitle of Import from Other Apps in Local Backup. List every supported app by its product name and explain that the official toolbox converts the file privately in the browser."
+  },
+  "backupPageOpenImportToolbox": "Open Toolbox",
+  "@backupPageOpenImportToolbox": {
+    "description": "Action in the backup import failure dialog and notification. Opens the official Kelivo conversion toolbox in the system browser."
+  },
+  "backupPageImportToolboxOpenFailed": "Couldn’t open the browser. Open this URL yourself: {url}",
+  "@backupPageImportToolboxOpenFailed": {
+    "description": "Notification when the system browser cannot open the import toolbox. Show its complete address {url} so the user can open it manually.",
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPageToolboxImportMergeOnlyHint": "This file was converted by the official toolbox. It will be merged into your existing data and will not replace chats or assistants already on this device.",
+  "@backupPageToolboxImportMergeOnlyHint": {
+    "description": "Explanation above Merge in the local backup import mode dialog when the file is a toolbox chat import. The user can merge or cancel."
+  },
   "backupPageNotSupportedYet": "Not supported yet",
   "backupPageRemoteBackups": "Remote Backups",
   "backupPageNoBackups": "No backups",
@@ -1057,14 +1082,23 @@
   "backupPageLocalBackup": "Local Backup",
   "backupPageIosSystemBackupNote": "Kelivo's local data is excluded from iCloud device backups. Before changing devices or deleting the app, back up to iCloud Drive or another folder outside Kelivo. Files in On My iPhone > Kelivo are deleted with the app.",
   "backupPageImportFromCherryStudio": "Import from Cherry Studio",
-  "backupPageCherryStudioUnsupportedBackupVersion": "This backup uses Cherry Studio format version {version}, which Kelivo cannot import yet. Export from Cherry Studio v1 instead, or wait for a Kelivo update that supports Cherry Studio v2 backups.",
+  "backupPageCherryStudioUnsupportedBackupVersion": "This is a Cherry Studio 2.x backup (format version {version}) and can’t be imported in the app directly. Convert it with the official toolbox into a Kelivo backup, then use Import Backup File and choose Merge. Conversion happens in your browser; the file is not uploaded.",
   "@backupPageCherryStudioUnsupportedBackupVersion": {
     "placeholders": {
       "version": {
         "type": "String"
       }
     },
-    "description": "Error message shown when a Cherry Studio backup uses format version {version} that Kelivo cannot import; advises exporting from Cherry Studio v1 or waiting for v2 support."
+    "description": "Shown in the import progress dialog and notification for a Cherry Studio 2.x backup. {version} is the file format version. Refer to the official browser toolbox and the Import Backup File and Merge actions in the app."
+  },
+  "backupPageChatboxUnsupportedBackupVersion": "This is a newer Chatbox backup (format version {version}) and can’t be imported in the app directly. Convert it with the official toolbox into a Kelivo backup, then use Import Backup File and choose Merge. Conversion happens in your browser; the file is not uploaded.",
+  "@backupPageChatboxUnsupportedBackupVersion": {
+    "description": "Shown in the import progress dialog and notification for an unsupported Chatbox backup. {version} is the file format version. Refer to the official browser toolbox and the Import Backup File and Merge actions in the app.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
   },
   "backupPageImportFromChatbox": "Import from Chatbox",
   "backupReminderSectionTitle": "Backup Reminder",
@@ -2097,6 +2131,72 @@
   "providerDetailPageClaudePromptCachingTtlHelp": "5 minutes is the default. 1 hour costs more to write but can reduce rebuilds in long conversations.",
   "providerDetailPageClaudePromptCachingTtl5m": "5 min",
   "providerDetailPageClaudePromptCachingTtl1h": "1 hour",
+  "providerBalanceDefaultInterval": "Default balance refresh interval",
+  "@providerBalanceDefaultInterval": {
+    "description": "Providers settings row for the global default interval between automatic account balance queries."
+  },
+  "providerBalanceInterval": "Balance refresh interval",
+  "@providerBalanceInterval": {
+    "description": "Row in a provider account balance editor for overriding its periodic refresh interval."
+  },
+  "providerBalanceRefreshOnReply": "Refresh balance after each reply",
+  "@providerBalanceRefreshOnReply": {
+    "description": "Global and provider settings label. An account balance query becomes due after a final model reply."
+  },
+  "providerBalanceFollowDefault": "Follow global setting ({value})",
+  "@providerBalanceFollowDefault": {
+    "description": "Provider override option that inherits the global setting. The value is the currently effective interval or the localized on/off state.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "providerBalanceRefreshOff": "Off",
+  "@providerBalanceRefreshOff": {
+    "description": "Option disabling the selected balance refresh trigger, either the periodic interval or refresh after replies."
+  },
+  "providerBalanceRefreshOn": "On",
+  "@providerBalanceRefreshOn": {
+    "description": "Provider override option that enables refreshing the account balance after replies."
+  },
+  "providerBalanceRefreshMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+  "@providerBalanceRefreshMinutes": {
+    "description": "Account balance refresh interval displayed as a number of whole minutes.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "providerBalanceRefreshHour": "1 hour",
+  "@providerBalanceRefreshHour": {
+    "description": "Preset selection for querying the account balance every one hour."
+  },
+  "providerBalanceCustomInterval": "Custom interval…",
+  "@providerBalanceCustomInterval": {
+    "description": "Option that opens the dialog for entering a custom balance refresh interval."
+  },
+  "providerBalanceIntervalMinutes": "Interval in minutes",
+  "@providerBalanceIntervalMinutes": {
+    "description": "Numeric field label in the custom account balance refresh interval dialog."
+  },
+  "providerBalanceRefreshNow": "Refresh balance now",
+  "@providerBalanceRefreshNow": {
+    "description": "Action in the account balance badge context menu to query the provider immediately."
+  },
+  "providerBalanceLastUpdated": "Last updated {date} at {time}",
+  "@providerBalanceLastUpdated": {
+    "description": "Balance badge tooltip showing the date and time of the most recent successful query. Both placeholders are already localized.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "providerDetailPageBalanceTitle": "Account Balance",
   "providerDetailPageBalanceInfo": "Get account balance",
   "providerDetailPageBalanceApiPathLabel": "Balance API Path or URL",
@@ -8135,8 +8235,10 @@
   "compressionTarget": "Compress to",
   "compressionWindow": "Summary model capacity",
   "compressionRequests": "Maximum requests",
-  "compressionReference": "Reference world books and historical memory",
-  "compressionReferenceHint": "World books are matched only against the history being compressed, using memory snapshots from that time. This is only to explain names and rules — it doesn’t mean those events happened, or that a character already knows them.",
+  "compressionReference": "Use background references",
+  "compressionReferenceHint": "The summary can draw on the assistant’s system prompt, world book entries matched to this part of the chat, and memories saved at the time. The chat history establishes what happened and what each character knows.",
+  "compressionInstructionInjections": "Use instruction injections as references",
+  "compressionInstructionInjectionsHint": "Send the instruction cards enabled for this chat to the summary model as background references.",
   "compressionToolReferences": "Keep only references to tool results already read",
   "compressionToolReferencesHint": "Only applies when tools are available. The latest unread results are kept in full. Results already read are kept as references — you can look them up, but not edit them.",
   "compressionSummaryScan": "Also match world-book keywords against the summary",
@@ -21549,10 +21651,16 @@
     "description": "Maximum number of model requests allowed for one compression task, including retries. Also labels the recovery action that opens this field."
   },
   "@compressionReference": {
-    "description": "Compression option to include world books evaluated on the selected history and memory snapshots frozen in that history, rather than current live memory or retained messages."
+    "description": "Main switch in the text compression details for including background information in the summary request. It also controls the availability of the instruction injection option. No placeholders."
   },
   "@compressionReferenceHint": {
-    "description": "Compression reference help: restrict dynamic reference sources to the selected historical range, and distinguish explanatory background from events or character knowledge. No placeholders."
+    "description": "Help below the background references switch in text compression settings. The assistant’s system prompt, world book entries matched to the selected history, and memory snapshots saved in that range help explain context. The chat history establishes events and character knowledge. No placeholders."
+  },
+  "@compressionInstructionInjections": {
+    "description": "Switch under background references in text compression settings. Enables sending the instruction cards selected for the chat as reference material to the model generating a summary. No placeholders."
+  },
+  "@compressionInstructionInjectionsHint": {
+    "description": "Help below the instruction injection switch in text compression settings. Describes the selected chat instruction cards being sent as background material for the summary. No placeholders."
   },
   "@compressionToolReferences": {
     "description": "Switch label for replacing already-consumed tool results with references."

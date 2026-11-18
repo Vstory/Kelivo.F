@@ -1731,6 +1731,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get backupPageFilesLabel => 'Dosyalar ve Görseller';
 
   @override
+  String get backupPageSettingsSaveFailed =>
+      'Yedekleme ayarları kaydedilemedi. Lütfen tekrar deneyin.';
+
+  @override
   String get backupPageScopeTitle => 'Yedekleme ve içe aktarma içeriği';
 
   @override
@@ -2242,6 +2246,22 @@ class AppLocalizationsTr extends AppLocalizations {
   String get backupPageImportFromOtherApps => 'Diğer Uygulamalardan İçe Aktar';
 
   @override
+  String get backupPageImportFromOtherAppsSubtitle =>
+      'Yeni Chatbox ve Cherry Studio 2.x yedekleri ile ChatGPT, Claude, DeepSeek, Gemini, Grok, Open WebUI, NextChat ve LobeChat. Tarayıcınızda yerel olarak Kelivo yedeğine dönüştürülür; dosya yüklenmez.';
+
+  @override
+  String get backupPageOpenImportToolbox => 'Araç Kutusunu Aç';
+
+  @override
+  String backupPageImportToolboxOpenFailed(String url) {
+    return 'Tarayıcı açılamadı. Bu URL\'yi kendiniz açın: $url';
+  }
+
+  @override
+  String get backupPageToolboxImportMergeOnlyHint =>
+      'Bu dosya resmi araç kutusu tarafından dönüştürüldü. Mevcut verilerinizle birleştirilecek ve bu cihazdaki sohbetlerin veya asistanların yerini almayacak.';
+
+  @override
   String get backupPageNotSupportedYet => 'Henüz desteklenmiyor';
 
   @override
@@ -2327,7 +2347,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String backupPageCherryStudioUnsupportedBackupVersion(String version) {
-    return 'Bu yedek, Kelivo\'nun henüz içe aktaramadığı Cherry Studio biçim sürümü $version kullanıyor. Bunun yerine Cherry Studio v1\'den dışa aktarın veya Cherry Studio v2 yedeklerini destekleyen bir Kelivo güncellemesini bekleyin.';
+    return 'Bu bir Cherry Studio 2.x yedeği (biçim sürümü $version) ve uygulamada doğrudan içe aktarılamaz. Resmi araç kutusuyla Kelivo yedeğine dönüştürün, ardından Yedek Dosyasını İçe Aktar\'ı kullanıp Birleştir\'i seçin. Dönüştürme tarayıcınızda gerçekleşir; dosya yüklenmez.';
+  }
+
+  @override
+  String backupPageChatboxUnsupportedBackupVersion(String version) {
+    return 'Bu daha yeni bir Chatbox yedeği (biçim sürümü $version) ve uygulamada doğrudan içe aktarılamaz. Resmi araç kutusuyla Kelivo yedeğine dönüştürün, ardından Yedek Dosyasını İçe Aktar\'ı kullanıp Birleştir\'i seçin. Dönüştürme tarayıcınızda gerçekleşir; dosya yüklenmez.';
   }
 
   @override
@@ -4503,6 +4528,56 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get providerDetailPageClaudePromptCachingTtl1h => '1 saat';
+
+  @override
+  String get providerBalanceDefaultInterval =>
+      'Varsayılan bakiye yenileme aralığı';
+
+  @override
+  String get providerBalanceInterval => 'Bakiye yenileme aralığı';
+
+  @override
+  String get providerBalanceRefreshOnReply =>
+      'Her yanıttan sonra bakiyeyi yenile';
+
+  @override
+  String providerBalanceFollowDefault(String value) {
+    return 'Genel ayarı takip et ($value)';
+  }
+
+  @override
+  String get providerBalanceRefreshOff => 'Kapalı';
+
+  @override
+  String get providerBalanceRefreshOn => 'Açık';
+
+  @override
+  String providerBalanceRefreshMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dakika',
+      one: '1 dakika',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get providerBalanceRefreshHour => '1 saat';
+
+  @override
+  String get providerBalanceCustomInterval => 'Özel aralık…';
+
+  @override
+  String get providerBalanceIntervalMinutes => 'Dakika cinsinden aralık';
+
+  @override
+  String get providerBalanceRefreshNow => 'Bakiyeyi şimdi yenile';
+
+  @override
+  String providerBalanceLastUpdated(String date, String time) {
+    return 'Son güncelleme: $date $time';
+  }
 
   @override
   String get providerDetailPageBalanceTitle => 'Hesap Bakiyesi';
@@ -16383,12 +16458,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get compressionRequests => 'Maksimum istek';
 
   @override
-  String get compressionReference =>
-      'Dünya kitaplarına ve geçmiş belleğe başvur';
+  String get compressionReference => 'Arka plan referanslarını kullan';
 
   @override
   String get compressionReferenceHint =>
-      'Dünya kitapları yalnızca sıkıştırılan geçmişe göre eşleştirilir ve o zamanki bellek anlık görüntüleri kullanılır. Bu yalnızca adları ve kuralları açıklamak içindir — bu olayların yaşandığı veya bir karakterin bunları zaten bildiği anlamına gelmez.';
+      'Özet hazırlanırken asistanın sistem isteminden, sohbetin bu bölümüyle eşleşen dünya kitabı girdilerinden ve o sırada kaydedilen anılardan yararlanılabilir. Olaylar ve her karakterin bildikleri için sohbet geçmişi esas alınır.';
+
+  @override
+  String get compressionInstructionInjections =>
+      'Talimat enjeksiyonlarını referans olarak kullan';
+
+  @override
+  String get compressionInstructionInjectionsHint =>
+      'Bu sohbet için etkinleştirilen talimat kartlarını arka plan referansı olarak özet modeline gönder.';
 
   @override
   String get compressionToolReferences =>
