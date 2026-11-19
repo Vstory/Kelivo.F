@@ -8209,28 +8209,40 @@ abstract class AppLocalizations {
   /// **'1 hour'**
   String get providerDetailPageClaudePromptCachingTtl1h;
 
-  /// Providers settings row for the global default interval between automatic account balance queries.
+  /// Label for selecting whether to edit this provider's automatic balance refresh settings or the global defaults.
   ///
   /// In en, this message translates to:
-  /// **'Default balance refresh interval'**
-  String get providerBalanceDefaultInterval;
+  /// **'Automatic balance refresh'**
+  String get providerBalanceAutoRefresh;
 
-  /// Row in a provider account balance editor for overriding its periodic refresh interval.
+  /// Scope choice in the automatic balance refresh settings for editing overrides that apply only to the current provider.
   ///
   /// In en, this message translates to:
-  /// **'Balance refresh interval'**
+  /// **'This provider'**
+  String get providerBalanceScopeProvider;
+
+  /// Scope choice in the automatic balance refresh settings for editing defaults shared across providers.
+  ///
+  /// In en, this message translates to:
+  /// **'Global defaults'**
+  String get providerBalanceScopeGlobal;
+
+  /// Short row label in automatic balance refresh settings for choosing how often to update the balance on a timer. Shown for both the global default and the provider override.
+  ///
+  /// In en, this message translates to:
+  /// **'Timed refresh'**
   String get providerBalanceInterval;
 
-  /// Global and provider settings label. An account balance query becomes due after a final model reply.
+  /// Short row label in automatic balance refresh settings. Updates the balance after each completed model reply. Shown for both the global default and the provider override.
   ///
   /// In en, this message translates to:
-  /// **'Refresh balance after each reply'**
+  /// **'Refresh after replies'**
   String get providerBalanceRefreshOnReply;
 
-  /// Provider override option that inherits the global setting. The value is the currently effective interval or the localized on/off state.
+  /// Compact current value and picker option that uses the global automatic balance refresh setting. Keep the wording short so it fits beside the row label. The value is the currently effective interval or localized on/off state.
   ///
   /// In en, this message translates to:
-  /// **'Follow global setting ({value})'**
+  /// **'Default · {value}'**
   String providerBalanceFollowDefault(String value);
 
   /// Option disabling the selected balance refresh trigger, either the periodic interval or refresh after replies.

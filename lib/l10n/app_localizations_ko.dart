@@ -4397,17 +4397,23 @@ class AppLocalizationsKo extends AppLocalizations {
   String get providerDetailPageClaudePromptCachingTtl1h => '1시간';
 
   @override
-  String get providerBalanceDefaultInterval => '기본 잔액 새로 고침 간격';
+  String get providerBalanceAutoRefresh => '자동 잔액 새로고침';
 
   @override
-  String get providerBalanceInterval => '잔액 새로 고침 간격';
+  String get providerBalanceScopeProvider => '이 공급자';
 
   @override
-  String get providerBalanceRefreshOnReply => '모델이 답변할 때마다 잔액 새로 고침';
+  String get providerBalanceScopeGlobal => '전역 기본값';
+
+  @override
+  String get providerBalanceInterval => '정기 새로고침';
+
+  @override
+  String get providerBalanceRefreshOnReply => '응답 후 새로고침';
 
   @override
   String providerBalanceFollowDefault(String value) {
-    return '전역 설정 따르기($value)';
+    return '기본값 · $value';
   }
 
   @override
