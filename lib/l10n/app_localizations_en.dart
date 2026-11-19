@@ -5084,6 +5084,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get miniMapScrollToBottomTooltip => 'Scroll to bottom';
 
   @override
+  String get miniMapSearchHint => 'Search minimap';
+
+  @override
+  String miniMapSearchMatchCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count matches',
+      one: '1 match',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get miniMapSearchNoResults => 'No matching messages';
+
+  @override
+  String get miniMapSearchFailed => 'Couldn’t search messages';
+
+  @override
   String get conversationFindHint => 'Find';
 
   @override
