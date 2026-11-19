@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SCRIPT_VERSION=1.0.2    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
+# SCRIPT_VERSION=1.0.3    # 脚本版本(无模板上游, 独立维护; 内容变更 +1)
 """同步上游：fetch → 合并 → fork 锚点门禁 → 经统一操作器预演并推送 → 打印新 CI 链接。
 
 裸跑即预演（只看计划和上游新增，不动仓库、不推远端）；真跑要显式 --yes。
@@ -13,6 +13,9 @@
     python3 scripts/sync-upstream.py --yes      # 合并并推送
     python3 scripts/sync-upstream.py --yes --no-push
     python3 scripts/sync-upstream.py --yes --skip-anchors   # 上游只改文档时用
+
+合并提交消息由脚本生成，不带 #编号 —— 别手改（手改把上游 issue 号写进去，会被 GitHub
+挂到上游 issue 时间线）。script 也会在合并后兜底改写这类编号。
 
 退出码：0 正常 / 2 工作区不干净或合并冲突 / 3 锚点门禁失败 / 4 找不到统一操作器 / 5 推送失败
 """
@@ -28,6 +31,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ANCHOR_SCRIPT = REPO_ROOT / "scripts" / "ci-fork-identity.py"
+
+# 上游 issue/PR 编号在提交消息里会被 GitHub 解析成引用，fork 的提交因此会挂到上游时间线
+ISSUE_REF = re.compile(r"#\d+")
 
 # 操作器在知识库里，Kelivo.F 是独立仓库：找不到就报错并给手动命令，绝不退化成自己拼凭据
 PKB_ROOT = Path(os.environ.get("PKB_ROOT", "/workspace/Personal-Knowledge-Base"))
@@ -109,8 +115,14 @@ def report_plan(upstream_ref: str, branch: str) -> int:
 
 def merge(upstream_ref: str) -> None:
     log(f"合并 {upstream_ref} …")
-    result = git("merge", upstream_ref, "--no-edit")
+    target = out(git("rev-parse", "--short", upstream_ref))
+    # 合并提交消息里绝不能出现 #编号：fork 的提交一旦引用上游编号，GitHub 会把它挂到上游
+    # issue 时间线（"Vstory/Kelivo.F mentioned this issue in commit …"）。上游自带 #编号的
+    # 提交原样复用同一 sha，不额外产生引用事件，无需处理。
+    message = f"merge: sync {upstream_ref} {target}"
+    result = git("merge", upstream_ref, "-m", message)
     if result.returncode == 0:
+        scrub_merge_message()
         log(f"合并完成：{out(git('log', '-1', '--format=%h %s'))}")
         return
     conflicts = out(git("diff", "--name-only", "--diff-filter=U"))
@@ -120,6 +132,20 @@ def merge(upstream_ref: str) -> None:
     else:
         log(result.stderr.strip() or "（无冲突文件，非冲突导致的失败）")
     raise SystemExit(2)
+
+
+def scrub_merge_message() -> None:
+    # 兜底：手改消息或 GIT_MERGE_AUTOEDIT 都可能把 #编号带进来。只改我们自己造的合并提交；
+    # 快进时 HEAD 就是上游提交，amend 会改上游 sha，绝不动。
+    parents = out(git("rev-list", "--parents", "-1", "HEAD")).split()
+    if len(parents) < 3:
+        return
+    body = out(git("log", "-1", "--format=%B"))
+    if not ISSUE_REF.search(body):
+        return
+    fixed = ISSUE_REF.sub(lambda m: f"PR {m.group(0)[1:]}", body)
+    git("commit", "--amend", "-m", fixed, check=True)
+    log("::warning::合并提交消息含 #编号，已改写为 PR 编号 —— 否则会被挂到上游 issue 时间线")
 
 
 def check_anchors(skip: bool) -> None:
