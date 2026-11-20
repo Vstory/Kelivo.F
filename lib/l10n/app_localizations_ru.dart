@@ -4346,6 +4346,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Отправлять ссылки на изображения http(s) как есть; при выключении удалённые ссылки отбрасываются и отправляются только локальные изображения';
 
   @override
+  String get modelSpecFormResponseSpeedTiers => 'Уровни скорости ответа';
+
+  @override
+  String get modelSpecFormResponseSpeedTiersSubtitle =>
+      'Настройте, какие уровни ускорения доступны для этой модели в чатах. Снимите оба флажка, чтобы оставить только «Стандартный».';
+
+  @override
   String get modelSpecFormPromptCacheControl => 'Маркер кэша промпта';
 
   @override
@@ -4653,11 +4660,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get providerDetailPageBalanceQuerying => 'Проверка...';
 
   @override
-  String get providerDetailPageBalanceResetDefaultsButton => 'Сбросить';
+  String get providerDetailPageBalanceResetDefaultsButton =>
+      'Восстановить настройки баланса по умолчанию';
 
   @override
-  String get providerDetailPageBalanceResetDefaultsTooltip =>
-      'Сбросить настройки баланса';
+  String get providerDetailPageBalanceResetConfirmMessage =>
+      'Это заменит пользовательские настройки запроса баланса этого провайдера, восстановит состояние его переключателя баланса по умолчанию и настроит автоматическое обновление в соответствии с глобальными настройками.';
+
+  @override
+  String get providerDetailPageBalanceResetConfirmButton =>
+      'Восстановить по умолчанию';
 
   @override
   String providerDetailPageBalanceResult(String value) {
@@ -5017,6 +5029,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get providerDetailPageModelsTitle => 'Модели';
 
   @override
+  String get providerDetailPageReorderModels => 'Изменить порядок моделей';
+
+  @override
   String get providerModelsGetButton => 'Получить';
 
   @override
@@ -5310,10 +5325,32 @@ class AppLocalizationsRu extends AppLocalizations {
       'Регион (необязательно, по умолчанию: us-en)';
 
   @override
+  String get searchServicesFourGetUrlInvalid =>
+      'Введите базовый URL HTTP или HTTPS.';
+
+  @override
+  String get searchServicesFourGetScraperOptional =>
+      'Вышестоящий движок (необязательно)';
+
+  @override
+  String get searchServicesFourGetPassOptional => 'Cookie pass (необязательно)';
+
+  @override
+  String get searchServicesFourGetPassHelp =>
+      'Если экземпляр требует CAPTCHA, пройдите её и вставьте значение cookie pass.';
+
+  @override
   String get searchServiceEditorProviderTypeTitle => 'Поисковый провайдер';
 
   @override
   String get searchServiceEditorConfigurationTitle => 'Конфигурация';
+
+  @override
+  String get searchServiceEditorChangeIcon => 'Сменить значок';
+
+  @override
+  String get searchServiceEditorIconFailed =>
+      'Не удалось использовать этот значок. Выберите другое изображение или значок.';
 
   @override
   String get searchServiceEditorNoConfiguration =>
@@ -5885,6 +5922,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get displaySettingsPageAutoSwitchTopicsTitle => 'Автопереход к темам';
+
+  @override
+  String get desktopDisplaySettingsFullWidthChatTitle => 'Чат на всю ширину';
+
+  @override
+  String get desktopDisplaySettingsFullWidthChatSubtitle =>
+      'Растянуть сообщения и поле ввода на всю доступную ширину области чата.';
 
   @override
   String get desktopDisplaySettingsTopicPositionTitle => 'Положение тем';
@@ -6740,6 +6784,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Метапоисковик, уважающий приватность. Требуется собственный экземпляр; без отслеживания.';
 
   @override
+  String get searchProviderFourGetDescription =>
+      'Веб-поиск через публичный или самостоятельно размещённый экземпляр 4get с включённым API.';
+
+  @override
   String get searchProviderTavilyDescription =>
       'Поисковый API на базе ИИ, оптимизированный для LLM. Предоставляет качественные релевантные результаты.';
 
@@ -6779,6 +6827,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get searchServiceNameSearXNG => 'SearXNG';
+
+  @override
+  String get searchServiceNameFourGet => '4get';
 
   @override
   String get searchServiceNameLinkUp => 'LinkUp';
@@ -11910,7 +11961,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get workspaceToolHelpViewImage =>
-      'Позволить модели просмотреть изображение из рабочей области.';
+      'Позволяет модели просматривать изображения в рабочей области или изображения по публичным URL.';
 
   @override
   String get workspaceToolHelpWrite =>

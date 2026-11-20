@@ -4121,6 +4121,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '直接发送 http(s) 图片链接；关闭后丢弃远程链接，只发送本地图片';
 
   @override
+  String get modelSpecFormResponseSpeedTiers => '响应速度档位';
+
+  @override
+  String get modelSpecFormResponseSpeedTiersSubtitle =>
+      '自定义聊天中可为此模型选择的加速档位。两档均不勾选时，只提供标准档。';
+
+  @override
   String get modelSpecFormPromptCacheControl => '提示缓存标记';
 
   @override
@@ -4407,10 +4414,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get providerDetailPageBalanceQuerying => '查询中...';
 
   @override
-  String get providerDetailPageBalanceResetDefaultsButton => '重置';
+  String get providerDetailPageBalanceResetDefaultsButton => '恢复默认余额设置';
 
   @override
-  String get providerDetailPageBalanceResetDefaultsTooltip => '重置余额设置';
+  String get providerDetailPageBalanceResetConfirmMessage =>
+      '这会覆盖当前供应商自定义的余额查询配置，将余额查询开关恢复为默认状态，并让自动刷新跟随全局设置。';
+
+  @override
+  String get providerDetailPageBalanceResetConfirmButton => '恢复默认';
 
   @override
   String providerDetailPageBalanceResult(String value) {
@@ -4760,6 +4771,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get providerDetailPageModelsTitle => '模型';
 
   @override
+  String get providerDetailPageReorderModels => '模型排序';
+
+  @override
   String get providerModelsGetButton => '获取';
 
   @override
@@ -5032,10 +5046,29 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchServicesEditDialogRegionOptional => '地区（可选，默认 us-en）';
 
   @override
+  String get searchServicesFourGetUrlInvalid => '请输入 HTTP 或 HTTPS 实例地址。';
+
+  @override
+  String get searchServicesFourGetScraperOptional => '上游搜索引擎（可选）';
+
+  @override
+  String get searchServicesFourGetPassOptional => 'pass Cookie（可选）';
+
+  @override
+  String get searchServicesFourGetPassHelp =>
+      '如果实例要求验证码，请完成验证并粘贴 pass Cookie 的值。';
+
+  @override
   String get searchServiceEditorProviderTypeTitle => '搜索提供商';
 
   @override
   String get searchServiceEditorConfigurationTitle => '服务配置';
+
+  @override
+  String get searchServiceEditorChangeIcon => '更换图标';
+
+  @override
+  String get searchServiceEditorIconFailed => '无法使用此图标，请另选图片或图标。';
 
   @override
   String get searchServiceEditorNoConfiguration => '此提供商无需额外配置。';
@@ -5546,6 +5579,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get displaySettingsPageAutoSwitchTopicsTitle => '自动切换话题';
+
+  @override
+  String get desktopDisplaySettingsFullWidthChatTitle => '聊天全宽显示';
+
+  @override
+  String get desktopDisplaySettingsFullWidthChatSubtitle =>
+      '让消息区和输入框随聊天栏的可用宽度展开。';
 
   @override
   String get desktopDisplaySettingsTopicPositionTitle => '话题位置';
@@ -6347,6 +6387,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchProviderSearXNGDescription => '注重隐私的元搜索引擎。需自建实例，无跟踪。';
 
   @override
+  String get searchProviderFourGetDescription =>
+      '通过已启用 API 的公开或自建 4get 实例搜索网页。';
+
+  @override
   String get searchProviderTavilyDescription =>
       '为大型语言模型（LLMs）优化的 AI 搜索 API，提供高质量、相关的搜索结果。';
 
@@ -6385,6 +6429,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get searchServiceNameSearXNG => 'SearXNG';
+
+  @override
+  String get searchServiceNameFourGet => '4get';
 
   @override
   String get searchServiceNameLinkUp => 'LinkUp';
@@ -11213,7 +11260,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get workspaceToolHelpRead => '按行读取文件内容，支持分页。';
 
   @override
-  String get workspaceToolHelpViewImage => '让模型查看工作区中的图片内容。';
+  String get workspaceToolHelpViewImage => '让模型查看工作区图片或公网链接中的图片。';
 
   @override
   String get workspaceToolHelpWrite => '创建文件或覆盖文件内容。';
@@ -20684,6 +20731,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
       '直接发送 http(s) 图片链接；关闭后丢弃远程链接，只发送本地图片';
 
   @override
+  String get modelSpecFormResponseSpeedTiers => '响应速度档位';
+
+  @override
+  String get modelSpecFormResponseSpeedTiersSubtitle =>
+      '自定义聊天中可为此模型选择的加速档位。两档均不勾选时，只提供标准档。';
+
+  @override
   String get modelSpecFormPromptCacheControl => '提示缓存标记';
 
   @override
@@ -20970,10 +21024,14 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get providerDetailPageBalanceQuerying => '查询中...';
 
   @override
-  String get providerDetailPageBalanceResetDefaultsButton => '重置';
+  String get providerDetailPageBalanceResetDefaultsButton => '恢复默认余额设置';
 
   @override
-  String get providerDetailPageBalanceResetDefaultsTooltip => '重置余额设置';
+  String get providerDetailPageBalanceResetConfirmMessage =>
+      '这会覆盖当前供应商自定义的余额查询配置，将余额查询开关恢复为默认状态，并让自动刷新跟随全局设置。';
+
+  @override
+  String get providerDetailPageBalanceResetConfirmButton => '恢复默认';
 
   @override
   String providerDetailPageBalanceResult(String value) {
@@ -21323,6 +21381,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get providerDetailPageModelsTitle => '模型';
 
   @override
+  String get providerDetailPageReorderModels => '模型排序';
+
+  @override
   String get providerModelsGetButton => '获取';
 
   @override
@@ -21595,10 +21656,29 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get searchServicesEditDialogRegionOptional => '地区（可选，默认 us-en）';
 
   @override
+  String get searchServicesFourGetUrlInvalid => '请输入 HTTP 或 HTTPS 实例地址。';
+
+  @override
+  String get searchServicesFourGetScraperOptional => '上游搜索引擎（可选）';
+
+  @override
+  String get searchServicesFourGetPassOptional => 'pass Cookie（可选）';
+
+  @override
+  String get searchServicesFourGetPassHelp =>
+      '如果实例要求验证码，请完成验证并粘贴 pass Cookie 的值。';
+
+  @override
   String get searchServiceEditorProviderTypeTitle => '搜索提供商';
 
   @override
   String get searchServiceEditorConfigurationTitle => '服务配置';
+
+  @override
+  String get searchServiceEditorChangeIcon => '更换图标';
+
+  @override
+  String get searchServiceEditorIconFailed => '无法使用此图标，请另选图片或图标。';
 
   @override
   String get searchServiceEditorNoConfiguration => '此提供商无需额外配置。';
@@ -22109,6 +22189,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get displaySettingsPageAutoSwitchTopicsTitle => '自动切换话题';
+
+  @override
+  String get desktopDisplaySettingsFullWidthChatTitle => '聊天全宽显示';
+
+  @override
+  String get desktopDisplaySettingsFullWidthChatSubtitle =>
+      '让消息区和输入框随聊天栏的可用宽度展开。';
 
   @override
   String get desktopDisplaySettingsTopicPositionTitle => '话题位置';
@@ -22910,6 +22997,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get searchProviderSearXNGDescription => '注重隐私的元搜索引擎。需自建实例，无跟踪。';
 
   @override
+  String get searchProviderFourGetDescription =>
+      '通过已启用 API 的公开或自建 4get 实例搜索网页。';
+
+  @override
   String get searchProviderTavilyDescription =>
       '为大型语言模型（LLMs）优化的 AI 搜索 API，提供高质量、相关的搜索结果。';
 
@@ -22948,6 +23039,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get searchServiceNameSearXNG => 'SearXNG';
+
+  @override
+  String get searchServiceNameFourGet => '4get';
 
   @override
   String get searchServiceNameLinkUp => 'LinkUp';
@@ -27776,7 +27870,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get workspaceToolHelpRead => '按行读取文件内容，支持分页。';
 
   @override
-  String get workspaceToolHelpViewImage => '让模型查看工作区中的图片内容。';
+  String get workspaceToolHelpViewImage => '让模型查看工作区图片或公网链接中的图片。';
 
   @override
   String get workspaceToolHelpWrite => '创建文件或覆盖文件内容。';
@@ -37252,6 +37346,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
       '直接傳送 http(s) 圖片連結；關閉後捨棄遠端連結，只傳送本機圖片';
 
   @override
+  String get modelSpecFormResponseSpeedTiers => '回應速度等級';
+
+  @override
+  String get modelSpecFormResponseSpeedTiersSubtitle =>
+      '自訂此模型在聊天中可提供的加速等級。兩者皆不勾選時，僅提供標準等級。';
+
+  @override
   String get modelSpecFormPromptCacheControl => '提示快取標記';
 
   @override
@@ -37538,10 +37639,14 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get providerDetailPageBalanceQuerying => '查詢中...';
 
   @override
-  String get providerDetailPageBalanceResetDefaultsButton => '重設';
+  String get providerDetailPageBalanceResetDefaultsButton => '恢復預設餘額設定';
 
   @override
-  String get providerDetailPageBalanceResetDefaultsTooltip => '重設餘額設定';
+  String get providerDetailPageBalanceResetConfirmMessage =>
+      '這會覆寫此供應商自訂的餘額查詢設定，將餘額查詢開關恢復為預設狀態，並讓自動重新整理跟隨全域設定。';
+
+  @override
+  String get providerDetailPageBalanceResetConfirmButton => '恢復預設';
 
   @override
   String providerDetailPageBalanceResult(String value) {
@@ -37890,6 +37995,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get providerDetailPageModelsTitle => '模型';
 
   @override
+  String get providerDetailPageReorderModels => '重新排序模型';
+
+  @override
   String get providerModelsGetButton => '取得';
 
   @override
@@ -38167,10 +38275,29 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get searchServicesEditDialogRegionOptional => '地區（可選，預設 us-en）';
 
   @override
+  String get searchServicesFourGetUrlInvalid => '請輸入 HTTP 或 HTTPS 執行個體位址。';
+
+  @override
+  String get searchServicesFourGetScraperOptional => '上游搜尋引擎（選填）';
+
+  @override
+  String get searchServicesFourGetPassOptional => 'pass Cookie（選填）';
+
+  @override
+  String get searchServicesFourGetPassHelp =>
+      '如果執行個體要求驗證碼，請完成驗證並貼上 pass Cookie 的值。';
+
+  @override
   String get searchServiceEditorProviderTypeTitle => '搜尋提供商';
 
   @override
   String get searchServiceEditorConfigurationTitle => '服務設定';
+
+  @override
+  String get searchServiceEditorChangeIcon => '更換圖示';
+
+  @override
+  String get searchServiceEditorIconFailed => '無法使用此圖示，請另選圖片或圖示。';
 
   @override
   String get searchServiceEditorNoConfiguration => '此提供商無需額外設定。';
@@ -38681,6 +38808,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get displaySettingsPageAutoSwitchTopicsTitle => '自動切換話題';
+
+  @override
+  String get desktopDisplaySettingsFullWidthChatTitle => '聊天全寬顯示';
+
+  @override
+  String get desktopDisplaySettingsFullWidthChatSubtitle =>
+      '讓訊息區和輸入框隨聊天欄的可用寬度展開。';
 
   @override
   String get desktopDisplaySettingsTopicPositionTitle => '主題位置';
@@ -39482,6 +39616,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get searchProviderSearXNGDescription => '重視隱私的元搜尋引擎。需自建實例，無追蹤。';
 
   @override
+  String get searchProviderFourGetDescription =>
+      '透過已啟用 API 的公開或自架 4get 執行個體搜尋網頁。';
+
+  @override
   String get searchProviderTavilyDescription =>
       '為大型語言模型（LLM）優化的 AI 搜尋 API，提供高品質、相關的搜尋結果。';
 
@@ -39521,6 +39659,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get searchServiceNameSearXNG => 'SearXNG';
+
+  @override
+  String get searchServiceNameFourGet => '4get';
 
   @override
   String get searchServiceNameLinkUp => 'LinkUp';
@@ -44351,7 +44492,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get workspaceToolHelpRead => '按行讀取檔案內容，支援分頁。';
 
   @override
-  String get workspaceToolHelpViewImage => '讓模型檢視工作區中的圖片內容。';
+  String get workspaceToolHelpViewImage => '讓模型檢視工作區圖片或公開網址中的圖片。';
 
   @override
   String get workspaceToolHelpWrite => '建立檔案或覆寫檔案內容。';
