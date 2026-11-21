@@ -1599,6 +1599,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get hotkeysResetAll => '모든 단축키를 기본값으로 재설정';
 
   @override
+  String hotkeysShortcutInUse(String action) {
+    return '이 단축키는 이미 $action에 할당되어 있습니다.';
+  }
+
+  @override
+  String get hotkeysTextEditing => '텍스트 편집 및 포커스 탐색';
+
+  @override
   String get assistantEditTemperatureTitle => '온도';
 
   @override
@@ -9434,6 +9442,14 @@ class AppLocalizationsKo extends AppLocalizations {
       '어시스턴트 답변의 빈 줄마다 문단별로 하나의 말풍선으로 나눕니다';
 
   @override
+  String get messageStyleSettingsPageCustomizeThinkingToolCards =>
+      '사고 및 도구 카드 사용자 지정';
+
+  @override
+  String get messageStyleSettingsPageCustomizeThinkingToolCardsSubtitle =>
+      '사고 및 도구 호출에 별도의 모양 적용';
+
+  @override
   String get messageStyleSettingsPageStyleFrostedSubtitle => '반투명 프로스트 유리';
 
   @override
@@ -9483,8 +9499,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get messageStyleSettingsPageRoleAssistant => '어시스턴트';
 
   @override
+  String get messageStyleSettingsPageRoleThinkingTool => '카드';
+
+  @override
   String get messageStyleSettingsPageRoleAssistantHint =>
-      '어시스턴트 설정은 생각, 도구 호출, 번역 카드에도 적용됩니다.';
+      '번역 카드는 어시스턴트 스타일을 따르며, 사고 및 도구 카드도 기본적으로 이를 따릅니다.';
 
   @override
   String get localSnapshotSectionTitle => '로컬 사본';
@@ -14646,7 +14665,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get compressOverSnack =>
-      '요약이 여전히 너무 길어 한도를 초과하므로 사용되지 않았습니다. 다시 압축하거나 컨텍스트가 더 큰 모델로 전환하세요.';
+      '결과가 채팅 모델의 윈도우를 초과할 수 있습니다. 요약을 검토하고 적용할 수 있습니다.';
 
   @override
   String get contextSummaryHint =>
@@ -15698,6 +15717,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get imageContextOmitted => '포함되지 않음';
 
   @override
+  String get imageContextExclude => '컨텍스트에서 제외';
+
+  @override
+  String get imageContextRestore => '제외 해제';
+
+  @override
+  String get imageContextExcluded => '사용자가 제외함';
+
+  @override
+  String get imageContextExcludedWithOriginal => '원본 이미지 제외됨';
+
+  @override
   String get imageContextPin => '이미지 고정';
 
   @override
@@ -15720,7 +15751,8 @@ class AppLocalizationsKo extends AppLocalizations {
       '업로드한 첨부 파일을 더 오래 유지하고 오래된 도구 이미지는 따로 보관합니다.';
 
   @override
-  String get imageContextActionsHint => '고정하여 우선 유지하거나 입력창에 다시 추가하세요.';
+  String get imageContextActionsHint =>
+      '개별 이미지를 제외하거나, 우선 유지를 위해 고정하거나, 입력창에 다시 추가할 수 있습니다.';
 
   @override
   String get imageContextEmptyDescription => '보내거나 도구가 읽은 이미지가 여기에 표시됩니다.';
@@ -15925,13 +15957,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get compressionTrigger => '사용량 도달 시';
 
   @override
-  String get compressionTarget => '압축 목표';
+  String get compressionTarget => '목표 사용량';
 
   @override
-  String get compressionWindow => '요약 모델 용량';
-
-  @override
-  String get compressionRequests => '최대 요청 수';
+  String get compressionWindow => '자동 압축 추정 윈도우';
 
   @override
   String get compressionReference => '배경 참조 사용';
@@ -16000,16 +16029,12 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get compressionBudgetError =>
-      '현재 한도보다 더 많은 모델 요청이 필요하므로 컨텍스트가 변경되지 않았습니다. 최대 요청 수를 높이거나 컨텍스트가 더 큰 모델로 전환하세요.';
-
-  @override
   String get compressionIncomplete =>
       '요약이 중단되었거나 거부되어 컨텍스트가 변경되지 않았습니다. 출력 한도를 높이거나 다른 모델을 사용해 보세요.';
 
   @override
-  String get compressionReferenceTooLarge =>
-      '참고 자료가 이미 이 모델의 용량을 채워 요약할 공간이 없습니다. 참고 자료를 줄이거나 컨텍스트가 더 큰 모델로 전환하세요.';
+  String get compressionProviderContextRejected =>
+      '공급자가 요청이 너무 크다고 보고했습니다. 컨텍스트가 더 큰 모델을 사용해 보세요.';
 
   @override
   String get compressionReferenceChanged =>
@@ -16017,7 +16042,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get compressionTargetNotReached =>
-      '압축 후에도 사용량이 자동 시작 지점보다 높아 원래 컨텍스트가 유지되었습니다. 요약을 더 줄이거나 시작 지점을 높이세요.';
+      '결과가 원본만큼 많은 컨텍스트를 사용할 것으로 추정됩니다. 요약을 검토하고 줄일 수 있습니다.';
 
   @override
   String get compressionTemplateMissing =>
@@ -16103,8 +16128,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get compressionOverflowAction => '한 번 압축한 후 실패한 응답 다시 시도';
 
   @override
-  String compressionPlannedCalls(int count, int limit) {
-    return '예상 $count회 요청 · 이번 한도 $limit회(재시도 포함)';
+  String compressionPlannedCalls(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '약 $count회 요청',
+      one: '약 1회 요청',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -16192,9 +16223,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get compressionTurnUnit => '턴';
 
   @override
-  String get compressionCallUnit => '회';
-
-  @override
   String get compressionRequestTimeout => '압축 요청 시간 초과';
 
   @override
@@ -16216,10 +16244,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get compressionAdvancedOptions => '압축 세부 정보';
 
   @override
-  String get compressionAdvancedHint => '참고 자료, 원문 다시 보기 여부, 요청 한도';
+  String get compressionAdvancedHint => '배경 참조, 원본 기록 및 윈도우 추정';
 
   @override
   String get compressionAutomaticWindow => '자동';
+
+  @override
+  String compressionSummaryWindowEstimate(String tokens, String source) {
+    return '요약 모델 윈도우 · $tokens 토큰 · $source';
+  }
 
   @override
   String get compressionAutoOffHint => '필요할 때 압축 페이지에서 수동으로 시작할 수 있습니다.';
@@ -16262,7 +16295,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get compressionAutoKeepHint =>
-      '자동 압축은 수동 실행에서 선택한 범위와 관계없이 항상 최근 원문을 유지합니다. 턴 수는 수동 압축과 공유됩니다.';
+      '자동 압축은 공간이 있을 때 최근 턴을 유지합니다. 공간이 부족하면 더 오래된 턴을 추가로 요약하며, 현재 요청은 항상 보호됩니다.';
 
   @override
   String get requestBudgetTitle => '이미지 및 요청 예산';
