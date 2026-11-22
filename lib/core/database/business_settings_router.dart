@@ -20,6 +20,7 @@ final class BusinessKeyRegistry {
 
   static const balanceRefreshIntervalKey = 'balance_refresh_interval_v1';
   static const balanceRefreshOnReplyKey = 'balance_refresh_on_reply_v1';
+  static const codexClientVersionCacheKey = 'codex_client_version_v1';
   static const modelListMetadataCacheKey = 'model_list_metadata_v1';
 
   static const localOnlyKeys = <String>{
@@ -39,6 +40,7 @@ final class BusinessKeyRegistry {
     'flutter_log_enabled_v1',
     'model_catalog_auto_update_v1',
     'ollama_model_metadata_v1',
+    codexClientVersionCacheKey,
     modelListMetadataCacheKey,
   };
 
@@ -1089,6 +1091,13 @@ final class BusinessSettingsRouter {
           kind,
           payload,
           strings: const {'apiKey', 'url'},
+          stringLists: const {'apiKeys'},
+        );
+      case 'keenable':
+        _validateKnownFields(
+          kind,
+          payload,
+          strings: const {'apiKey'},
           stringLists: const {'apiKeys'},
         );
       case 'zhipu':
