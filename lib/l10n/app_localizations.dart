@@ -5746,6 +5746,12 @@ abstract class AppLocalizations {
   /// **'Show Deep Thinking and tool cards'**
   String get messageExportSheetShowThinkingAndToolCards;
 
+  /// Switch in the single-message and batch PNG export options. On shows all thinking and tool-call steps in each card. Off folds older steps and shows the latest ones. The adjacent Show thinking content switch controls the reasoning text inside each step.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand all steps'**
+  String get messageExportSheetExpandAllSteps;
+
   /// Label for a toggle controlling whether the expanded thinking content is included in the export.
   ///
   /// In en, this message translates to:
@@ -29808,6 +29814,12 @@ abstract class AppLocalizations {
   /// **'Turkish'**
   String get languageDisplayTurkish;
 
+  /// Name of the Bengali language (Bangla) as a target in the assistant reply translation menu and standalone translator.
+  ///
+  /// In en, this message translates to:
+  /// **'Bangla'**
+  String get languageDisplayBangla;
+
   /// Confirmation question before deleting the named chat from the sidebar. Keep the title placeholder; reorder the sentence naturally.
   ///
   /// In en, this message translates to:
@@ -30857,6 +30869,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'macOS denied access to the backup password. If a system prompt appears, allow Kelivo to access it. You can also check the default keychain and the password item’s permissions in Keychain Access.'**
   String get backupMacKeychainAccessDenied;
+
+  /// Tooltip for a group-related action menu in World Book settings. A group header shows actions for its folder, and the main menu shows actions across folders.
+  ///
+  /// In en, this message translates to:
+  /// **'Group actions'**
+  String get worldBookGroupActions;
+
+  /// Label of the folder field in the World Book editor and title of its group picker. This sets which folder contains the book.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get worldBookGroupLabel;
+
+  /// Menu action and page title in World Book settings for dragging all books into the order used to break ties between entries with the same priority.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrange injection order'**
+  String get worldBookOrder;
+
+  /// Title in World Book settings while selecting books to move. count is the number selected across all folders.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 book selected} other{{count} books selected}}'**
+  String worldBookGroupSelectedBooks(int count);
+
+  /// Name of the section and move destination for World Books without a folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Ungrouped'**
+  String get worldBookGroupUngrouped;
+
+  /// Action and dialog title for creating a World Book folder in settings.
+  ///
+  /// In en, this message translates to:
+  /// **'New group'**
+  String get worldBookGroupNew;
+
+  /// Input field hint when naming or renaming a World Book folder in settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get worldBookGroupName;
+
+  /// Validation below the group name field when another World Book folder has this name.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a unique group name.'**
+  String get worldBookGroupNameInvalid;
+
+  /// Action and dialog title for renaming the currently displayed World Book folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename group'**
+  String get worldBookGroupRename;
+
+  /// Action and confirmation title for removing the currently displayed World Book folder. Its books are kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete group'**
+  String get worldBookGroupDelete;
+
+  /// Text in the World Book folder deletion confirmation. group is the user-provided name of the folder being deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Books in “{group}” will move to Ungrouped.'**
+  String worldBookGroupDeleteMessage(String group);
+
+  /// Control and destination picker title for moving one or more World Books into a folder or back to Ungrouped.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to group'**
+  String get worldBookGroupMove;
+
+  /// Title of the checklist for choosing books to move together in World Book settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Select World Books'**
+  String get worldBookGroupSelectBooks;
+
+  /// Error when a World Book folder edit, bulk move, or group selection could not be saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save your changes. Try again.'**
+  String get worldBookGroupSaveFailed;
+
+  /// Action in the chat World Book picker to select the currently enabled books in this folder for the current chat or assistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all in group'**
+  String get worldBookGroupSelectAll;
+
+  /// Action in the chat World Book picker to deselect all books in this folder for the current chat or assistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear group selection'**
+  String get worldBookGroupClearSelection;
 }
 
 class _AppLocalizationsDelegate

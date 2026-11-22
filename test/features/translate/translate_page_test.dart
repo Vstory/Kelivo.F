@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:markstream/markstream.dart';
 import 'package:provider/provider.dart';
@@ -134,6 +135,34 @@ void main() {
           await tester.pumpAndSettle();
           expect(find.text('Translated result appears here…'), findsOneWidget);
 
+          await tester.tap(find.text('English'));
+          await tester.pumpAndSettle();
+          final bangla = find.text('Bangla');
+          final flag = find.byWidgetPredicate(
+            (widget) =>
+                widget is SvgPicture &&
+                widget.bytesLoader ==
+                    const SvgAssetLoader('assets/icons/bangladesh-flag.svg'),
+          );
+          if (desktop) {
+            await tester.scrollUntilVisible(
+              bangla,
+              150,
+              scrollable: find.descendant(
+                of: find.byType(ListView),
+                matching: find.byType(Scrollable),
+              ),
+            );
+          } else {
+            await tester.ensureVisible(bangla);
+          }
+          expect(flag, findsOneWidget);
+          await tester.tap(bangla);
+          await tester.pumpAndSettle();
+          expect(bangla, findsOneWidget);
+          expect(flag, findsOneWidget);
+          expect(settings.translateTargetLang, 'bn');
+
           final output = find.byType(TranslationOutput);
           final markdown = find.descendant(
             of: output,
@@ -148,12 +177,19 @@ void main() {
 
           Future<HttpResponse> start() async {
             HttpResponse? response;
+            String? prompt;
             await tester.pumpAndSettle();
             await tester.runAsync(() async {
               Future<void> accept() async {
                 if (!await requests.moveNext()) return;
                 final request = requests.current;
-                await request.drain<void>();
+                final body =
+                    jsonDecode(await utf8.decoder.bind(request).join())
+                        as Map<String, dynamic>;
+                final messages = body['messages'] as List<dynamic>;
+                prompt =
+                    (messages.single as Map<String, dynamic>)['content']
+                        as String;
                 response = request.response
                   ..headers.contentType = ContentType('text', 'event-stream')
                   ..bufferOutput = false;
@@ -173,6 +209,7 @@ void main() {
               reason: 'Tapping Translate must start the request.',
             );
             await _pumpUntil(tester, () => response != null);
+            expect(prompt, contains('translate it into Bangla,'));
             return response!;
           }
 

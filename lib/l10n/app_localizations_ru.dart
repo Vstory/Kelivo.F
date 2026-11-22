@@ -3203,6 +3203,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Показывать карточки рассуждений и инструментов';
 
   @override
+  String get messageExportSheetExpandAllSteps => 'Развернуть все шаги';
+
+  @override
   String get messageExportSheetShowThinkingContent =>
       'Показывать содержимое рассуждений';
 
@@ -17300,6 +17303,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get languageDisplayTurkish => 'Турецкий';
 
   @override
+  String get languageDisplayBangla => 'Бенгальский';
+
+  @override
   String sideDrawerDeleteConfirmContent(String title) {
     return 'Удалить «$title»?';
   }
@@ -17960,4 +17966,65 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get backupMacKeychainAccessDenied =>
       'macOS запретила доступ к паролю резервной копии. Если появится системный запрос, разрешите Kelivo доступ к нему. Также можно проверить связку ключей по умолчанию и разрешения элемента пароля в «Связке ключей».';
+
+  @override
+  String get worldBookGroupActions => 'Действия с группой';
+
+  @override
+  String get worldBookGroupLabel => 'Группа';
+
+  @override
+  String get worldBookOrder => 'Настроить порядок внедрения';
+
+  @override
+  String worldBookGroupSelectedBooks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Выбрано $count книги',
+      many: 'Выбрано $count книг',
+      few: 'Выбрано $count книги',
+      one: 'Выбрана $count книга',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get worldBookGroupUngrouped => 'Без группы';
+
+  @override
+  String get worldBookGroupNew => 'Новая группа';
+
+  @override
+  String get worldBookGroupName => 'Название группы';
+
+  @override
+  String get worldBookGroupNameInvalid => 'Введите уникальное название группы.';
+
+  @override
+  String get worldBookGroupRename => 'Переименовать группу';
+
+  @override
+  String get worldBookGroupDelete => 'Удалить группу';
+
+  @override
+  String worldBookGroupDeleteMessage(String group) {
+    return 'Книги в «$group» будут перемещены в «Без группы».';
+  }
+
+  @override
+  String get worldBookGroupMove => 'Переместить в группу';
+
+  @override
+  String get worldBookGroupSelectBooks => 'Выбрать книги мира';
+
+  @override
+  String get worldBookGroupSaveFailed =>
+      'Не удалось сохранить изменения. Попробуйте ещё раз.';
+
+  @override
+  String get worldBookGroupSelectAll => 'Выбрать все в группе';
+
+  @override
+  String get worldBookGroupClearSelection => 'Снять выбор группы';
 }
