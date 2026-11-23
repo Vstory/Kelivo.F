@@ -16102,6 +16102,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageDisplayBangla => '孟加拉语';
 
   @override
+  String get languageDisplayArabic => '阿拉伯语';
+
+  @override
+  String get translationLanguageManagerTitle => '翻译语言';
+
+  @override
+  String get translationLanguageManagerHint => '开启开关即可显示，拖动调整顺序。';
+
+  @override
+  String get translationLanguageManagerShown => '显示在菜单中';
+
+  @override
+  String get translationLanguageManagerHidden => '已隐藏';
+
+  @override
+  String get translationLanguageManagerKeepOne => '请至少保留一种翻译语言。';
+
+  @override
+  String get translationLanguageManagerSaveFailed => '无法保存翻译语言设置，请重试。';
+
+  @override
   String sideDrawerDeleteConfirmContent(String title) {
     return '删除“$title”？';
   }
@@ -32832,6 +32853,27 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get languageDisplayBangla => '孟加拉语';
+
+  @override
+  String get languageDisplayArabic => '阿拉伯语';
+
+  @override
+  String get translationLanguageManagerTitle => '翻译语言';
+
+  @override
+  String get translationLanguageManagerHint => '开启开关即可显示，拖动调整顺序。';
+
+  @override
+  String get translationLanguageManagerShown => '显示在菜单中';
+
+  @override
+  String get translationLanguageManagerHidden => '已隐藏';
+
+  @override
+  String get translationLanguageManagerKeepOne => '请至少保留一种翻译语言。';
+
+  @override
+  String get translationLanguageManagerSaveFailed => '无法保存翻译语言设置，请重试。';
 
   @override
   String sideDrawerDeleteConfirmContent(String title) {
@@ -49586,6 +49628,27 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get languageDisplayBangla => '孟加拉語';
+
+  @override
+  String get languageDisplayArabic => '阿拉伯文';
+
+  @override
+  String get translationLanguageManagerTitle => '翻譯語言';
+
+  @override
+  String get translationLanguageManagerHint => '開啟開關即可顯示，拖曳調整順序。';
+
+  @override
+  String get translationLanguageManagerShown => '顯示於選單中';
+
+  @override
+  String get translationLanguageManagerHidden => '已隱藏';
+
+  @override
+  String get translationLanguageManagerKeepOne => '請至少保留一種翻譯語言。';
+
+  @override
+  String get translationLanguageManagerSaveFailed => '無法儲存翻譯語言設定，請重試。';
 
   @override
   String sideDrawerDeleteConfirmContent(String title) {

@@ -16494,6 +16494,28 @@ class AppLocalizationsKo extends AppLocalizations {
   String get languageDisplayBangla => '벵골어';
 
   @override
+  String get languageDisplayArabic => '아랍어';
+
+  @override
+  String get translationLanguageManagerTitle => '번역 언어';
+
+  @override
+  String get translationLanguageManagerHint => '표시할 언어를 켜세요. 드래그하여 순서를 변경하세요.';
+
+  @override
+  String get translationLanguageManagerShown => '메뉴에 표시됨';
+
+  @override
+  String get translationLanguageManagerHidden => '숨김';
+
+  @override
+  String get translationLanguageManagerKeepOne => '번역 언어를 하나 이상 표시해야 합니다.';
+
+  @override
+  String get translationLanguageManagerSaveFailed =>
+      '번역 언어를 저장하지 못했습니다. 다시 시도하세요.';
+
+  @override
   String sideDrawerDeleteConfirmContent(String title) {
     return '\"$title\"을(를) 삭제하시겠습니까?';
   }

@@ -29820,6 +29820,48 @@ abstract class AppLocalizations {
   /// **'Bangla'**
   String get languageDisplayBangla;
 
+  /// Name of the Arabic language as a target in the translation menus and standalone translator.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get languageDisplayArabic;
+
+  /// Accessible label for the translation toolbar action and title of its mobile page or desktop dialog. The settings control which target languages appear and in what order.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation languages'**
+  String get translationLanguageManagerTitle;
+
+  /// Brief instructions above the translation languages list. Turning on a switch shows its language in translation menus. Drag handles on those rows change the order.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on the languages to show. Drag to reorder.'**
+  String get translationLanguageManagerHint;
+
+  /// Section heading above the enabled translation languages. These languages appear in translation menus in this order.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown in menus'**
+  String get translationLanguageManagerShown;
+
+  /// Section heading above translation languages that are currently hidden from the translation menus and can be turned on again.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden'**
+  String get translationLanguageManagerHidden;
+
+  /// Validation message in the translation language manager when no languages are checked and the Save button is disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep at least one translation language visible.'**
+  String get translationLanguageManagerKeepOne;
+
+  /// Error in the translation language manager if saving the visible languages or their order fails. The user can retry with their current choices.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the translation languages. Try again.'**
+  String get translationLanguageManagerSaveFailed;
+
   /// Confirmation question before deleting the named chat from the sidebar. Keep the title placeholder; reorder the sentence naturally.
   ///
   /// In en, this message translates to:
