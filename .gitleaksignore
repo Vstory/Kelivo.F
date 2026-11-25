@@ -12,3 +12,5 @@ f685a3396077b6623ae7880802a9a4d9483411df:lib/core/providers/settings_provider.da
 003679664882bbc2223668708aeba8151f00d1ff:test/core/services/backup/backup_encryption_test.dart:generic-api-key:184
 003679664882bbc2223668708aeba8151f00d1ff:test/core/services/backup/backup_encryption_test.dart:generic-api-key:190
 c2eabf0f0c692574f63d2ef57c1e156566340861:lib/core/providers/settings_provider.dart:generic-api-key:129
+# 创作功能新增键名常量后 _perChatModelEnabledKey 被挤到 136 行（*_v1 键名被 generic-api-key 误判）
+f4836a7c0fb2770c7d8fd5f3388827a87c405441:lib/core/providers/settings_provider.dart:generic-api-key:136
