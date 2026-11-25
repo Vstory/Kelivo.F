@@ -1,4 +1,5 @@
 import '../../../features/chat/models/conversation_find_candidate.dart';
+import '../../../features/chat/services/conversation_find_worker.dart';
 import '../../models/carried_original.dart';
 import '../../../shared/markdown/markdown_image_sources.dart';
 import '../api/request_image_context.dart';
@@ -1992,9 +1993,12 @@ class ChatService extends ChangeNotifier {
   }
 
   Stream<List<ConversationFindCandidate>> conversationFindCandidates(
-    String conversationId,
-  ) async* {
-    if (!_initialized) return;
+    String conversationId, {
+    bool Function()? isCurrent,
+    ConversationFindPrefilter? prefilter,
+    ConversationFindWorker? worker,
+  }) async* {
+    if (!_initialized || isCurrent?.call() == false) return;
     if (_temporaryConversationIds.contains(conversationId) ||
         _draftConversations.containsKey(conversationId)) {
       final selected = _collapseTitleVersions(
@@ -2007,12 +2011,18 @@ class ChatService extends ChangeNotifier {
         batch.add(ConversationFindCandidate(message));
         if (batch.length == ConversationFindCandidate.batchSize) {
           yield batch;
+          if (isCurrent?.call() == false) return;
           batch = [];
         }
       }
       if (batch.isNotEmpty) yield batch;
     } else {
-      yield* _repo.conversationFindCandidates(conversationId);
+      yield* _repo.conversationFindCandidates(
+        conversationId,
+        isCurrent: isCurrent,
+        prefilter: prefilter,
+        worker: worker,
+      );
     }
   }
 
