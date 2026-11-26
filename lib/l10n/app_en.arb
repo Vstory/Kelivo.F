@@ -819,6 +819,34 @@
   "backupRestoreFailureContent": "Kelivo could not verify a complete old or new data set, so chat data was not opened. Close Kelivo and try again. If this repeats, keep the diagnostic code for support.",
   "backupRestoreBusinessLeaseUnavailableTitle": "Kelivo is already running",
   "backupRestoreBusinessLeaseUnavailableContent": "Kelivo's data is still in use by another app process. Close any other Kelivo window, then restart. Your chat data has not been opened by this process.",
+  "databaseUpgradeTitle": "Updating your chat database",
+  "@databaseUpgradeTitle": {
+    "description": "Title of the startup progress screen during a chat database upgrade, including recovery from an interrupted upgrade."
+  },
+  "databaseUpgradeStageBackup": "Backing up your chat history",
+  "@databaseUpgradeStageBackup": {
+    "description": "Startup database upgrade stage while Kelivo saves a temporary safety copy of the installed database before changing it."
+  },
+  "databaseUpgradeStageUpdate": "Updating database tables and indexes",
+  "@databaseUpgradeStageUpdate": {
+    "description": "Startup database upgrade stage while Kelivo applies the new database structure to existing chat data."
+  },
+  "databaseUpgradeStageCheck": "Checking the chat database",
+  "@databaseUpgradeStageCheck": {
+    "description": "Startup database upgrade stage while validating the upgraded database or checking the files left by an interrupted upgrade."
+  },
+  "databaseUpgradeStageRestore": "Restoring the pre-upgrade backup",
+  "@databaseUpgradeStageRestore": {
+    "description": "Startup database upgrade stage while Kelivo restores the safety copy after a failed or interrupted upgrade."
+  },
+  "databaseUpgradeStageOpen": "Opening Kelivo",
+  "@databaseUpgradeStageOpen": {
+    "description": "Final stage of the startup database upgrade screen after the database is ready and before the main app opens."
+  },
+  "databaseUpgradeKeepOpen": "Large chat histories can take a while. Please keep Kelivo open.",
+  "@databaseUpgradeKeepOpen": {
+    "description": "Reassurance on the startup database upgrade screen explaining the wait for a large chat history and asking the user to keep the app open."
+  },
   "restoreProgressTitle": "Restoring your backup",
   "restoreProgressWarning": "Keep Kelivo open until this finishes. If you close it now, the next launch starts this over.",
   "restoreProgressStageCheckingBackup": "Checking the backup",
@@ -23229,9 +23257,9 @@
   "@creationDeleteTopic": {
     "description": "Destructive action and confirmation title for deleting a topic, its generation groups, and media files."
   },
-  "creationDeleteTopicBody": "Delete this topic and all its creations?",
+  "creationDeleteTopicBody": "Delete this topic and all its creations? Linked images in chats and reference lists will also become unavailable.",
   "@creationDeleteTopicBody": {
-    "description": "Confirmation body for deleting an entire media creation topic."
+    "description": "Confirmation body for deleting an entire media creation topic. Explains the effect on linked chat images and creation references."
   },
   "creationImage": "Image",
   "@creationImage": {
@@ -23446,13 +23474,29 @@
   "@creationShare": {
     "description": "Shares a generated image file."
   },
+  "creationReferenceImagesLabel": "Reference images",
+  "@creationReferenceImagesLabel": {
+    "description": "Caption above the reference image thumbnails in a creation topic."
+  },
+  "creationReferenceDeleted": "This reference image was deleted",
+  "@creationReferenceDeleted": {
+    "description": "Accessible label for a reference thumbnail whose original was deleted from Creation."
+  },
+  "creationOriginalDeleted": "Image deleted from Creation",
+  "@creationOriginalDeleted": {
+    "description": "Shown in chat when the linked artwork has been deleted from Creation."
+  },
+  "creationMaskLabel": "Mask",
+  "@creationMaskLabel": {
+    "description": "Label of the input image used as an edit mask."
+  },
   "creationDeleteItem": "Delete creation",
   "@creationDeleteItem": {
     "description": "Action and confirmation title for deleting one generated image or video."
   },
-  "creationDeleteItemBody": "Delete this creation?",
+  "creationDeleteItemBody": "Delete this creation? Linked images in chats and reference lists will also become unavailable.",
   "@creationDeleteItemBody": {
-    "description": "Confirmation text for deleting one generated image or video."
+    "description": "Confirmation text for deleting one generated image or video. Explains the effect on linked chat images and creation references."
   },
   "creationActionFailed": "Could not complete the action",
   "@creationActionFailed": {
@@ -24018,9 +24062,9 @@
   "@creationDeleteBatch": {
     "description": "Destructive action in the generation group menu and title of its confirmation dialog."
   },
-  "creationDeleteBatchBody": "{count, plural, =0{Delete this generation record from this device?} one{Delete this group and its file from this device?} other{Delete this group and its {count} files from this device?}}",
+  "creationDeleteBatchBody": "{count, plural, =0{Delete this generation record from this device?} one{Delete this group and its file from this device?} other{Delete this group and its {count} files from this device?}} Linked images in chats and reference lists will also become unavailable.",
   "@creationDeleteBatchBody": {
-    "description": "Confirmation before deleting a generation group from this device. The count is the number of stored result files. A failed group can have none.",
+    "description": "Confirmation before deleting a generation group from this device. The count is the number of stored result files. A failed group can have none. Explains the effect on linked chat images and creation references.",
     "placeholders": {
       "count": {
         "type": "int"

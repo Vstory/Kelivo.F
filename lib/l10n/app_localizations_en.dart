@@ -1856,6 +1856,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'Kelivo\'s data is still in use by another app process. Close any other Kelivo window, then restart. Your chat data has not been opened by this process.';
 
   @override
+  String get databaseUpgradeTitle => 'Updating your chat database';
+
+  @override
+  String get databaseUpgradeStageBackup => 'Backing up your chat history';
+
+  @override
+  String get databaseUpgradeStageUpdate =>
+      'Updating database tables and indexes';
+
+  @override
+  String get databaseUpgradeStageCheck => 'Checking the chat database';
+
+  @override
+  String get databaseUpgradeStageRestore => 'Restoring the pre-upgrade backup';
+
+  @override
+  String get databaseUpgradeStageOpen => 'Opening Kelivo';
+
+  @override
+  String get databaseUpgradeKeepOpen =>
+      'Large chat histories can take a while. Please keep Kelivo open.';
+
+  @override
   String get restoreProgressTitle => 'Restoring your backup';
 
   @override
@@ -17898,7 +17921,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creationDeleteTopicBody =>
-      'Delete this topic and all its creations?';
+      'Delete this topic and all its creations? Linked images in chats and reference lists will also become unavailable.';
 
   @override
   String get creationImage => 'Image';
@@ -18072,10 +18095,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get creationShare => 'Share';
 
   @override
+  String get creationReferenceImagesLabel => 'Reference images';
+
+  @override
+  String get creationReferenceDeleted => 'This reference image was deleted';
+
+  @override
+  String get creationOriginalDeleted => 'Image deleted from Creation';
+
+  @override
+  String get creationMaskLabel => 'Mask';
+
+  @override
   String get creationDeleteItem => 'Delete creation';
 
   @override
-  String get creationDeleteItemBody => 'Delete this creation?';
+  String get creationDeleteItemBody =>
+      'Delete this creation? Linked images in chats and reference lists will also become unavailable.';
 
   @override
   String get creationActionFailed => 'Could not complete the action';
@@ -18523,7 +18559,7 @@ class AppLocalizationsEn extends AppLocalizations {
       one: 'Delete this group and its file from this device?',
       zero: 'Delete this generation record from this device?',
     );
-    return '$_temp0';
+    return '$_temp0 Linked images in chats and reference lists will also become unavailable.';
   }
 
   @override

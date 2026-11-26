@@ -1864,6 +1864,30 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kelivo\'nun verileri hâlâ başka bir uygulama süreci tarafından kullanılıyor. Diğer Kelivo pencerelerini kapatın, ardından yeniden başlatın. Sohbet verileriniz bu süreç tarafından açılmadı.';
 
   @override
+  String get databaseUpgradeTitle => 'Sohbet veritabanınız güncelleniyor';
+
+  @override
+  String get databaseUpgradeStageBackup => 'Sohbet geçmişiniz yedekleniyor';
+
+  @override
+  String get databaseUpgradeStageUpdate =>
+      'Veritabanı tabloları ve dizinleri güncelleniyor';
+
+  @override
+  String get databaseUpgradeStageCheck => 'Sohbet veritabanı kontrol ediliyor';
+
+  @override
+  String get databaseUpgradeStageRestore =>
+      'Güncelleme öncesi yedek geri yükleniyor';
+
+  @override
+  String get databaseUpgradeStageOpen => 'Kelivo açılıyor';
+
+  @override
+  String get databaseUpgradeKeepOpen =>
+      'Büyük sohbet geçmişleri biraz zaman alabilir. Lütfen Kelivo\'yu açık tutun.';
+
+  @override
   String get restoreProgressTitle => 'Yedeğiniz geri yükleniyor';
 
   @override
@@ -18002,7 +18026,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get creationDeleteTopicBody =>
-      'Bu konu ve tüm oluşturulanlar silinsin mi?';
+      'Bu konu ve içindeki tüm eserler silinsin mi? Sohbetlerde ve referans listelerinde bağlantılı görseller de kullanılamaz hale gelecek.';
 
   @override
   String get creationImage => 'Görsel';
@@ -18176,10 +18200,23 @@ class AppLocalizationsTr extends AppLocalizations {
   String get creationShare => 'Paylaş';
 
   @override
+  String get creationReferenceImagesLabel => 'Referans görselleri';
+
+  @override
+  String get creationReferenceDeleted => 'Bu referans görsel silindi';
+
+  @override
+  String get creationOriginalDeleted => 'Görsel Oluşturma\'dan silindi';
+
+  @override
+  String get creationMaskLabel => 'Maske';
+
+  @override
   String get creationDeleteItem => 'Oluşturmayı sil';
 
   @override
-  String get creationDeleteItemBody => 'Bu oluşturma silinsin mi?';
+  String get creationDeleteItemBody =>
+      'Bu eser silinsin mi? Sohbetlerde ve referans listelerinde bağlantılı görseller de kullanılamaz hale gelecek.';
 
   @override
   String get creationActionFailed => 'İşlem tamamlanamadı';
@@ -18624,11 +18661,11 @@ class AppLocalizationsTr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Bu grup ve $count dosyası bu cihazdan silinsin mi?',
+      other: 'Bu grup ve içindeki $count dosya bu cihazdan silinsin mi?',
       one: 'Bu grup ve dosyası bu cihazdan silinsin mi?',
-      zero: 'Bu üretim kaydı bu cihazdan silinsin mi?',
+      zero: 'Bu oluşturma kaydı bu cihazdan silinsin mi?',
     );
-    return '$_temp0';
+    return '$_temp0 Sohbetlerde ve referans listelerinde bağlantılı görseller de kullanılamaz hale gelecek.';
   }
 
   @override

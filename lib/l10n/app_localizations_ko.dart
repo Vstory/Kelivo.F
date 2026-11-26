@@ -1816,6 +1816,28 @@ class AppLocalizationsKo extends AppLocalizations {
       'Kelivo의 데이터가 다른 앱 프로세스에서 아직 사용 중입니다. 다른 Kelivo 창을 닫은 후 다시 시작하세요. 현재 프로세스는 채팅 데이터를 열지 않았습니다.';
 
   @override
+  String get databaseUpgradeTitle => '채팅 데이터베이스 업데이트 중';
+
+  @override
+  String get databaseUpgradeStageBackup => '채팅 기록 백업 중';
+
+  @override
+  String get databaseUpgradeStageUpdate => '데이터베이스 테이블 및 인덱스 업데이트 중';
+
+  @override
+  String get databaseUpgradeStageCheck => '채팅 데이터베이스 확인 중';
+
+  @override
+  String get databaseUpgradeStageRestore => '업그레이드 전 백업 복원 중';
+
+  @override
+  String get databaseUpgradeStageOpen => 'Kelivo 여는 중';
+
+  @override
+  String get databaseUpgradeKeepOpen =>
+      '채팅 기록이 많으면 시간이 걸릴 수 있습니다. Kelivo를 열어 두세요.';
+
+  @override
   String get restoreProgressTitle => '백업 복원 중';
 
   @override
@@ -17348,7 +17370,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get creationDeleteTopic => '주제 삭제';
 
   @override
-  String get creationDeleteTopicBody => '이 주제와 모든 생성물을 삭제할까요?';
+  String get creationDeleteTopicBody =>
+      '이 주제와 모든 창작물을 삭제할까요? 채팅과 참조 목록에 연결된 이미지도 사용할 수 없게 됩니다.';
 
   @override
   String get creationImage => '이미지';
@@ -17517,10 +17540,23 @@ class AppLocalizationsKo extends AppLocalizations {
   String get creationShare => '공유';
 
   @override
+  String get creationReferenceImagesLabel => '참조 이미지';
+
+  @override
+  String get creationReferenceDeleted => '이 참조 이미지는 삭제되었습니다';
+
+  @override
+  String get creationOriginalDeleted => '이미지가 창작에서 삭제되었습니다';
+
+  @override
+  String get creationMaskLabel => '마스크';
+
+  @override
   String get creationDeleteItem => '작품 삭제';
 
   @override
-  String get creationDeleteItemBody => '이 작품을 삭제할까요?';
+  String get creationDeleteItemBody =>
+      '이 창작물을 삭제할까요? 채팅과 참조 목록에 연결된 이미지도 사용할 수 없게 됩니다.';
 
   @override
   String get creationActionFailed => '작업을 완료할 수 없습니다';
@@ -17949,10 +17985,10 @@ class AppLocalizationsKo extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '이 기기에서 이 그룹과 파일 $count개를 삭제할까요?',
+      other: '이 기기에서 이 그룹과 $count개 파일을 삭제할까요?',
       zero: '이 기기에서 이 생성 기록을 삭제할까요?',
     );
-    return '$_temp0';
+    return '$_temp0 채팅과 참조 목록에 연결된 이미지도 사용할 수 없게 됩니다.';
   }
 
   @override

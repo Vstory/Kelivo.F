@@ -1885,6 +1885,31 @@ class AppLocalizationsRu extends AppLocalizations {
       'Данные Kelivo всё ещё используются другим процессом приложения. Закройте другие окна Kelivo и перезапустите. Этот процесс не открывал данные чатов.';
 
   @override
+  String get databaseUpgradeTitle => 'Обновление базы данных чатов';
+
+  @override
+  String get databaseUpgradeStageBackup =>
+      'Создание резервной копии истории чатов';
+
+  @override
+  String get databaseUpgradeStageUpdate =>
+      'Обновление таблиц и индексов базы данных';
+
+  @override
+  String get databaseUpgradeStageCheck => 'Проверка базы данных чатов';
+
+  @override
+  String get databaseUpgradeStageRestore =>
+      'Восстановление резервной копии, созданной до обновления';
+
+  @override
+  String get databaseUpgradeStageOpen => 'Открытие Kelivo';
+
+  @override
+  String get databaseUpgradeKeepOpen =>
+      'При большой истории чатов это может занять некоторое время. Пожалуйста, не закрывайте Kelivo.';
+
+  @override
   String get restoreProgressTitle => 'Восстановление резервной копии';
 
   @override
@@ -18209,7 +18234,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get creationDeleteTopic => 'Удалить тему';
 
   @override
-  String get creationDeleteTopicBody => 'Удалить эту тему и все её работы?';
+  String get creationDeleteTopicBody =>
+      'Удалить эту тему и все её работы? Связанные изображения в чатах и списках референсов также станут недоступны.';
 
   @override
   String get creationImage => 'Изображение';
@@ -18386,10 +18412,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get creationShare => 'Поделиться';
 
   @override
+  String get creationReferenceImagesLabel => 'Референсные изображения';
+
+  @override
+  String get creationReferenceDeleted =>
+      'Это референсное изображение было удалено';
+
+  @override
+  String get creationOriginalDeleted => 'Изображение удалено из «Творчества»';
+
+  @override
+  String get creationMaskLabel => 'Маска';
+
+  @override
   String get creationDeleteItem => 'Удалить творение';
 
   @override
-  String get creationDeleteItemBody => 'Удалить это творение?';
+  String get creationDeleteItemBody =>
+      'Удалить эту работу? Связанные изображения в чатах и списках референсов также станут недоступны.';
 
   @override
   String get creationActionFailed => 'Не удалось выполнить действие';
@@ -18849,7 +18889,7 @@ class AppLocalizationsRu extends AppLocalizations {
       one: 'Удалить эту группу и её файл с этого устройства?',
       zero: 'Удалить эту запись генерации с этого устройства?',
     );
-    return '$_temp0';
+    return '$_temp0 Связанные изображения в чатах и списках референсов также станут недоступны.';
   }
 
   @override

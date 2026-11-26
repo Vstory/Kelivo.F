@@ -3478,6 +3478,48 @@ abstract class AppLocalizations {
   /// **'Kelivo\'s data is still in use by another app process. Close any other Kelivo window, then restart. Your chat data has not been opened by this process.'**
   String get backupRestoreBusinessLeaseUnavailableContent;
 
+  /// Title of the startup progress screen during a chat database upgrade, including recovery from an interrupted upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating your chat database'**
+  String get databaseUpgradeTitle;
+
+  /// Startup database upgrade stage while Kelivo saves a temporary safety copy of the installed database before changing it.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing up your chat history'**
+  String get databaseUpgradeStageBackup;
+
+  /// Startup database upgrade stage while Kelivo applies the new database structure to existing chat data.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating database tables and indexes'**
+  String get databaseUpgradeStageUpdate;
+
+  /// Startup database upgrade stage while validating the upgraded database or checking the files left by an interrupted upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking the chat database'**
+  String get databaseUpgradeStageCheck;
+
+  /// Startup database upgrade stage while Kelivo restores the safety copy after a failed or interrupted upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring the pre-upgrade backup'**
+  String get databaseUpgradeStageRestore;
+
+  /// Final stage of the startup database upgrade screen after the database is ready and before the main app opens.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening Kelivo'**
+  String get databaseUpgradeStageOpen;
+
+  /// Reassurance on the startup database upgrade screen explaining the wait for a large chat history and asking the user to keep the app open.
+  ///
+  /// In en, this message translates to:
+  /// **'Large chat histories can take a while. Please keep Kelivo open.'**
+  String get databaseUpgradeKeepOpen;
+
   /// Title on the restore progress screen shown while a backup is being restored.
   ///
   /// In en, this message translates to:
@@ -31308,10 +31350,10 @@ abstract class AppLocalizations {
   /// **'Delete topic'**
   String get creationDeleteTopic;
 
-  /// Confirmation body for deleting an entire media creation topic.
+  /// Confirmation body for deleting an entire media creation topic. Explains the effect on linked chat images and creation references.
   ///
   /// In en, this message translates to:
-  /// **'Delete this topic and all its creations?'**
+  /// **'Delete this topic and all its creations? Linked images in chats and reference lists will also become unavailable.'**
   String get creationDeleteTopicBody;
 
   /// Image mode in the creation composer. Produces still images.
@@ -31626,16 +31668,40 @@ abstract class AppLocalizations {
   /// **'Share'**
   String get creationShare;
 
+  /// Caption above the reference image thumbnails in a creation topic.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference images'**
+  String get creationReferenceImagesLabel;
+
+  /// Accessible label for a reference thumbnail whose original was deleted from Creation.
+  ///
+  /// In en, this message translates to:
+  /// **'This reference image was deleted'**
+  String get creationReferenceDeleted;
+
+  /// Shown in chat when the linked artwork has been deleted from Creation.
+  ///
+  /// In en, this message translates to:
+  /// **'Image deleted from Creation'**
+  String get creationOriginalDeleted;
+
+  /// Label of the input image used as an edit mask.
+  ///
+  /// In en, this message translates to:
+  /// **'Mask'**
+  String get creationMaskLabel;
+
   /// Action and confirmation title for deleting one generated image or video.
   ///
   /// In en, this message translates to:
   /// **'Delete creation'**
   String get creationDeleteItem;
 
-  /// Confirmation text for deleting one generated image or video.
+  /// Confirmation text for deleting one generated image or video. Explains the effect on linked chat images and creation references.
   ///
   /// In en, this message translates to:
-  /// **'Delete this creation?'**
+  /// **'Delete this creation? Linked images in chats and reference lists will also become unavailable.'**
   String get creationDeleteItemBody;
 
   /// Fallback failure toast for a local creation action, such as saving or deleting a file.
@@ -32382,10 +32448,10 @@ abstract class AppLocalizations {
   /// **'Delete group'**
   String get creationDeleteBatch;
 
-  /// Confirmation before deleting a generation group from this device. The count is the number of stored result files. A failed group can have none.
+  /// Confirmation before deleting a generation group from this device. The count is the number of stored result files. A failed group can have none. Explains the effect on linked chat images and creation references.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =0{Delete this generation record from this device?} one{Delete this group and its file from this device?} other{Delete this group and its {count} files from this device?}}'**
+  /// **'{count, plural, =0{Delete this generation record from this device?} one{Delete this group and its file from this device?} other{Delete this group and its {count} files from this device?}} Linked images in chats and reference lists will also become unavailable.'**
   String creationDeleteBatchBody(int count);
 
   /// Title and action for redacted diagnostics of a failed generation.
