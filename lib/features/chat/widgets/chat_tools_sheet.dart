@@ -27,14 +27,11 @@ import 'package:Kelivo/theme/app_font_weights.dart';
 import 'package:Kelivo/theme/app_semantic_colors.dart';
 
 import 'tools_sheet_row.dart';
-import 'image_recall_control.dart';
 import '../../mcp/widgets/mcp_server_avatar.dart';
 import '../../mcp/widgets/mcp_tool_connection_status.dart';
 import '../../mcp/utils/mcp_tool_groups.dart';
 
-/// Everything the model can call in this chat: device-local tools, connected
-/// MCP servers, and the workspace binding. Replaces the MCP-only sheet that
-/// used to sit behind the composer's tool button.
+/// Opens the composer's controls for local tools, MCP servers, and the workspace.
 Future<void> showChatToolsSheet(
   BuildContext context, {
   required String assistantId,
@@ -185,7 +182,6 @@ class _ChatToolsSheetState extends State<ChatToolsSheet> {
                           SliverToBoxAdapter(
                             child: _LocalToolsGroup(
                               assistantId: widget.assistantId,
-                              conversationId: widget.conversationId,
                               expanded: _expanded.contains(_ToolsGroupId.local),
                               onToggle: () => _toggleGroup(_ToolsGroupId.local),
                             ),
@@ -353,13 +349,11 @@ class _ToolsGroup extends StatelessWidget {
 class _LocalToolsGroup extends StatelessWidget {
   const _LocalToolsGroup({
     required this.assistantId,
-    required this.conversationId,
     required this.expanded,
     required this.onToggle,
   });
 
   final String assistantId;
-  final String? conversationId;
   final bool expanded;
   final VoidCallback onToggle;
 
@@ -388,63 +382,45 @@ class _LocalToolsGroup extends StatelessWidget {
     if (!hasImageModel) enabled.remove(LocalToolNames.generateImage);
     final enabledCount = ids.where(enabled.contains).length;
 
-    return ImageRecallControl(
-      assistantId: assistantId,
-      conversationId: conversationId,
-      builder: (imageEnabled, onImageChanged) => _ToolsGroup(
-        key: ChatToolsSheet.localGroupKey,
-        isFirst: true,
-        title: l10n.assistantEditPageLocalToolsTab,
-        summary: '${enabledCount + (imageEnabled ? 1 : 0)}/${ids.length + 1}',
-        expanded: expanded,
-        onToggle: onToggle,
-        children: [
-          for (final id in ids)
-            ToolsSheetRow(
-              key: ChatToolsSheet.localToolKey(id),
-              icon: localToolIcon(id),
-              label: localToolTitle(l10n, id),
-              subtitle: id == LocalToolNames.generateImage && !hasImageModel
-                  ? l10n.creationSelectDefaultImage
-                  : null,
-              selected: enabled.contains(id),
-              onTap: () => unawaited(
+    return _ToolsGroup(
+      key: ChatToolsSheet.localGroupKey,
+      isFirst: true,
+      title: l10n.assistantEditPageLocalToolsTab,
+      summary: '$enabledCount/${ids.length}',
+      expanded: expanded,
+      onToggle: onToggle,
+      children: [
+        for (final id in ids)
+          ToolsSheetRow(
+            key: ChatToolsSheet.localToolKey(id),
+            icon: localToolIcon(id),
+            label: localToolTitle(l10n, id),
+            subtitle: id == LocalToolNames.generateImage && !hasImageModel
+                ? l10n.creationSelectDefaultImage
+                : null,
+            selected: enabled.contains(id),
+            onTap: () => unawaited(
+              setLocalToolEnabled(
+                context,
+                assistant: assistant,
+                toolId: id,
+                value: !enabled.contains(id),
+              ),
+            ),
+            trailing: IosSwitch(
+              value: enabled.contains(id),
+              semanticLabel: localToolTitle(l10n, id),
+              onChanged: (value) => unawaited(
                 setLocalToolEnabled(
                   context,
                   assistant: assistant,
                   toolId: id,
-                  value: !enabled.contains(id),
+                  value: value,
                 ),
               ),
-              trailing: IosSwitch(
-                value: enabled.contains(id),
-                semanticLabel: localToolTitle(l10n, id),
-                onChanged: (value) => unawaited(
-                  setLocalToolEnabled(
-                    context,
-                    assistant: assistant,
-                    toolId: id,
-                    value: value,
-                  ),
-                ),
-              ),
-            ),
-          ToolsSheetRow(
-            key: const ValueKey('chat-tools-view-image'),
-            icon: Lucide.Image,
-            label: l10n.workspaceToolTitleViewImage,
-            selected: imageEnabled,
-            onTap: onImageChanged == null
-                ? null
-                : () => onImageChanged(!imageEnabled),
-            trailing: IosSwitch(
-              value: imageEnabled,
-              semanticLabel: l10n.workspaceToolTitleViewImage,
-              onChanged: onImageChanged,
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -472,9 +448,9 @@ class _McpGroup extends StatelessWidget {
     if (assistant == null) return const SliverToBoxAdapter();
     final conversationScoped =
         assistant.allowConversationMcp && conversationId != null;
-    final conversation = conversationScoped
-        ? context.select<ChatService, Conversation?>(
-            (chat) => chat.getConversation(conversationId!),
+    final conversation = conversationId != null
+        ? context.select<ChatService?, Conversation?>(
+            (chat) => chat?.getConversation(conversationId!),
           )
         : null;
     final inherited = !ConversationMcpSettings.isOverridden(conversation);
@@ -616,6 +592,13 @@ class _McpGroup extends StatelessWidget {
                   ),
                 );
               }
+              final scope = server.scopeFor(conversation);
+              final status = scope == null
+                  ? mcp.statusFor(server.id)
+                  : mcp.statusForScope(scope);
+              final tools = scope == null
+                  ? server.declaredTools
+                  : mcp.cachedWorkspaceTools(scope);
               return Padding(
                 padding: EdgeInsets.only(
                   top: index == 0 || rows[index - 1].server == null ? 0 : 8,
@@ -630,14 +613,15 @@ class _McpGroup extends StatelessWidget {
                         size: 20,
                         radius: 7,
                         showBackground: false,
-                        status: mcp.statusFor(server.id) == McpStatus.connected
-                            ? null
-                            : mcp.statusFor(server.id),
+                        status: status == McpStatus.connected ? null : status,
                       ),
                       label: server.name,
                       selected: selected.contains(server.id),
-                      detail:
-                          '${server.tools.where((tool) => tool.enabled).length}/${server.tools.length}',
+                      detail: status == McpStatus.onDemand
+                          ? l10n.mcpStatusOnDemand
+                          : scope != null && status != McpStatus.connected
+                          ? null
+                          : '${tools.where((tool) => tool.enabled).length}/${tools.length}',
                       onTap: () => unawaited(
                         setSelected(server.id, !selected.contains(server.id)),
                       ),
@@ -648,7 +632,7 @@ class _McpGroup extends StatelessWidget {
                             unawaited(setSelected(server.id, value)),
                       ),
                     ),
-                    McpToolConnectionStatus(serverId: server.id),
+                    McpToolConnectionStatus(serverId: server.id, scope: scope),
                   ],
                 ),
               );

@@ -752,6 +752,17 @@ class AppLocalizationsRu extends AppLocalizations {
       'Привязать рабочую область (необязательно)';
 
   @override
+  String get mcpFollowConversationWorkspace => 'Следовать рабочей области чата';
+
+  @override
+  String mcpFollowConversationWorkspaceHint(int limit) {
+    return 'Подключать рабочую область этого чата в /workspace. Чат без привязки запускается без подключённой рабочей области. В этом режиме между серверами совместно используется до $limit процессов. Простаивающие процессы закрываются автоматически.';
+  }
+
+  @override
+  String get mcpStatusOnDemand => 'Запускается по требованию';
+
+  @override
   String get mcpWorkspaceBindingHint =>
       'Сервер может получить доступ к этой рабочей области по пути /workspace. Оставьте рабочий каталог пустым, чтобы запускать сервер оттуда. Привязка не меняется при переключении чатов.';
 
@@ -3122,6 +3133,18 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get displaySettingsPageEnableMathSubtitle =>
       'Отображать математику LaTeX (встроенную и блочную)';
+
+  @override
+  String get displaySettingsPageMathFontTitle => 'Шрифт формул';
+
+  @override
+  String displaySettingsPageMathFontName(String font) {
+    String _temp0 = intl.Intl.selectLogic(font, {
+      'stixTwo': 'STIX Two Math',
+      'other': 'По умолчанию',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleTitle =>
@@ -10355,6 +10378,47 @@ class AppLocalizationsRu extends AppLocalizations {
       'Файл слишком большой для предпросмотра. Откройте его во внешнем приложении.';
 
   @override
+  String get workspacePreviewEdit => 'Изменить';
+
+  @override
+  String get workspaceEditorUnsaved => 'Несохранённые изменения';
+
+  @override
+  String workspaceEditorLeavePrompt(String name) {
+    return 'Сохранить изменения в $name перед выходом?';
+  }
+
+  @override
+  String get workspaceEditorKeepEditing => 'Продолжить редактирование';
+
+  @override
+  String get workspaceEditorDiscard => 'Отменить изменения';
+
+  @override
+  String get workspaceEditorConflict => 'Файл изменён на диске';
+
+  @override
+  String get workspaceEditorConflictMessage =>
+      'Ваш черновик сохранён. Сохраните отдельную копию или загрузите текущий файл и отмените изменения.';
+
+  @override
+  String get workspaceEditorSaveCopy => 'Сохранить копию';
+
+  @override
+  String get workspaceEditorReload => 'Загрузить последнюю версию';
+
+  @override
+  String get workspaceEditorLargePreview =>
+      'Большие файлы и длинный текст доступны только для просмотра.';
+
+  @override
+  String get workspaceEditorEncoding =>
+      'Эта кодировка текста доступна только для просмотра.';
+
+  @override
+  String get workspaceEditorReadOnly => 'Местоположение только для чтения';
+
+  @override
   String get workspacePreviewSource => 'Исходный код';
 
   @override
@@ -17573,6 +17637,48 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get storageAttachmentRetentionInvalidDays =>
       'Введите от 1 до 3650 дней.';
+
+  @override
+  String get storageAttachmentDeleteLocalImage =>
+      'Удалить локальное изображение';
+
+  @override
+  String get storageAttachmentDeleteLocalImageConfirm =>
+      'Удалить это изображение с данного устройства? В перечисленных ниже чатах сообщения сохранятся, но изображение больше нельзя будет просмотреть или отправить.';
+
+  @override
+  String get storageAttachmentImageRetained =>
+      'Изображение сохранено. Его использование изменилось, или оно всё ещё нужно другой функции.';
+
+  @override
+  String get storageAttachmentImageDeleted => 'Изображение удалено';
+
+  @override
+  String get storageAttachmentImagesCleanupHint =>
+      'Нажмите на название чата под изображением, чтобы открыть исходное сообщение или удалить локальное изображение. «Очистить неиспользуемые» удаляет изображения, которые больше не используются.';
+
+  @override
+  String get storageAttachmentImageCopiesPending =>
+      'Изображение удалено. Kelivo повторит попытку очистки его копий в чате.';
+
+  @override
+  String get storageAttachmentImageFrozen =>
+      'Это изображение защищено, поскольку сжатый контекст чата может по-прежнему отправлять сохранённую копию.';
+
+  @override
+  String get storageImageShowSource => 'Открыть исходное сообщение';
+
+  @override
+  String get storageImageSourceNotFound =>
+      'В текущей версии этого чата не найдено сообщений с этим изображением.';
+
+  @override
+  String get storageImageSourceBusy =>
+      'Генерируется ответ. Повторите попытку после его завершения.';
+
+  @override
+  String get storageImageSourceFailed =>
+      'Не удалось найти исходное сообщение. Повторите попытку.';
 
   @override
   String get storageAttachmentDetailsTitle => 'Информация о файле';

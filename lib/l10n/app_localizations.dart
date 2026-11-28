@@ -1426,6 +1426,24 @@ abstract class AppLocalizations {
   /// **'Bind workspace (optional)'**
   String get mcpWorkspaceBindingLabel;
 
+  /// Switch in the mobile STDIO MCP server editor. Enables selecting the mounted workspace from each conversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow conversation workspace'**
+  String get mcpFollowConversationWorkspace;
+
+  /// Help below the follow-workspace switch in the mobile STDIO MCP editor. Explains unbound chats, the total process limit across following servers, and idle eviction.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount this chat’s workspace at /workspace. An unbound chat starts without a workspace mount. Up to {limit} processes are shared across servers in this mode. Idle processes close automatically.'**
+  String mcpFollowConversationWorkspaceHint(int limit);
+
+  /// Status of an enabled mobile STDIO MCP server waiting for a conversation to start a workspace process.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts on demand'**
+  String get mcpStatusOnDemand;
+
   /// Explanatory hint under the workspace binding field describing /workspace access and fixed binding behavior.
   ///
   /// In en, this message translates to:
@@ -5619,6 +5637,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Render LaTeX math (inline and block)'**
   String get displaySettingsPageEnableMathSubtitle;
+
+  /// Label for the math font picker in Rendering Settings. This sets the font used to typeset formulas in chat messages.
+  ///
+  /// In en, this message translates to:
+  /// **'Math font'**
+  String get displaySettingsPageMathFontTitle;
+
+  /// Option and current value in the chat math font picker. The font identifier stixTwo shows the proper typeface name STIX Two Math, which must stay in English. The other choice uses the default formula renderer.
+  ///
+  /// In en, this message translates to:
+  /// **'{font, select, stixTwo{STIX Two Math} other{Default}}'**
+  String displaySettingsPageMathFontName(String font);
 
   /// Toggle label in display settings to use the legacy inline code style.
   ///
@@ -18133,6 +18163,78 @@ abstract class AppLocalizations {
   /// **'This file is too large to preview. Open it externally instead.'**
   String get workspacePreviewFileTooLarge;
 
+  /// Button at the top of a writable workspace file preview that opens the original text for editing.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get workspacePreviewEdit;
+
+  /// Status beside the workspace text editor title while its draft differs from the original file.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsaved changes'**
+  String get workspaceEditorUnsaved;
+
+  /// Unsaved workspace file confirmation before closing its editor. name is the displayed filename.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes to {name} before leaving?'**
+  String workspaceEditorLeavePrompt(String name);
+
+  /// Action that dismisses a workspace file confirmation and keeps the current draft open.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get workspaceEditorKeepEditing;
+
+  /// Destructive action that drops the unsaved workspace file draft.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes'**
+  String get workspaceEditorDiscard;
+
+  /// Title of the workspace editor dialog when the original file changed, moved, or was deleted before saving.
+  ///
+  /// In en, this message translates to:
+  /// **'File changed on disk'**
+  String get workspaceEditorConflict;
+
+  /// Explains the choices when a workspace text draft conflicts with the current file on disk.
+  ///
+  /// In en, this message translates to:
+  /// **'Your draft is safe. Save a separate copy, or load the current file and discard your changes.'**
+  String get workspaceEditorConflictMessage;
+
+  /// Workspace file conflict action that creates a uniquely named sibling file containing the draft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a copy'**
+  String get workspaceEditorSaveCopy;
+
+  /// Workspace text editor conflict action that discards the draft and reloads the original file from disk.
+  ///
+  /// In en, this message translates to:
+  /// **'Load latest version'**
+  String get workspaceEditorReload;
+
+  /// Quiet status in a workspace text preview when the file exceeds the size, line count, or line length supported by the editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Large files and long text are available in preview only.'**
+  String get workspaceEditorLargePreview;
+
+  /// Status in a workspace text preview for binary content or an encoding the editor cannot save losslessly.
+  ///
+  /// In en, this message translates to:
+  /// **'This text encoding is available in preview only.'**
+  String get workspaceEditorEncoding;
+
+  /// Status in a workspace file preview when its source has no write permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only location'**
+  String get workspaceEditorReadOnly;
+
   /// Segmented tab label in CSV/HTML previews switching to the raw source view.
   ///
   /// In en, this message translates to:
@@ -18817,7 +18919,7 @@ abstract class AppLocalizations {
   /// **'Read file'**
   String get workspaceToolTitleReadFile;
 
-  /// Title for the view_image tool card and the image viewing entry in mobile and desktop chat tool menus.
+  /// Action label for view_image in the workspace tool list and on its tool calls in chat.
   ///
   /// In en, this message translates to:
   /// **'View image'**
@@ -28572,7 +28674,7 @@ abstract class AppLocalizations {
   /// **'Some copies were made by a newer version of Kelivo. Update Kelivo before restoring them. These copies have been kept.'**
   String get recoveryCopiesNeedUpdate;
 
-  /// Label for the conversation image recall switch in the image context panel and mobile/desktop chat tool menus. Controls the historical-image capability of view_image.
+  /// Switch in the Image Context panel that lets the model retrieve historical images from this conversation using view_image.
   ///
   /// In en, this message translates to:
   /// **'Allow the model to recall images'**
@@ -30269,6 +30371,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter 1–3650 days.'**
   String get storageAttachmentRetentionInvalidDays;
+
+  /// Button in Storage Space image details for explicitly deleting one image referenced by chats.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete local image'**
+  String get storageAttachmentDeleteLocalImage;
+
+  /// Confirmation for deleting a single local chat image. The affected chat names appear below this message.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this image from this device? The chats listed below will keep their messages, but the image will no longer be available to view or send.'**
+  String get storageAttachmentDeleteLocalImageConfirm;
+
+  /// Storage Space notice when a confirmed image cannot be removed, for example because a draft, appearance setting or active reply needs it.
+  ///
+  /// In en, this message translates to:
+  /// **'The image was kept. Its usage changed or it is still needed by another feature.'**
+  String get storageAttachmentImageRetained;
+
+  /// Placeholder shown in a chat at the position of a local image the user explicitly deleted in Storage Space.
+  ///
+  /// In en, this message translates to:
+  /// **'Image deleted'**
+  String get storageAttachmentImageDeleted;
+
+  /// Hint on the Storage Space Images page explaining how to open an image’s chat sources or delete the local photo, and what bulk cleanup removes.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap an image’s chat names to view the original message or delete the local image. Clean unused removes images no longer in use.'**
+  String get storageAttachmentImagesCleanupHint;
+
+  /// Storage Space notification after the original was removed but a conversation copy could not be cleaned. Cleanup is retried during attachment maintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Image deleted. Kelivo will retry cleaning up its conversation copies.'**
+  String get storageAttachmentImageCopiesPending;
+
+  /// Storage Space notice when an active compressed chat context retains the image and would otherwise keep sending its stored pixels.
+  ///
+  /// In en, this message translates to:
+  /// **'This image is protected because a compressed chat context may still send a saved copy.'**
+  String get storageAttachmentImageFrozen;
+
+  /// Button beside a chat name in Storage Space image details. On demand, find the first currently selected message that uses this image and highlight it in that chat.
+  ///
+  /// In en, this message translates to:
+  /// **'View original message'**
+  String get storageImageShowSource;
+
+  /// Notice in Storage Space image details when the image is used only by other revisions, or the message or its attachment has been removed.
+  ///
+  /// In en, this message translates to:
+  /// **'No message using this image was found in the current version of this chat.'**
+  String get storageImageSourceNotFound;
+
+  /// Notice shown only after the user requests an original image message while a chat reply is being generated. The lookup yields to the reply.
+  ///
+  /// In en, this message translates to:
+  /// **'A reply is being generated. Try again when it finishes.'**
+  String get storageImageSourceBusy;
+
+  /// Storage Space image details message when a requested lookup cannot read the chat database.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t look up the original message. Try again.'**
+  String get storageImageSourceFailed;
 
   /// Title of the information dialog opened by tapping an attachment status label. Shows its chats or cleanup status; this is not the automatic-cleanup settings dialog.
   ///

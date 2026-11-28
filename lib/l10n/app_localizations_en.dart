@@ -736,6 +736,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mcpWorkspaceBindingLabel => 'Bind workspace (optional)';
 
   @override
+  String get mcpFollowConversationWorkspace => 'Follow conversation workspace';
+
+  @override
+  String mcpFollowConversationWorkspaceHint(int limit) {
+    return 'Mount this chat’s workspace at /workspace. An unbound chat starts without a workspace mount. Up to $limit processes are shared across servers in this mode. Idle processes close automatically.';
+  }
+
+  @override
+  String get mcpStatusOnDemand => 'Starts on demand';
+
+  @override
   String get mcpWorkspaceBindingHint =>
       'The server can access this workspace at /workspace. Leave Working Directory empty to start there. The binding stays fixed when you switch chats.';
 
@@ -3074,6 +3085,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get displaySettingsPageEnableMathSubtitle =>
       'Render LaTeX math (inline and block)';
+
+  @override
+  String get displaySettingsPageMathFontTitle => 'Math font';
+
+  @override
+  String displaySettingsPageMathFontName(String font) {
+    String _temp0 = intl.Intl.selectLogic(font, {
+      'stixTwo': 'STIX Two Math',
+      'other': 'Default',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleTitle =>
@@ -10190,6 +10213,47 @@ class AppLocalizationsEn extends AppLocalizations {
       'This file is too large to preview. Open it externally instead.';
 
   @override
+  String get workspacePreviewEdit => 'Edit';
+
+  @override
+  String get workspaceEditorUnsaved => 'Unsaved changes';
+
+  @override
+  String workspaceEditorLeavePrompt(String name) {
+    return 'Save changes to $name before leaving?';
+  }
+
+  @override
+  String get workspaceEditorKeepEditing => 'Keep editing';
+
+  @override
+  String get workspaceEditorDiscard => 'Discard changes';
+
+  @override
+  String get workspaceEditorConflict => 'File changed on disk';
+
+  @override
+  String get workspaceEditorConflictMessage =>
+      'Your draft is safe. Save a separate copy, or load the current file and discard your changes.';
+
+  @override
+  String get workspaceEditorSaveCopy => 'Save a copy';
+
+  @override
+  String get workspaceEditorReload => 'Load latest version';
+
+  @override
+  String get workspaceEditorLargePreview =>
+      'Large files and long text are available in preview only.';
+
+  @override
+  String get workspaceEditorEncoding =>
+      'This text encoding is available in preview only.';
+
+  @override
+  String get workspaceEditorReadOnly => 'Read-only location';
+
+  @override
   String get workspacePreviewSource => 'Source';
 
   @override
@@ -17277,6 +17341,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storageAttachmentRetentionInvalidDays => 'Enter 1–3650 days.';
+
+  @override
+  String get storageAttachmentDeleteLocalImage => 'Delete local image';
+
+  @override
+  String get storageAttachmentDeleteLocalImageConfirm =>
+      'Delete this image from this device? The chats listed below will keep their messages, but the image will no longer be available to view or send.';
+
+  @override
+  String get storageAttachmentImageRetained =>
+      'The image was kept. Its usage changed or it is still needed by another feature.';
+
+  @override
+  String get storageAttachmentImageDeleted => 'Image deleted';
+
+  @override
+  String get storageAttachmentImagesCleanupHint =>
+      'Tap an image’s chat names to view the original message or delete the local image. Clean unused removes images no longer in use.';
+
+  @override
+  String get storageAttachmentImageCopiesPending =>
+      'Image deleted. Kelivo will retry cleaning up its conversation copies.';
+
+  @override
+  String get storageAttachmentImageFrozen =>
+      'This image is protected because a compressed chat context may still send a saved copy.';
+
+  @override
+  String get storageImageShowSource => 'View original message';
+
+  @override
+  String get storageImageSourceNotFound =>
+      'No message using this image was found in the current version of this chat.';
+
+  @override
+  String get storageImageSourceBusy =>
+      'A reply is being generated. Try again when it finishes.';
+
+  @override
+  String get storageImageSourceFailed =>
+      'Couldn’t look up the original message. Try again.';
 
   @override
   String get storageAttachmentDetailsTitle => 'File info';

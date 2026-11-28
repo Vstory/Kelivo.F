@@ -354,6 +354,9 @@
   "mcpServerEditSheetStdioArgumentsLabel": "Arguments",
   "mcpServerEditSheetStdioWorkingDirectoryLabel": "Working Directory (optional)",
   "mcpWorkspaceBindingLabel": "Bind workspace (optional)",
+  "mcpFollowConversationWorkspace": "Follow conversation workspace",
+  "mcpFollowConversationWorkspaceHint": "Mount this chat’s workspace at /workspace. An unbound chat starts without a workspace mount. Up to {limit} processes are shared across servers in this mode. Idle processes close automatically.",
+  "mcpStatusOnDemand": "Starts on demand",
   "mcpWorkspaceBindingHint": "The server can access this workspace at /workspace. Leave Working Directory empty to start there. The binding stays fixed when you switch chats.",
   "mcpWorkspaceBindingMobileOnly": "Workspace binding is available in the mobile Linux environment. Unbind it to run this server on desktop.",
   "mcpServerEditSheetStdioEnvironmentTitle": "Environment",
@@ -1548,6 +1551,8 @@
   "displaySettingsPageEnableDollarLatexSubtitle": "Render inline math inside $...$",
   "displaySettingsPageEnableMathTitle": "Math Formula Rendering",
   "displaySettingsPageEnableMathSubtitle": "Render LaTeX math (inline and block)",
+  "displaySettingsPageMathFontTitle": "Math font",
+  "displaySettingsPageMathFontName": "{font, select, stixTwo{STIX Two Math} other{Default}}",
   "displaySettingsPageUseLegacyInlineCodeStyleTitle": "Legacy inline code style",
   "displaySettingsPageUseLegacyInlineCodeStyleSubtitle": "Use a lighter background, a thin border, and more line spacing for inline code.",
   "displaySettingsPageUseLegacyCodeBlockStyleTitle": "Legacy code block style",
@@ -4972,6 +4977,59 @@
   "workspacePreviewOpenExternally": "Open externally",
   "workspacePreviewOpenWith": "Open with…",
   "workspacePreviewFileTooLarge": "This file is too large to preview. Open it externally instead.",
+  "workspacePreviewEdit": "Edit",
+  "@workspacePreviewEdit": {
+    "description": "Button at the top of a writable workspace file preview that opens the original text for editing."
+  },
+  "workspaceEditorUnsaved": "Unsaved changes",
+  "@workspaceEditorUnsaved": {
+    "description": "Status beside the workspace text editor title while its draft differs from the original file."
+  },
+  "workspaceEditorLeavePrompt": "Save changes to {name} before leaving?",
+  "@workspaceEditorLeavePrompt": {
+    "description": "Unsaved workspace file confirmation before closing its editor. name is the displayed filename.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceEditorKeepEditing": "Keep editing",
+  "@workspaceEditorKeepEditing": {
+    "description": "Action that dismisses a workspace file confirmation and keeps the current draft open."
+  },
+  "workspaceEditorDiscard": "Discard changes",
+  "@workspaceEditorDiscard": {
+    "description": "Destructive action that drops the unsaved workspace file draft."
+  },
+  "workspaceEditorConflict": "File changed on disk",
+  "@workspaceEditorConflict": {
+    "description": "Title of the workspace editor dialog when the original file changed, moved, or was deleted before saving."
+  },
+  "workspaceEditorConflictMessage": "Your draft is safe. Save a separate copy, or load the current file and discard your changes.",
+  "@workspaceEditorConflictMessage": {
+    "description": "Explains the choices when a workspace text draft conflicts with the current file on disk."
+  },
+  "workspaceEditorSaveCopy": "Save a copy",
+  "@workspaceEditorSaveCopy": {
+    "description": "Workspace file conflict action that creates a uniquely named sibling file containing the draft."
+  },
+  "workspaceEditorReload": "Load latest version",
+  "@workspaceEditorReload": {
+    "description": "Workspace text editor conflict action that discards the draft and reloads the original file from disk."
+  },
+  "workspaceEditorLargePreview": "Large files and long text are available in preview only.",
+  "@workspaceEditorLargePreview": {
+    "description": "Quiet status in a workspace text preview when the file exceeds the size, line count, or line length supported by the editor."
+  },
+  "workspaceEditorEncoding": "This text encoding is available in preview only.",
+  "@workspaceEditorEncoding": {
+    "description": "Status in a workspace text preview for binary content or an encoding the editor cannot save losslessly."
+  },
+  "workspaceEditorReadOnly": "Read-only location",
+  "@workspaceEditorReadOnly": {
+    "description": "Status in a workspace file preview when its source has no write permission."
+  },
   "workspacePreviewSource": "Source",
   "workspacePreviewRendered": "Rendered",
   "workspacePreviewFileName": "Name",
@@ -9384,6 +9442,21 @@
   "@mcpWorkspaceBindingLabel": {
     "description": "Label for the optional workspace binding field on an MCP server, with folder icon."
   },
+  "@mcpFollowConversationWorkspace": {
+    "description": "Switch in the mobile STDIO MCP server editor. Enables selecting the mounted workspace from each conversation."
+  },
+  "@mcpFollowConversationWorkspaceHint": {
+    "description": "Help below the follow-workspace switch in the mobile STDIO MCP editor. Explains unbound chats, the total process limit across following servers, and idle eviction.",
+    "placeholders": {
+      "limit": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "@mcpStatusOnDemand": {
+    "description": "Status of an enabled mobile STDIO MCP server waiting for a conversation to start a workspace process."
+  },
   "@mcpWorkspaceBindingHint": {
     "description": "Explanatory hint under the workspace binding field describing /workspace access and fixed binding behavior."
   },
@@ -11258,6 +11331,18 @@
   },
   "@displaySettingsPageEnableMathSubtitle": {
     "description": "Description under the math rendering toggle noting it covers inline and block LaTeX math."
+  },
+  "@displaySettingsPageMathFontTitle": {
+    "description": "Label for the math font picker in Rendering Settings. This sets the font used to typeset formulas in chat messages."
+  },
+  "@displaySettingsPageMathFontName": {
+    "description": "Option and current value in the chat math font picker. The font identifier stixTwo shows the proper typeface name STIX Two Math, which must stay in English. The other choice uses the default formula renderer.",
+    "placeholders": {
+      "font": {
+        "type": "String",
+        "example": "stixTwo"
+      }
+    }
   },
   "@displaySettingsPageUseLegacyInlineCodeStyleTitle": {
     "description": "Toggle label in display settings to use the legacy inline code style."
@@ -17316,7 +17401,7 @@
     "description": "Title for the read_file tool card."
   },
   "@workspaceToolTitleViewImage": {
-    "description": "Title for the view_image tool card and the image viewing entry in mobile and desktop chat tool menus."
+    "description": "Action label for view_image in the workspace tool list and on its tool calls in chat."
   },
   "@workspaceToolTitleWriteFile": {
     "description": "Title for the write_file tool card."
@@ -21678,7 +21763,7 @@
     "description": "Message on the restore failure screen warning some copies come from a newer Kelivo version and require an app update; copies kept."
   },
   "@imageContextAllowRecall": {
-    "description": "Label for the conversation image recall switch in the image context panel and mobile/desktop chat tool menus. Controls the historical-image capability of view_image."
+    "description": "Switch in the Image Context panel that lets the model retrieve historical images from this conversation using view_image."
   },
   "@imageContextAllowRecallDescription": {
     "description": "Description under the conversation image recall switch. Explains that view_image can retrieve historical chat images; disabling this does not disable direct vision on message attachments, automatic image management, or separately controlled workspace file access. Keep the tool name view_image unchanged."
@@ -22452,6 +22537,50 @@
   "storageAttachmentRetentionInvalidDays": "Enter 1–3650 days.",
   "@storageAttachmentRetentionInvalidDays": {
     "description": "Inline error below the delayed attachment cleanup number field. Only shown when the value is empty, zero, or above the maximum. Immediate cleanup has its own option."
+  },
+  "storageAttachmentDeleteLocalImage": "Delete local image",
+  "@storageAttachmentDeleteLocalImage": {
+    "description": "Button in Storage Space image details for explicitly deleting one image referenced by chats."
+  },
+  "storageAttachmentDeleteLocalImageConfirm": "Delete this image from this device? The chats listed below will keep their messages, but the image will no longer be available to view or send.",
+  "@storageAttachmentDeleteLocalImageConfirm": {
+    "description": "Confirmation for deleting a single local chat image. The affected chat names appear below this message."
+  },
+  "storageAttachmentImageRetained": "The image was kept. Its usage changed or it is still needed by another feature.",
+  "@storageAttachmentImageRetained": {
+    "description": "Storage Space notice when a confirmed image cannot be removed, for example because a draft, appearance setting or active reply needs it."
+  },
+  "storageAttachmentImageDeleted": "Image deleted",
+  "@storageAttachmentImageDeleted": {
+    "description": "Placeholder shown in a chat at the position of a local image the user explicitly deleted in Storage Space."
+  },
+  "storageAttachmentImagesCleanupHint": "Tap an image’s chat names to view the original message or delete the local image. Clean unused removes images no longer in use.",
+  "@storageAttachmentImagesCleanupHint": {
+    "description": "Hint on the Storage Space Images page explaining how to open an image’s chat sources or delete the local photo, and what bulk cleanup removes."
+  },
+  "storageAttachmentImageCopiesPending": "Image deleted. Kelivo will retry cleaning up its conversation copies.",
+  "@storageAttachmentImageCopiesPending": {
+    "description": "Storage Space notification after the original was removed but a conversation copy could not be cleaned. Cleanup is retried during attachment maintenance."
+  },
+  "storageAttachmentImageFrozen": "This image is protected because a compressed chat context may still send a saved copy.",
+  "@storageAttachmentImageFrozen": {
+    "description": "Storage Space notice when an active compressed chat context retains the image and would otherwise keep sending its stored pixels."
+  },
+  "storageImageShowSource": "View original message",
+  "@storageImageShowSource": {
+    "description": "Button beside a chat name in Storage Space image details. On demand, find the first currently selected message that uses this image and highlight it in that chat."
+  },
+  "storageImageSourceNotFound": "No message using this image was found in the current version of this chat.",
+  "@storageImageSourceNotFound": {
+    "description": "Notice in Storage Space image details when the image is used only by other revisions, or the message or its attachment has been removed."
+  },
+  "storageImageSourceBusy": "A reply is being generated. Try again when it finishes.",
+  "@storageImageSourceBusy": {
+    "description": "Notice shown only after the user requests an original image message while a chat reply is being generated. The lookup yields to the reply."
+  },
+  "storageImageSourceFailed": "Couldn’t look up the original message. Try again.",
+  "@storageImageSourceFailed": {
+    "description": "Storage Space image details message when a requested lookup cannot read the chat database."
   },
   "storageAttachmentDetailsTitle": "File info",
   "@storageAttachmentDetailsTitle": {

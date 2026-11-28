@@ -1,6 +1,7 @@
 import '../../../shared/widgets/ios_date_picker.dart';
 import '../widgets/custom_theme_widgets.dart';
 import '../widgets/attachment_cleanup_button.dart';
+import '../widgets/storage_image_sources.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -11,6 +12,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:provider/provider.dart';
 
 import '../../../desktop/macos_window_drag_area.dart';
+import '../../../desktop/hotkeys/chat_action_bus.dart';
 import '../../../core/database/business_repository.dart';
 import '../../../core/services/chat/chat_service.dart';
 import '../../../core/services/haptics.dart';
@@ -2418,23 +2420,50 @@ class _UploadManagerState extends State<_UploadManager> {
     setState(() => _selected.clear());
   }
 
-  Future<void> _deleteSelected() async {
-    if (!_usageReady || _selected.isEmpty || _deleting) return;
+  Future<void> _deleteSelected({StorageFileEntry? chatImage}) async {
+    if (!_usageReady || (chatImage == null && _selected.isEmpty) || _deleting) {
+      return;
+    }
     final l10n = AppLocalizations.of(context)!;
     // Back can clear or replace the selection while deletion awaits file I/O.
     // Keep the targets shown in this confirmation independent of that UI state.
-    final pathsToDelete = _selected.toList(growable: false);
+    final pathsToDelete = chatImage == null
+        ? _selected.toList(growable: false)
+        : [chatImage.path];
     final count = pathsToDelete.length;
+    OpenConversationMessage? source;
     final ok = await showAppDialog<bool>(
       context,
       maxWidth: 420,
+      waitForExit: chatImage != null,
       child: Builder(
         builder: (ctx) => Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(l10n.storageAttachmentDeleteConfirm(count)),
+              if (chatImage == null)
+                Text(l10n.storageAttachmentDeleteConfirm(count))
+              else ...[
+                Text(
+                  l10n.storageAttachmentDetailsTitle,
+                  style: Theme.of(ctx).textTheme.titleMedium,
+                ),
+                if (chatImage.canRemoveChatImage) ...[
+                  const SizedBox(height: 12),
+                  Text(l10n.storageAttachmentDeleteLocalImageConfirm),
+                ],
+                const SizedBox(height: 12),
+                Flexible(
+                  child: StorageImageSources(
+                    entry: chatImage,
+                    onFound: (chat, message) {
+                      source = OpenConversationMessage(chat, message);
+                      Navigator.of(ctx).pop(false);
+                    },
+                  ),
+                ),
+              ],
               const SizedBox(height: 20),
               Wrap(
                 spacing: 10,
@@ -2445,12 +2474,15 @@ class _UploadManagerState extends State<_UploadManager> {
                     icon: Lucide.X,
                     onTap: () => Navigator.of(ctx).pop(false),
                   ),
-                  IosTileButton(
-                    label: l10n.homePageDelete,
-                    icon: Lucide.Trash2,
-                    backgroundColor: Theme.of(ctx).colorScheme.error,
-                    onTap: () => Navigator.of(ctx).pop(true),
-                  ),
+                  if (chatImage == null || chatImage.canRemoveChatImage)
+                    IosTileButton(
+                      label: chatImage == null
+                          ? l10n.homePageDelete
+                          : l10n.storageAttachmentDeleteLocalImage,
+                      icon: Lucide.Trash2,
+                      backgroundColor: Theme.of(ctx).colorScheme.error,
+                      onTap: () => Navigator.of(ctx).pop(true),
+                    ),
                 ],
               ),
             ],
@@ -2458,22 +2490,62 @@ class _UploadManagerState extends State<_UploadManager> {
         ),
       ),
     );
-    if (ok != true || !mounted || !_usageReady) return;
+    if (!mounted) return;
+    if (source case final target?) {
+      final chat = context.read<ChatService?>();
+      if (ModalRoute.of(context)?.isCurrent != false &&
+          chat != null &&
+          !chat.isTemporaryConversation(chat.currentConversationId) &&
+          !chat.isTemporaryConversation(target.conversationId)) {
+        ChatActionBus.instance.fireNavigation(target);
+      }
+      return;
+    }
+    if (ok != true || !_usageReady) return;
     setState(() => _deleting = true);
 
     try {
-      final deleted = await StorageUsageService.deleteUploadFiles(
-        pathsToDelete,
-        images: widget.images,
-      );
+      final int deleted;
+      String? notice;
+      if (chatImage == null) {
+        deleted = await StorageUsageService.deleteUploadFiles(
+          pathsToDelete,
+          images: widget.images,
+        );
+      } else {
+        final chat = context.read<ChatService?>();
+        await chat?.composerDrafts?.flush();
+        final result = await StorageUsageService.removeChatImage(
+          chatImage,
+          deletedLabel: l10n.storageAttachmentImageDeleted,
+        );
+        await chat?.refreshRemovedChatImage(
+          chatImage.conversations.keys,
+          result.changedRevisions,
+        );
+        deleted = result.deleted ? 1 : 0;
+        if (result.copiesPending) {
+          notice = l10n.storageAttachmentImageCopiesPending;
+        }
+        if (result.frozen) notice = l10n.storageAttachmentImageFrozen;
+      }
       if (!mounted) return;
       _clearSelection();
       showAppSnackBar(
         context,
-        message: deleted < count
-            ? l10n.storageSpaceDeletedUploadsPartial(deleted, count - deleted)
-            : l10n.storageSpaceDeletedUploadsDone(deleted),
-        type: NotificationType.success,
+        message:
+            notice ??
+            (chatImage != null && deleted == 0
+                ? l10n.storageAttachmentImageRetained
+                : deleted < count
+                ? l10n.storageSpaceDeletedUploadsPartial(
+                    deleted,
+                    count - deleted,
+                  )
+                : l10n.storageSpaceDeletedUploadsDone(deleted)),
+        type: notice != null || deleted == 0 && chatImage != null
+            ? NotificationType.warning
+            : NotificationType.success,
       );
     } catch (error) {
       if (!mounted) return;
@@ -2621,7 +2693,9 @@ class _UploadManagerState extends State<_UploadManager> {
               ] else if (_entries.isNotEmpty)
                 Text(
                   _usageReady
-                      ? l10n.storageAttachmentProtectedHint
+                      ? widget.images
+                            ? l10n.storageAttachmentImagesCleanupHint
+                            : l10n.storageAttachmentProtectedHint
                       : l10n.storageAttachmentChecking,
                   style: TextStyle(
                     fontSize: 12.5,
@@ -2688,6 +2762,9 @@ class _UploadManagerState extends State<_UploadManager> {
                   key: ValueKey('storage-image-${e.path}'),
                   entry: e,
                   selected: selected,
+                  onShowDetails: e.conversations.isNotEmpty && !_deleting
+                      ? () => _deleteSelected(chatImage: e)
+                      : null,
                   onToggle: () => _toggleSelect(e.path),
                   onTap: () {
                     if (_selectMode && e.canDelete) {
@@ -2883,6 +2960,7 @@ class _ImageTile extends StatelessWidget {
     required this.onToggle,
     required this.onTap,
     required this.onLongPress,
+    this.onShowDetails,
   });
 
   static const _maxTileEdge = 1024;
@@ -2893,6 +2971,7 @@ class _ImageTile extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final VoidCallback? onShowDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -2957,7 +3036,10 @@ class _ImageTile extends StatelessWidget {
                       color: cs.surface.withValues(alpha: 0.94),
                       child: Padding(
                         padding: const EdgeInsets.all(6),
-                        child: _AttachmentStatus(entry: entry),
+                        child: _AttachmentStatus(
+                          entry: entry,
+                          onShowDetails: onShowDetails,
+                        ),
                       ),
                     ),
                   ),
@@ -2988,8 +3070,9 @@ class _ImageTile extends StatelessWidget {
 }
 
 class _AttachmentStatus extends StatelessWidget {
-  const _AttachmentStatus({required this.entry});
+  const _AttachmentStatus({required this.entry, this.onShowDetails});
   final StorageFileEntry entry;
+  final VoidCallback? onShowDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -3010,25 +3093,27 @@ class _AttachmentStatus extends StatelessWidget {
         : l10n.storageAttachmentUnused;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => showAppDialog<void>(
-        context,
-        maxWidth: 420,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AppDialogHeader(title: l10n.storageAttachmentDetailsTitle),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.sizeOf(context).height * .5,
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Text(text),
-              ),
+      onTap:
+          onShowDetails ??
+          () => showAppDialog<void>(
+            context,
+            maxWidth: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppDialogHeader(title: l10n.storageAttachmentDetailsTitle),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.sizeOf(context).height * .5,
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                    child: Text(text),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
       child: Tooltip(
         message: text,
         child: Text(

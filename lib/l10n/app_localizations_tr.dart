@@ -739,6 +739,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get mcpWorkspaceBindingLabel => 'Çalışma alanını bağla (isteğe bağlı)';
 
   @override
+  String get mcpFollowConversationWorkspace =>
+      'Sohbet çalışma alanını takip et';
+
+  @override
+  String mcpFollowConversationWorkspaceHint(int limit) {
+    return 'Bu sohbetin çalışma alanını /workspace konumuna bağlar. Bağlanmamış bir sohbet, çalışma alanı bağlaması olmadan başlar. Bu modda sunucular arasında en fazla $limit işlem paylaşılır. Boşta kalan işlemler otomatik olarak kapanır.';
+  }
+
+  @override
+  String get mcpStatusOnDemand => 'İsteğe bağlı başlatılır';
+
+  @override
   String get mcpWorkspaceBindingHint =>
       'Sunucu bu çalışma alanına /workspace üzerinden erişebilir. Çalışma Dizini boş bırakılırsa orada başlar. Sohbetler arasında geçiş yaptığınızda bağlantı sabit kalır.';
 
@@ -3099,6 +3111,18 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get displaySettingsPageEnableMathSubtitle =>
       'LaTeX matematiğini oluştur (satır içi ve blok)';
+
+  @override
+  String get displaySettingsPageMathFontTitle => 'Matematik yazı tipi';
+
+  @override
+  String displaySettingsPageMathFontName(String font) {
+    String _temp0 = intl.Intl.selectLogic(font, {
+      'stixTwo': 'STIX Two Math',
+      'other': 'Varsayılan',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleTitle =>
@@ -10265,6 +10289,47 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu dosya önizleme için çok büyük. Bunun yerine harici olarak açın.';
 
   @override
+  String get workspacePreviewEdit => 'Düzenle';
+
+  @override
+  String get workspaceEditorUnsaved => 'Kaydedilmemiş değişiklikler';
+
+  @override
+  String workspaceEditorLeavePrompt(String name) {
+    return 'Ayrılmadan önce $name dosyasındaki değişiklikler kaydedilsin mi?';
+  }
+
+  @override
+  String get workspaceEditorKeepEditing => 'Düzenlemeye devam et';
+
+  @override
+  String get workspaceEditorDiscard => 'Değişiklikleri at';
+
+  @override
+  String get workspaceEditorConflict => 'Dosya diskte değişti';
+
+  @override
+  String get workspaceEditorConflictMessage =>
+      'Taslağınız güvende. Ayrı bir kopya kaydedin veya geçerli dosyayı yükleyip değişikliklerinizi atın.';
+
+  @override
+  String get workspaceEditorSaveCopy => 'Kopya kaydet';
+
+  @override
+  String get workspaceEditorReload => 'En son sürümü yükle';
+
+  @override
+  String get workspaceEditorLargePreview =>
+      'Büyük dosyalar ve uzun metinler yalnızca önizlemede kullanılabilir.';
+
+  @override
+  String get workspaceEditorEncoding =>
+      'Bu metin kodlaması yalnızca önizlemede kullanılabilir.';
+
+  @override
+  String get workspaceEditorReadOnly => 'Salt okunur konum';
+
+  @override
   String get workspacePreviewSource => 'Kaynak';
 
   @override
@@ -17381,6 +17446,47 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get storageAttachmentRetentionInvalidDays => '1–3650 gün girin.';
+
+  @override
+  String get storageAttachmentDeleteLocalImage => 'Yerel görseli sil';
+
+  @override
+  String get storageAttachmentDeleteLocalImageConfirm =>
+      'Bu görsel bu cihazdan silinsin mi? Aşağıda listelenen sohbetler mesajlarını koruyacak, ancak görsel artık görüntülenemeyecek veya gönderilemeyecek.';
+
+  @override
+  String get storageAttachmentImageRetained =>
+      'Görsel korundu. Kullanımı değişti veya başka bir özellik tarafından hâlâ gerekli.';
+
+  @override
+  String get storageAttachmentImageDeleted => 'Görsel silindi';
+
+  @override
+  String get storageAttachmentImagesCleanupHint =>
+      'Orijinal mesajı görüntülemek veya yerel görseli silmek için bir görselin sohbet adlarına dokunun. Kullanılmayanları temizle, artık kullanılmayan görselleri kaldırır.';
+
+  @override
+  String get storageAttachmentImageCopiesPending =>
+      'Görsel silindi. Kelivo sohbet kopyalarını temizlemeyi yeniden deneyecek.';
+
+  @override
+  String get storageAttachmentImageFrozen =>
+      'Sıkıştırılmış sohbet bağlamı kaydedilmiş bir kopyayı hâlâ gönderebileceği için bu görsel korunuyor.';
+
+  @override
+  String get storageImageShowSource => 'Orijinal mesajı görüntüle';
+
+  @override
+  String get storageImageSourceNotFound =>
+      'Bu sohbetin geçerli sürümünde bu görseli kullanan bir mesaj bulunamadı.';
+
+  @override
+  String get storageImageSourceBusy =>
+      'Bir yanıt oluşturuluyor. Tamamlandığında tekrar deneyin.';
+
+  @override
+  String get storageImageSourceFailed =>
+      'Orijinal mesaj aranamadı. Tekrar deneyin.';
 
   @override
   String get storageAttachmentDetailsTitle => 'Dosya bilgisi';

@@ -721,6 +721,17 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mcpWorkspaceBindingLabel => '작업 공간 바인딩 (선택 사항)';
 
   @override
+  String get mcpFollowConversationWorkspace => '대화 작업 공간 따르기';
+
+  @override
+  String mcpFollowConversationWorkspaceHint(int limit) {
+    return '이 채팅의 작업 공간을 /workspace에 마운트합니다. 작업 공간이 연결되지 않은 채팅은 작업 공간 마운트 없이 시작됩니다. 이 모드에서는 서버 전체에서 최대 $limit개의 프로세스가 공유됩니다. 유휴 프로세스는 자동으로 종료됩니다.';
+  }
+
+  @override
+  String get mcpStatusOnDemand => '필요 시 시작';
+
+  @override
   String get mcpWorkspaceBindingHint =>
       '서버는 /workspace에서 이 작업 공간에 접근할 수 있습니다. 작업 디렉터리를 비워 두면 해당 디렉터리에서 시작합니다. 채팅을 전환해도 바인딩은 유지됩니다.';
 
@@ -3005,6 +3016,18 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get displaySettingsPageEnableMathSubtitle => 'LaTeX 수식 렌더링(인라인 및 블록)';
+
+  @override
+  String get displaySettingsPageMathFontTitle => '수식 글꼴';
+
+  @override
+  String displaySettingsPageMathFontName(String font) {
+    String _temp0 = intl.Intl.selectLogic(font, {
+      'stixTwo': 'STIX Two Math',
+      'other': '기본',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleTitle =>
@@ -9885,6 +9908,45 @@ class AppLocalizationsKo extends AppLocalizations {
       '파일이 너무 커서 미리 볼 수 없습니다. 외부 앱으로 여세요.';
 
   @override
+  String get workspacePreviewEdit => '편집';
+
+  @override
+  String get workspaceEditorUnsaved => '저장되지 않은 변경 사항';
+
+  @override
+  String workspaceEditorLeavePrompt(String name) {
+    return '나가기 전에 $name의 변경 사항을 저장할까요?';
+  }
+
+  @override
+  String get workspaceEditorKeepEditing => '계속 편집';
+
+  @override
+  String get workspaceEditorDiscard => '변경 사항 버리기';
+
+  @override
+  String get workspaceEditorConflict => '디스크의 파일이 변경됨';
+
+  @override
+  String get workspaceEditorConflictMessage =>
+      '초안은 안전하게 보관되어 있습니다. 별도 사본으로 저장하거나, 현재 파일을 불러오고 변경 사항을 버릴 수 있습니다.';
+
+  @override
+  String get workspaceEditorSaveCopy => '사본으로 저장';
+
+  @override
+  String get workspaceEditorReload => '최신 버전 불러오기';
+
+  @override
+  String get workspaceEditorLargePreview => '큰 파일과 긴 텍스트는 미리보기만 지원됩니다.';
+
+  @override
+  String get workspaceEditorEncoding => '이 텍스트 인코딩은 미리보기만 지원됩니다.';
+
+  @override
+  String get workspaceEditorReadOnly => '읽기 전용 위치';
+
+  @override
   String get workspacePreviewSource => '소스';
 
   @override
@@ -16749,6 +16811,45 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get storageAttachmentRetentionInvalidDays => '1–3650일 사이로 입력하세요.';
+
+  @override
+  String get storageAttachmentDeleteLocalImage => '로컬 이미지 삭제';
+
+  @override
+  String get storageAttachmentDeleteLocalImageConfirm =>
+      '이 기기에서 이 이미지를 삭제할까요? 아래에 나열된 대화는 메시지를 유지하지만, 이미지는 더 이상 보거나 보낼 수 없습니다.';
+
+  @override
+  String get storageAttachmentImageRetained =>
+      '이미지가 유지되었습니다. 사용 상태가 변경되었거나 다른 기능에서 여전히 필요로 합니다.';
+
+  @override
+  String get storageAttachmentImageDeleted => '이미지가 삭제됨';
+
+  @override
+  String get storageAttachmentImagesCleanupHint =>
+      '이미지의 채팅 이름을 탭하면 원본 메시지를 보거나 로컬 이미지를 삭제할 수 있습니다. 사용하지 않는 항목 정리는 더 이상 사용되지 않는 이미지를 삭제합니다.';
+
+  @override
+  String get storageAttachmentImageCopiesPending =>
+      '이미지가 삭제되었습니다. Kelivo가 대화 사본 정리를 다시 시도합니다.';
+
+  @override
+  String get storageAttachmentImageFrozen =>
+      '압축된 대화 컨텍스트가 저장된 사본을 계속 전송할 수 있으므로 이 이미지는 보호됩니다.';
+
+  @override
+  String get storageImageShowSource => '원본 메시지 보기';
+
+  @override
+  String get storageImageSourceNotFound =>
+      '이 채팅의 현재 버전에서 이 이미지를 사용하는 메시지를 찾을 수 없습니다.';
+
+  @override
+  String get storageImageSourceBusy => '응답을 생성하는 중입니다. 완료된 후 다시 시도하세요.';
+
+  @override
+  String get storageImageSourceFailed => '원본 메시지를 조회하지 못했습니다. 다시 시도하세요.';
 
   @override
   String get storageAttachmentDetailsTitle => '파일 정보';

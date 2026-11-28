@@ -707,6 +707,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mcpWorkspaceBindingLabel => '绑定工作区（可选）';
 
   @override
+  String get mcpFollowConversationWorkspace => '跟随对话工作区';
+
+  @override
+  String mcpFollowConversationWorkspaceHint(int limit) {
+    return '将此对话的工作区挂载到 /workspace。未绑定工作区的对话不挂载目录。所有跟随模式的服务最多共用 $limit 个进程，空闲进程会自动关闭。';
+  }
+
+  @override
+  String get mcpStatusOnDemand => '按需启动';
+
+  @override
   String get mcpWorkspaceBindingHint =>
       '服务器可通过 /workspace 访问此工作区。工作目录留空时默认进入该目录，切换聊天不会改变绑定。';
 
@@ -2943,6 +2954,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get displaySettingsPageEnableMathSubtitle => '渲染 LaTeX 数学公式（行内与块级）';
+
+  @override
+  String get displaySettingsPageMathFontTitle => '公式字体';
+
+  @override
+  String displaySettingsPageMathFontName(String font) {
+    String _temp0 = intl.Intl.selectLogic(font, {
+      'stixTwo': 'STIX Two Math',
+      'other': '默认',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleTitle => '旧版行内代码样式';
@@ -9710,6 +9733,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get workspacePreviewFileTooLarge => '文件过大，无法预览，请用其他应用打开。';
 
   @override
+  String get workspacePreviewEdit => '编辑';
+
+  @override
+  String get workspaceEditorUnsaved => '有未保存的更改';
+
+  @override
+  String workspaceEditorLeavePrompt(String name) {
+    return '离开前要保存对「$name」的更改吗？';
+  }
+
+  @override
+  String get workspaceEditorKeepEditing => '继续编辑';
+
+  @override
+  String get workspaceEditorDiscard => '放弃更改';
+
+  @override
+  String get workspaceEditorConflict => '原文件已发生变化';
+
+  @override
+  String get workspaceEditorConflictMessage =>
+      '你的修改已保留。可以另存副本，也可以放弃草稿并重新载入原文件。';
+
+  @override
+  String get workspaceEditorSaveCopy => '另存副本';
+
+  @override
+  String get workspaceEditorReload => '载入最新版本';
+
+  @override
+  String get workspaceEditorLargePreview => '文件较大或文本过长，仅支持预览。';
+
+  @override
+  String get workspaceEditorEncoding => '当前文本编码仅支持预览。';
+
+  @override
+  String get workspaceEditorReadOnly => '只读位置';
+
+  @override
   String get workspacePreviewSource => '源码';
 
   @override
@@ -16351,6 +16413,41 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get storageAttachmentRetentionInvalidDays => '请输入 1–3650 天。';
+
+  @override
+  String get storageAttachmentDeleteLocalImage => '删除本地图片';
+
+  @override
+  String get storageAttachmentDeleteLocalImageConfirm =>
+      '从此设备删除这张图片？下列对话会保留聊天记录，图片将无法再查看或发送。';
+
+  @override
+  String get storageAttachmentImageRetained => '已保留图片。它的使用情况已变化，或仍有其他功能需要它。';
+
+  @override
+  String get storageAttachmentImageDeleted => '图片已删除';
+
+  @override
+  String get storageAttachmentImagesCleanupHint =>
+      '点图片下方的对话名，可以查看原消息或删除本地图片。「清理未使用」会删除闲置图片。';
+
+  @override
+  String get storageAttachmentImageCopiesPending => '图片已删除，Kelivo 稍后会重试清理会话副本。';
+
+  @override
+  String get storageAttachmentImageFrozen => '压缩后的对话可能继续发送已保存的图片副本，因此这张图片受到保护。';
+
+  @override
+  String get storageImageShowSource => '查看原消息';
+
+  @override
+  String get storageImageSourceNotFound => '在此对话的当前版本中找不到使用这张图片的消息。';
+
+  @override
+  String get storageImageSourceBusy => '正在生成回复，请在回复结束后再查看。';
+
+  @override
+  String get storageImageSourceFailed => '查找原消息失败，请重试。';
 
   @override
   String get storageAttachmentDetailsTitle => '文件信息';
@@ -18566,6 +18663,17 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mcpWorkspaceBindingLabel => '绑定工作区（可选）';
 
   @override
+  String get mcpFollowConversationWorkspace => '跟随对话工作区';
+
+  @override
+  String mcpFollowConversationWorkspaceHint(int limit) {
+    return '将此对话的工作区挂载到 /workspace。未绑定工作区的对话不挂载目录。所有跟随模式的服务最多共用 $limit 个进程，空闲进程会自动关闭。';
+  }
+
+  @override
+  String get mcpStatusOnDemand => '按需启动';
+
+  @override
   String get mcpWorkspaceBindingHint =>
       '服务器可通过 /workspace 访问此工作区。工作目录留空时默认进入该目录，切换聊天不会改变绑定。';
 
@@ -20802,6 +20910,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get displaySettingsPageEnableMathSubtitle => '渲染 LaTeX 数学公式（行内与块级）';
+
+  @override
+  String get displaySettingsPageMathFontTitle => '公式字体';
+
+  @override
+  String displaySettingsPageMathFontName(String font) {
+    String _temp0 = intl.Intl.selectLogic(font, {
+      'stixTwo': 'STIX Two Math',
+      'other': '默认',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleTitle => '旧版行内代码样式';
@@ -27569,6 +27689,45 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get workspacePreviewFileTooLarge => '文件过大，无法预览，请用其他应用打开。';
 
   @override
+  String get workspacePreviewEdit => '编辑';
+
+  @override
+  String get workspaceEditorUnsaved => '有未保存的更改';
+
+  @override
+  String workspaceEditorLeavePrompt(String name) {
+    return '离开前要保存对「$name」的更改吗？';
+  }
+
+  @override
+  String get workspaceEditorKeepEditing => '继续编辑';
+
+  @override
+  String get workspaceEditorDiscard => '放弃更改';
+
+  @override
+  String get workspaceEditorConflict => '原文件已发生变化';
+
+  @override
+  String get workspaceEditorConflictMessage =>
+      '你的修改已保留。可以另存副本，也可以放弃草稿并重新载入原文件。';
+
+  @override
+  String get workspaceEditorSaveCopy => '另存副本';
+
+  @override
+  String get workspaceEditorReload => '载入最新版本';
+
+  @override
+  String get workspaceEditorLargePreview => '文件较大或文本过长，仅支持预览。';
+
+  @override
+  String get workspaceEditorEncoding => '当前文本编码仅支持预览。';
+
+  @override
+  String get workspaceEditorReadOnly => '只读位置';
+
+  @override
   String get workspacePreviewSource => '源码';
 
   @override
@@ -34212,6 +34371,41 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get storageAttachmentRetentionInvalidDays => '请输入 1–3650 天。';
 
   @override
+  String get storageAttachmentDeleteLocalImage => '删除本地图片';
+
+  @override
+  String get storageAttachmentDeleteLocalImageConfirm =>
+      '从此设备删除这张图片？下列对话会保留聊天记录，图片将无法再查看或发送。';
+
+  @override
+  String get storageAttachmentImageRetained => '已保留图片。它的使用情况已变化，或仍有其他功能需要它。';
+
+  @override
+  String get storageAttachmentImageDeleted => '图片已删除';
+
+  @override
+  String get storageAttachmentImagesCleanupHint =>
+      '点图片下方的对话名，可以查看原消息或删除本地图片。「清理未使用」会删除闲置图片。';
+
+  @override
+  String get storageAttachmentImageCopiesPending => '图片已删除，Kelivo 稍后会重试清理会话副本。';
+
+  @override
+  String get storageAttachmentImageFrozen => '压缩后的对话可能继续发送已保存的图片副本，因此这张图片受到保护。';
+
+  @override
+  String get storageImageShowSource => '查看原消息';
+
+  @override
+  String get storageImageSourceNotFound => '在此对话的当前版本中找不到使用这张图片的消息。';
+
+  @override
+  String get storageImageSourceBusy => '正在生成回复，请在回复结束后再查看。';
+
+  @override
+  String get storageImageSourceFailed => '查找原消息失败，请重试。';
+
+  @override
   String get storageAttachmentDetailsTitle => '文件信息';
 
   @override
@@ -36423,6 +36617,17 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get mcpWorkspaceBindingLabel => '綁定工作區（可選）';
+
+  @override
+  String get mcpFollowConversationWorkspace => '跟隨對話工作區';
+
+  @override
+  String mcpFollowConversationWorkspaceHint(int limit) {
+    return '將此對話的工作區掛載到 /workspace。未綁定工作區的對話不會掛載目錄。此模式下，所有跟隨模式的伺服器最多共用 $limit 個程序，閒置程序會自動關閉。';
+  }
+
+  @override
+  String get mcpStatusOnDemand => '按需啟動';
 
   @override
   String get mcpWorkspaceBindingHint =>
@@ -38671,6 +38876,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get displaySettingsPageEnableMathSubtitle => '渲染 LaTeX 數學公式（行內與區塊）';
+
+  @override
+  String get displaySettingsPageMathFontTitle => '數學字型';
+
+  @override
+  String displaySettingsPageMathFontName(String font) {
+    String _temp0 = intl.Intl.selectLogic(font, {
+      'stixTwo': 'STIX Two Math',
+      'other': '預設',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get displaySettingsPageUseLegacyInlineCodeStyleTitle => '舊版行內程式碼樣式';
@@ -45444,6 +45661,45 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get workspacePreviewFileTooLarge => '檔案過大，無法預覽，請用其他應用程式開啟。';
 
   @override
+  String get workspacePreviewEdit => '編輯';
+
+  @override
+  String get workspaceEditorUnsaved => '有未儲存的變更';
+
+  @override
+  String workspaceEditorLeavePrompt(String name) {
+    return '離開前要儲存對「$name」的變更嗎？';
+  }
+
+  @override
+  String get workspaceEditorKeepEditing => '繼續編輯';
+
+  @override
+  String get workspaceEditorDiscard => '放棄變更';
+
+  @override
+  String get workspaceEditorConflict => '原檔案已發生變化';
+
+  @override
+  String get workspaceEditorConflictMessage =>
+      '你的修改已保留。可以另存副本，也可以放棄草稿並重新載入原檔案。';
+
+  @override
+  String get workspaceEditorSaveCopy => '另存副本';
+
+  @override
+  String get workspaceEditorReload => '載入最新版本';
+
+  @override
+  String get workspaceEditorLargePreview => '檔案較大或文字過長，僅支援預覽。';
+
+  @override
+  String get workspaceEditorEncoding => '目前文字編碼僅支援預覽。';
+
+  @override
+  String get workspaceEditorReadOnly => '唯讀位置';
+
+  @override
   String get workspacePreviewSource => '原始碼';
 
   @override
@@ -52092,6 +52348,42 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get storageAttachmentRetentionInvalidDays => '請輸入 1–3650 天。';
+
+  @override
+  String get storageAttachmentDeleteLocalImage => '刪除本機圖片';
+
+  @override
+  String get storageAttachmentDeleteLocalImageConfirm =>
+      '要從此裝置刪除這張圖片嗎？下方列出的對話會保留訊息，但圖片將無法再檢視或傳送。';
+
+  @override
+  String get storageAttachmentImageRetained => '已保留圖片。其使用情況已變更，或仍有其他功能需要使用它。';
+
+  @override
+  String get storageAttachmentImageDeleted => '圖片已刪除';
+
+  @override
+  String get storageAttachmentImagesCleanupHint =>
+      '點擊圖片下方的對話名稱，即可查看原訊息或刪除本機圖片。「清理未使用」會刪除閒置圖片。';
+
+  @override
+  String get storageAttachmentImageCopiesPending => '圖片已刪除，Kelivo 稍後會重試清理會話副本。';
+
+  @override
+  String get storageAttachmentImageFrozen =>
+      '由於壓縮後的對話仍可能傳送已儲存的圖片副本，因此這張圖片受到保護。';
+
+  @override
+  String get storageImageShowSource => '查看原訊息';
+
+  @override
+  String get storageImageSourceNotFound => '在此對話的目前版本中找不到使用這張圖片的訊息。';
+
+  @override
+  String get storageImageSourceBusy => '正在生成回覆，請在回覆結束後再查看。';
+
+  @override
+  String get storageImageSourceFailed => '查找原訊息失敗，請重試。';
 
   @override
   String get storageAttachmentDetailsTitle => '檔案資訊';
