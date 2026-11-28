@@ -14,3 +14,5 @@ f685a3396077b6623ae7880802a9a4d9483411df:lib/core/providers/settings_provider.da
 c2eabf0f0c692574f63d2ef57c1e156566340861:lib/core/providers/settings_provider.dart:generic-api-key:129
 # 创作功能新增键名常量后 _perChatModelEnabledKey 被挤到 136 行（*_v1 键名被 generic-api-key 误判）
 f4836a7c0fb2770c7d8fd5f3388827a87c405441:lib/core/providers/settings_provider.dart:generic-api-key:136
+# 聊天图片移除测试用固定 UUID 作临时目录名（.kelivo-pending-chat-image-<token>），非密钥
+f55e048b04b8b8f2a55e36b24cfefe1837c1bb56:test/core/services/storage/storage_chat_image_removal_test.dart:generic-api-key:206
